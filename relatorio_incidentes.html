@@ -143,7 +143,7 @@
         <div class="main-content" id="relatorio-incidentes">
             </div>
 
-        <a href="menu2.html"><button class="back-button">Voltar para a Página Inicial</button></a>
+        <a href="menu.html"><button class="back-button">Voltar para a Página Inicial</button></a>
     </div>
 
     <script>
@@ -153,7 +153,7 @@
 
         async function fetchIncidentes() {
             try {
-                const response = await fetch('http://localhost:3000/api/incidentes');
+                const response = await fetch('/api/incidentes'); // URL CORRIGIDA AQUI
                 if (response.ok) {
                     const data = await response.json();
                     return data;
@@ -220,7 +220,7 @@
         async function excluirIncidente(idIncidente, agenteExclusao) {
             if (confirm(`Tem certeza que deseja excluir este incidente?`)) {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/incidentes/${idIncidente}`, {
+                    const response = await fetch(`/api/incidentes/${idIncidente}`, { // URL CORRIGIDA AQUI
                         method: 'DELETE'
                     });
                     
@@ -228,7 +228,8 @@
                         alert('Incidente excluído com sucesso!');
                         renderIncidentes(); // Atualiza a tela
                     } else {
-                        alert('Erro ao excluir o incidente.');
+                        const errorText = await response.text();
+                        alert('Erro ao excluir o incidente: ' + errorText);
                     }
                 } catch (error) {
                     console.error('Erro ao conectar com o servidor:', error);
@@ -238,5 +239,4 @@
         }
     </script>
 </body>
-
 </html>
