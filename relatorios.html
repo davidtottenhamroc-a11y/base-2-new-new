@@ -170,6 +170,9 @@
         .filtro-mensal select, .filtro-mensal button, .filtro-mensal input {
             flex: 1;
         }
+        .report-section {
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
@@ -218,56 +221,27 @@
                         <h2>Relatório de Aulas - <span id="periodo-relatorio">Semanal</span></h2>
                         <p>Gerado em: <span id="data-geracao"></span></p>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="aulasChart"></canvas>
-                    </div>
-
-                    <div class="chart-container">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-
-                    <div id="statusLegend" class="status-legend"></div>
-                    
-                    <h3 style="margin-top: 30px;">Dados Diários</h3>
-                    <table id="dataTable" class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Registro</th>
-                                <th>Total</th>
-                                <th>Execução</th>
-                                <th>Não Enviadas</th>
-                                <th>Recusadas</th>
-                                <th>Processamento</th>
-                                <th>Status</th>
-                                <th>Observação</th>
-                                <th class="coluna-agente" style="display:none;">Agente</th>
-                                <th class="coluna-estado" style="display:none;">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div id="relatorios-gerados">
+                         </div>
                 </div>
 
                 <div class="button-group">
                     <button onclick="gerarPDF()" style="margin-top: 20px;">Gerar Relatório em PDF</button>
-                    <a href="menu2.html" style="text-decoration: none;"><button type="button" style="margin-top: 20px;">Voltar</button></a>
+                    <a href="index.html" style="text-decoration: none;"><button type="button" style="margin-top: 20px;">Voltar</button></a>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let aulasChart, statusChart;
+        let charts = {};
         let allAulasData = [];
         const agente = localStorage.getItem('agenteSelecionado');
         const estado = localStorage.getItem('estadoSelecionado');
         let currentPeriodo = 'semanal';
 
-        const aulasChartCanvas = document.getElementById('aulasChart').getContext('2d');
-        const statusChartCanvas = document.getElementById('statusChart').getContext('2d');
-        const statusLegend = document.getElementById('statusLegend');
-        const dataTableBody = document.querySelector('#dataTable tbody');
+        const relatoriosGeradosContainer = document.getElementById('relatorios-gerados');
+
         const periodoRelatorio = document.getElementById('periodo-relatorio');
         const dataGeracao = document.getElementById('data-geracao');
         const dataInicioInput = document.getElementById('data-inicio');
@@ -327,7 +301,7 @@
         
         async function fetchAulasData() {
             try {
-                const response = await fetch('http://localhost:3000/api/aulas');
+                const response = await fetch('/api/aulas');
                 if (response.ok) {
                     const data = await response.json();
                     return data;
@@ -365,6 +339,7 @@
                  }
             }
 
+
             let startDate, endDate;
             const today = new Date();
             
@@ -394,46 +369,150 @@
                 })
                 .sort((a, b) => new Date(a.data) - new Date(b.data));
 
+            relatoriosGeradosContainer.innerHTML = '';
+            
             if (filteredData.length === 0) {
                  alert('Nenhum registro encontrado para o período selecionado.');
+                 return;
             }
 
-            const labels = filteredData.map(item => new Date(item.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }));
-            const totalAulas = filteredData.map(item => item.total);
-            const aulasNaoEnviadas = filteredData.map(item => item.naoEnviadas);
-            const aulasRecusadas = filteredData.map(item => item.recusadas);
-            const aulasEmProcessamento = filteredData.map(item => item.processamento);
-            const statusCounts = filteredData.reduce((acc, item) => {
-                acc[item.status] = (acc[item.status] || 0) + 1;
+            if (agente === 'Wesley' && estadoFiltroSelect.value === 'Todos') {
+                const dataByState = filteredData.reduce((acc, item) => {
+                    if (!acc[item.estado]) {
+                        acc[item.estado] = [];
+                    }
+                    acc[item.estado].push(item);
+                    return acc;
+                }, {});
+
+                for (const state in dataByState) {
+                    createReportSection(state, dataByState[state], relatoriosGeradosContainer);
+                }
+            } else {
+                createReportSection(document.getElementById('agente-estado-header').textContent, filteredData, relatoriosGeradosContainer);
+            }
+            
+            periodoRelatorio.textContent = (filterType === 'custom') ? `De ${new Date(startDate).toLocaleDateString()} a ${new Date(endDate).toLocaleDateString()}` : filterType;
+            dataGeracao.textContent = new Date().toLocaleDateString('pt-BR');
+        }
+
+        function createReportSection(title, data, container) {
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+
+            const section = document.createElement('div');
+            section.className = 'report-section';
+            
+            const tableHeaders = ['Data', 'Registro', 'Total', 'Execução', 'Não Enviadas', 'Recusadas', 'Processamento', 'Status', 'Observação'];
+            
+            const isWesleyTodos = agente === 'Wesley' && estadoFiltroSelect.value === 'Todos';
+            if (isWesleyTodos) {
+                tableHeaders.push('Agente', 'Estado');
+            } else if (agente === 'Wesley' && estadoFiltroSelect.value !== 'Todos') {
+                tableHeaders.push('Agente');
+            } else if (agente !== 'Wesley' && (currentPeriodo === 'estado')) {
+                 tableHeaders.push('Agente');
+            }
+
+
+            section.innerHTML = `
+                <h3 style="margin-top: 30px;">Relatório de ${title}</h3>
+                <div class="chart-container">
+                    <canvas id="aulasChart-${title.replace(/[^a-zA-Z0-9]/g, '')}"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="statusChart-${title.replace(/[^a-zA-Z0-9]/g, '')}"></canvas>
+                </div>
+                <div id="statusLegend-${title.replace(/[^a-zA-Z0-9]/g, '')}" class="status-legend"></div>
+                <h4>Dados Diários</h4>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            ${tableHeaders.map(header => `<th>${header}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(item => {
+                            const cells = [
+                                `<td>${new Date(item.data).toLocaleDateString('pt-BR')}</td>`,
+                                `<td>${item.tipoRegistro}</td>`,
+                                `<td>${item.total}</td>`,
+                                `<td>${item.execucao}</td>`,
+                                `<td>${item.naoEnviadas}</td>`,
+                                `<td>${item.recusadas}</td>`,
+                                `<td>${item.processamento}</td>`,
+                                `<td>${statusLabels[item.status]}</td>`,
+                                `<td>${item.observacao || '-'}</td>`
+                            ];
+                            if (isWesleyTodos) {
+                                cells.push(`<td>${item.agente}</td>`, `<td>${item.estado}</td>`);
+                            } else if (agente === 'Wesley' && estadoFiltroSelect.value !== 'Todos') {
+                                cells.push(`<td>${item.agente}</td>`);
+                            } else if (agente !== 'Wesley' && (currentPeriodo === 'estado')) {
+                                cells.push(`<td>${item.agente}</td>`);
+                            }
+                            return `<tr>${cells.join('')}</tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.appendChild(section);
+
+            renderChartsForSection(title, data);
+        }
+
+        function renderChartsForSection(title, data) {
+            const chartData = data.reduce((acc, item) => {
+                const date = new Date(item.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                if (!acc[date]) {
+                    acc[date] = { total: 0, naoEnviadas: 0, recusadas: 0, processamento: 0 };
+                }
+                acc[date].total += item.total;
+                acc[date].naoEnviadas += item.naoEnviadas;
+                acc[date].recusadas += item.recusadas;
+                acc[date].processamento += item.processamento;
                 return acc;
             }, {});
 
-            if (aulasChart) aulasChart.destroy();
-            aulasChart = new Chart(aulasChartCanvas, {
+            const labels = Object.keys(chartData);
+            const totalAulas = labels.map(label => chartData[label].total);
+            const naoEnviadas = labels.map(label => chartData[label].naoEnviadas);
+            const recusadas = labels.map(label => chartData[label].recusadas);
+            const processamento = labels.map(label => chartData[label].processamento);
+            
+            const statusCounts = {};
+            data.forEach(item => {
+                statusCounts[item.status] = (statusCounts[item.status] || 0) + 1;
+            });
+
+            const aulasChartCanvas = document.getElementById(`aulasChart-${title.replace(/[^a-zA-Z0-9]/g, '')}`).getContext('2d');
+            if (charts[`aulas-${title}`]) charts[`aulas-${title}`].destroy();
+            charts[`aulas-${title}`] = new Chart(aulasChartCanvas, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
                         { label: 'Total de Aulas', data: totalAulas, borderColor: '#0056b3', fill: false, tension: 0.1 },
-                        { label: 'Não Enviadas', data: aulasNaoEnviadas, borderColor: '#dc3545', fill: false, tension: 0.1 },
-                        { label: 'Recusadas', data: aulasRecusadas, borderColor: '#6c757d', fill: false, tension: 0.1 },
-                        { label: 'Em Processamento', data: aulasEmProcessamento, borderColor: '#ffc107', fill: false, tension: 0.1 }
+                        { label: 'Não Enviadas', data: naoEnviadas, borderColor: '#dc3545', fill: false, tension: 0.1 },
+                        { label: 'Recusadas', data: recusadas, borderColor: '#6c757d', fill: false, tension: 0.1 },
+                        { label: 'Em Processamento', data: processamento, borderColor: '#ffc107', fill: false, tension: 0.1 }
                     ]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: `Desempenho das Aulas (${filterType})` }
+                        title: { display: true, text: `Desempenho das Aulas` }
                     }
                 }
             });
 
+            const statusChartCanvas = document.getElementById(`statusChart-${title.replace(/[^a-zA-Z0-9]/g, '')}`).getContext('2d');
             const statusLabelsData = Object.keys(statusCounts).map(status => statusLabels[status]);
             const statusValuesData = Object.values(statusCounts);
             const statusColorsData = Object.keys(statusCounts).map(status => statusColors[status]);
             
-            if (statusChart) statusChart.destroy();
-            statusChart = new Chart(statusChartCanvas, {
+            if (charts[`status-${title}`]) charts[`status-${title}`].destroy();
+            charts[`status-${title}`] = new Chart(statusChartCanvas, {
                 type: 'doughnut',
                 data: {
                     labels: statusLabelsData,
@@ -447,86 +526,56 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: `Status da Operação (${filterType})` }
+                        title: { display: true, text: `Status da Operação` }
                     }
                 }
             });
-            
-            updateStatusLegend(statusCounts);
-            updateDataTable(filteredData, filterType);
-            
-            periodoRelatorio.textContent = (filterType === 'custom') ? `De ${new Date(startDate).toLocaleDateString()} a ${new Date(endDate).toLocaleDateString()}` : filterType;
-            dataGeracao.textContent = new Date().toLocaleDateString('pt-BR');
-        }
 
-        function updateStatusLegend(counts) {
-            statusLegend.innerHTML = '';
-            for (const status in counts) {
+            const legendContainer = document.getElementById(`statusLegend-${title.replace(/[^a-zA-Z0-9]/g, '')}`);
+            legendContainer.innerHTML = '';
+            for (const status in statusCounts) {
                 const item = document.createElement('div');
                 item.className = 'legend-item';
                 item.innerHTML = `
                     <div class="legend-color" style="background-color: ${statusColors[status]};"></div>
-                    <span>${statusLabels[status]} (${counts[status]} dia${counts[status] > 1 ? 's' : ''})</span>
+                    <span>${statusLabels[status]} (${statusCounts[status]} dia${statusCounts[status] > 1 ? 's' : ''})</span>
                 `;
-                statusLegend.appendChild(item);
+                legendContainer.appendChild(item);
             }
         }
         
-        function updateDataTable(data, filterType) {
-            const tableHeaders = ['Data', 'Registro', 'Total', 'Execução', 'Não Enviadas', 'Recusadas', 'Processamento', 'Status', 'Observação'];
-            if (filterType === 'estado' || (agente === 'Wesley' && estadoFiltroSelect.value !== 'Todos')) {
-                 tableHeaders.push('Agente');
-            } else if (filterType === 'geral' && estadoFiltroSelect.value === 'Todos') {
-                 tableHeaders.push('Agente');
-                 tableHeaders.push('Estado');
-            }
-            
-            let tableHtml = `<thead><tr>${tableHeaders.map(header => `<th>${header}</th>`).join('')}</tr></thead>`;
-            
-            let tbodyHtml = '';
-            data.forEach((values) => {
-                tbodyHtml += `
-                    <tr>
-                        <td>${new Date(values.data).toLocaleDateString('pt-BR')}</td>
-                        <td>${values.tipoRegistro}</td>
-                        <td>${values.total}</td>
-                        <td>${values.execucao}</td>
-                        <td>${values.naoEnviadas}</td>
-                        <td>${values.recusadas}</td>
-                        <td>${values.processamento}</td>
-                        <td>${statusLabels[values.status]}</td>
-                        <td>${values.observacao || '-'}</td>
-                        ${(filterType === 'estado') ? `<td>${values.agente}</td>` : ''}
-                        ${(filterType === 'geral' && estadoFiltroSelect.value === 'Todos') ? `<td>${values.agente}</td><td>${values.estado}</td>` : ''}
-                    </tr>
-                `;
-            });
-            tableHtml += `<tbody>${tbodyHtml}</tbody>`;
-            dataTableBody.innerHTML = tableHtml;
-        }
-
         async function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
-            const printArea = document.getElementById('print-area');
             const pdfHeader = document.getElementById('pdf-header');
 
             pdfHeader.style.display = 'block';
 
-            await html2canvas(printArea, { scale: 2, useCORS: true }).then(canvas => {
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                const imgWidth = 210; 
-                const pageHeight = 295;
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-
-                doc.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-
-                doc.save(`relatorio-aulas-${periodoRelatorio.textContent.toLowerCase()}.pdf`);
-            });
+            const reportSections = document.querySelectorAll('.report-section');
+            if (reportSections.length > 0) {
+                for (const section of reportSections) {
+                    const canvas = await html2canvas(section, { scale: 2, useCORS: true });
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    const imgWidth = 210;
+                    const pageHeight = 295;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    doc.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                    if (section !== reportSections[reportSections.length - 1]) {
+                        doc.addPage();
+                    }
+                }
+            } else {
+                 const canvas = await html2canvas(relatoriosGeradosContainer, { scale: 2, useCORS: true });
+                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                 const imgWidth = 210;
+                 const pageHeight = 295;
+                 const imgHeight = canvas.height * imgWidth / canvas.width;
+                 doc.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+            }
             
+            doc.save(`relatorio-aulas-${periodoRelatorio.textContent.toLowerCase()}.pdf`);
             pdfHeader.style.display = 'none';
         }
     </script>
 </body>
-
 </html>
