@@ -175,7 +175,7 @@
 
         async function fetchAulasData() {
             try {
-                const response = await fetch('/api/aulas'); // URL CORRIGIDA AQUI
+                const response = await fetch('/api/aulas');
                 if (response.ok) {
                     const data = await response.json();
                     return data;
