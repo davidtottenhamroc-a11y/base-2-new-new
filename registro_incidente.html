@@ -138,7 +138,7 @@
                 <button type="submit">Registrar Incidente</button>
             </form>
             <div class="button-group">
-                 <a href="menu2.html" style="text-decoration: none;"><button type="button" style="background: #6c757d;">Voltar</button></a>
+                 <a href="menu.html" style="text-decoration: none;"><button type="button" style="background: #6c757d;">Voltar</button></a>
             </div>
         </div>
     </div>
@@ -169,7 +169,7 @@
             };
 
             try {
-                const response = await fetch('http://localhost:3000/api/incidentes', {
+                const response = await fetch('/api/incidentes', { // URL CORRIGIDA AQUI
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(novoIncidente)
@@ -179,7 +179,8 @@
                     alert('Incidente registrado com sucesso!');
                     form.reset();
                 } else {
-                    alert('Erro ao registrar o incidente.');
+                    const errorText = await response.text();
+                    alert('Erro ao registrar o incidente: ' + errorText);
                 }
             } catch (error) {
                 console.error('Erro ao conectar com o servidor:', error);
@@ -188,5 +189,4 @@
         });
     </script>
 </body>
-
 </html>
