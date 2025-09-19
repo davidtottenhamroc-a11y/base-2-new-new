@@ -165,7 +165,7 @@
 
         <div class="main-content" id="acompanhamento-content">
             </div>
-        <a href="menu2.html"><button>Voltar para a Página Inicial</button></a>
+        <a href="menu.html"><button>Voltar para a Página Inicial</button></a>
     </div>
 
     <script>
@@ -175,7 +175,7 @@
 
         async function fetchAulasData() {
             try {
-                const response = await fetch('http://localhost:3000/api/aulas');
+                const response = await fetch('/api/aulas'); // URL CORRIGIDA AQUI
                 if (response.ok) {
                     const data = await response.json();
                     return data;
@@ -288,5 +288,4 @@
         }
     </script>
 </body>
-
 </html>
