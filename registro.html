@@ -224,7 +224,7 @@
             };
 
             try {
-                const response = await fetch('http://localhost:3000/api/aulas', {
+                const response = await fetch('/api/aulas', { // URL CORRIGIDA AQUI
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dailyData)
