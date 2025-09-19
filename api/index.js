@@ -70,6 +70,7 @@ app.post('/api/aulas', async (req, res) => {
         await novaAula.save();
         res.status(201).send(novaAula);
     } catch (error) {
+        // Envia o erro do Mongoose para o frontend
         res.status(400).send(`Erro de validação: ${error.message}` || 'Erro desconhecido ao salvar os dados.');
     }
 });
