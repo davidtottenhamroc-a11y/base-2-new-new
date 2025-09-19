@@ -224,7 +224,7 @@
             };
 
             try {
-                const response = await fetch('/api/aulas', { // URL CORRIGIDA AQUI
+                const response = await fetch('/api/aulas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dailyData)
@@ -234,7 +234,9 @@
                     alert('Dados salvos com sucesso!');
                     form.reset();
                 } else {
-                    alert('Erro ao salvar os dados.');
+                    // Exibe a mensagem de erro retornada pelo backend
+                    const errorText = await response.text();
+                    alert('Erro ao salvar os dados: ' + errorText);
                 }
             } catch (error) {
                 console.error('Erro ao conectar com o servidor:', error);
