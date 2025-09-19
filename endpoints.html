@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoints - Documentação Interativa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #0d1a2a; /* Fundo azul escuro */
+            color: #f4f4f4; /* Cor do texto para contraste */
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            background: rgba(255, 255, 255, 0.2);
+            color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #f4f4f4;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1f1f1f;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #3498db;
+        }
+        
+        .result.success {
+            border-left-color: #28a745;
+        }
+        
+        .result.error {
+            border-left-color: #dc3545;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+        }
+        
+        .result-content {
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            color: #f4f4f4;
+        }
+        
+        .coleta-group {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .coleta-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+        }
+        
+        .flex-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .flex-row > div {
+            flex: 1;
+        }
+        
+        .coleta-image {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ddd;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            border-radius: 5px;
+            color: #6c757d;
+        }
+        
+        .documentation {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6f42c1;
+        }
+        
+        .doc-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+            font-size: 18px;
+        }
+        
+        .doc-section {
+            margin-bottom: 15px;
+        }
+        
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f4f4f4;
+        }
+        
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        .param-table th, .param-table td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .param-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            color: #f4f4f4;
+        }
+        
+        .param-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .info-box {
+            background: rgba(52, 152, 219, 0.2);
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+        }
+        
+        .info-content {
+            line-height: 1.5;
+        }
+        
+        .endpoint {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .flex-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Endpoints - Documentação Interativa</h1>
+            <p class="description">Aplicação interativa para consulta de dados e confirmação de aulas com explicações técnicas</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="cfc">Consulta CFC</div>
+            <div class="tab" data-tab="instrutor">Consulta Instrutor</div>
+            <div class="tab" data-tab="veiculo">Consulta Veículo</div>
+            <div class="tab" data-tab="sala">Consulta Sala</div>
+            <div class="tab" data-tab="candidato">Consulta Candidato</div>
+            <div class="tab" data-tab="agendamento-pratico">Agendamento Prático</div>
+            <div class="tab" data-tab="agendamento-teorico">Agendamento Teórico</div>
+            <div class="tab" data-tab="confirmacao-pratica">Confirmação Aula Prática</div>
+            <div class="tab" data-tab="confirmacao-teorica">Confirmação Aula Teórica</div>
+        </div>
+        
+        <div class="tab-content active" id="cfc">
+            <h2>Consulta de CFC</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">GET /api/consulta/cfc?cnpj={cnpj}</div>
+                <div class="info-content">
+                    Este endpoint retorna informações sobre os Centros de Formação de Condutores cadastrados e ativos no sistema.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="cfc-cnpj">CNPJ (opcional):</label>
+                <input type="text" id="cfc-cnpj" placeholder="Digite o CNPJ do CFC">
+            </div>
+            <button onclick="consultarCFC()">Consultar CFC</button>
+            <button onclick="mostrarDocumentacao('cfc')">Ver Documentação</button>
+            <div class="result" id="cfc-result"></div>
+            
+            <div class="documentation" id="cfc-doc" style="display: none;">
+                <div class="doc-title">Documentação - Consulta CFC</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CNPJ</td>
+                            <td>String</td>
+                            <td>Não</td>
+                            <td>CNPJ do CFC. Se não informado, retorna todos os CFCs ativos.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Inteiro</td>
+                            <td>Código de retorno da operação (0 = sucesso, outros = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                        <tr>
+                            <td>CFCs</td>
+                            <td>Array</td>
+                            <td>Lista de CFCs com os campos: CNPJ, RazaoSocial, NomeFantasia, Email, Categoria (A/B/AB), CodigoCFC</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+// Retorna todos os CFCs ativos
+GET /api/consulta/cfc
+
+// Retorna um CFC específico
+GET /api/consulta/cfc?cnpj=12.345.678/0001-90
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Consulta realizada com sucesso",
+  "CFCs": [
+    {
+      "CNPJ": "12.345.678/0001-90",
+      "RazaoSocial": "Auto Escola Excelência Ltda",
+      "NomeFantasia": "Auto Escola Excelência",
+      "Email": "contato@autoescolaexcelencia.com.br",
+      "Categoria": "AB",
+      "CodigoCFC": 1234
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="instrutor">
+            <h2>Consulta de Instrutor</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">GET /api/consulta/instrutor?cnpj={cnpj}&cpf={cpf}</div>
+                <div class="info-content">
+                    Este endpoint retorna informações sobre os instrutores ativos de um CFC específico.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="instrutor-cnpj">CNPJ:</label>
+                <input type="text" id="instrutor-cnpj" placeholder="Digite o CNPJ do CFC">
+            </div>
+            <div class="form-group">
+                <label for="instrutor-cpf">CPF (opcional):</label>
+                <input type="text" id="instrutor-cpf" placeholder="Digite o CPF do instrutor">
+            </div>
+            <button onclick="consultarInstrutor()">Consultar Instrutor</button>
+            <button onclick="mostrarDocumentacao('instrutor')">Ver Documentação</button>
+            <div class="result" id="instrutor-result"></div>
+            
+            <div class="documentation" id="instrutor-doc" style="display: none;">
+                <div class="doc-title">Documentação - Consulta Instrutor</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CNPJ</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC para filtrar os instrutores</td>
+                        </tr>
+                        <tr>
+                            <td>CPF</td>
+                            <td>String</td>
+                            <td>Não</td>
+                            <td>CPF do instrutor. Se não informado, retorna todos os instrutores ativos do CFC.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Inteiro</td>
+                            <td>Código de retorno da operação (0 = sucesso, outros = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                        <tr>
+                            <td>Instrutores</td>
+                            <td>Array</td>
+                            <td>Lista de instrutores com os campos: CPF, Nome, Categoria, Foto (Bytes em Base64)</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+// Retorna todos os instrutores de um CFC
+GET /api/consulta/instrutor?cnpj=12.345.678/0001-90
+
+// Retorna um instrutor específico
+GET /api/consulta/instrutor?cnpj=12.345.678/0001-90&cpf=123.456.789-00
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Consulta realizada com sucesso",
+  "Instrutores": [
+    {
+      "CPF": "123.456.789-00",
+      "Nome": "Carlos Silva",
+      "Categoria": "AB",
+      "Foto": "base64_encoded_image_data"
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="veiculo">
+            <h2>Consulta de Veículo</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">GET /api/consulta/veiculo?cnpj={cnpj}&placa={placa}</div>
+                <div class="info-content">
+                    Este endpoint retorna informações sobre os veículos ativos de um CFC específico.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="veiculo-cnpj">CNPJ:</label>
+                <input type="text" id="veiculo-cnpj" placeholder="Digite o CNPJ do CFC">
+            </div>
+            <div class="form-group">
+                <label for="veiculo-placa">Placa (opcional):</label>
+                <input type="text" id="veiculo-placa" placeholder="Digite a placa do veículo">
+            </div>
+            <button onclick="consultarVeiculo()">Consultar Veículo</button>
+            <button onclick="mostrarDocumentacao('veiculo')">Ver Documentação</button>
+            <div class="result" id="veiculo-result"></div>
+            
+            <div class="documentation" id="veiculo-doc" style="display: none;">
+                <div class="doc-title">Documentação - Consulta Veículo</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CNPJ</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC para filtrar os veículos</td>
+                        </tr>
+                        <tr>
+                            <td>Placa</td>
+                            <td>String</td>
+                            <td>Não</td>
+                            <td>Placa do veículo. Se não informado, retorna todos os veículos ativos do CFC.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Inteiro</td>
+                            <td>Código de retorno da operação (0 = sucesso, outros = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                        <tr>
+                            <td>Veiculos</td>
+                            <td>Array</td>
+                            <td>Lista de veículos com os campos: Placa, Categoria</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+// Retorna todos os veículos de um CFC
+GET /api/consulta/veiculo?cnpj=12.345.678/0001-90
+
+// Retorna um veículo específico
+GET /api/consulta/veiculo?cnpj=12.345.678/0001-90&placa=ABC1D23
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Consulta realizada com sucesso",
+  "Veiculos": [
+    {
+      "Placa": "ABC1D23",
+      "Categoria": "B"
+    },
+    {
+      "Placa": "XYZ9W87",
+      "Categoria": "A"
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="sala">
+            <h2>Consulta de Sala</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">GET /api/consulta/sala?cnpj={cnpj}&codigoSala={codigoSala}</div>
+                <div class="info-content">
+                    Este endpoint retorna informações sobre as salas ativas de um CFC específico.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="sala-cnpj">CNPJ:</label>
+                <input type="text" id="sala-cnpj" placeholder="Digite o CNPJ do CFC">
+            </div>
+            <div class="form-group">
+                <label for="sala-codigo">Código da Sala (opcional):</label>
+                <input type="text" id="sala-codigo" placeholder="Digite o código da sala">
+            </div>
+            <button onclick="consultarSala()">Consultar Sala</button>
+            <button onclick="mostrarDocumentacao('sala')">Ver Documentação</button>
+            <div class="result" id="sala-result"></div>
+            
+            <div class="documentation" id="sala-doc" style="display: none;">
+                <div class="doc-title">Documentação - Consulta Sala</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CNPJ</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC para filtrar as salas</td>
+                        </tr>
+                        <tr>
+                            <td>CodigoSala</td>
+                            <td>String</td>
+                            <td>Não</td>
+                            <td>Código da sala. Se não informado, retorna todas as salas ativas do CFC.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Inteiro</td>
+                            <td>Código de retorno da operação (0 = sucesso, outros = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                        <tr>
+                            <td>Salas</td>
+                            <td>Array</td>
+                            <td>Lista de salas com os campos: Descricao, Capacidade, CodigoSala</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+// Retorna todas as salas de um CFC
+GET /api/consulta/sala?cnpj=12.345.678/0001-90
+
+// Retorna uma sala específica
+GET /api/consulta/sala?cnpj=12.345.678/0001-90&codigoSala=SALA01
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Consulta realizada com sucesso",
+  "Salas": [
+    {
+      "Descricao": "Sala Principal",
+      "Capacidade": 30,
+      "CodigoSala": "SALA01"
+    },
+    {
+      "Descricao": "Sala de Vídeo",
+      "Capacidade": 20,
+      "CodigoSala": "SALA02"
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="candidato">
+            <h2>Consulta de Candidato</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">GET /api/consulta/candidato?cpf={cpf}&cnpj={cnpj}</div>
+                <div class="info-content">
+                    Este endpoint retorna os dados da matrícula de um candidato em um CFC específico.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="candidato-cpf">CPF:</label>
+                <input type="text" id="candidato-cpf" placeholder="Digite o CPF do candidato">
+            </div>
+            <div class="form-group">
+                <label for="candidato-cnpj">CNPJ:</label>
+                <input type="text" id="candidato-cnpj" placeholder="Digite o CNPJ do CFC">
+            </div>
+            <button onclick="consultarCandidato()">Consultar Candidato</button>
+            <button onclick="mostrarDocumentacao('candidato')">Ver Documentação</button>
+            <div class="result" id="candidato-result"></div>
+            
+            <div class="documentation" id="candidato-doc" style="display: none;">
+                <div class="doc-title">Documentação - Consulta Candidato</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CPF</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CPF do candidato que se deseja consultar</td>
+                        </tr>
+                        <tr>
+                            <td>CNPJ</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC onde o candidato está matriculado</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Inteiro</td>
+                            <td>Código de retorno da operação (0 = sucesso, outros = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                        <tr>
+                            <td>Candidatos</td>
+                            <td>Array</td>
+                            <td>Dados do candidato com campos: CPF, Renach, Nome, DataAbertura, Curso (Teorico, PraticoB, C, D, E), EmissaoLADV, VencimentoLADV, Foto, Digitais</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+// Consulta os dados de um candidato
+GET /api/consulta/candidato?cpf=123.456.789-00&cnpj=12.345.678/0001-90
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Consulta realizada com sucesso",
+  "Candidatos": [
+    {
+      "CPF": "123.456.789-00",
+      "Renach": "123456789",
+      "Nome": "João da Silva",
+      "DataAbertura": "2023-01-15",
+      "Curso": {
+        "Teorico": true,
+        "PraticoB": true,
+        "C": false,
+        "D": false,
+        "E": false
+      },
+      "EmissaoLADV": "2023-05-20T10:30:00",
+      "VencimentoLADV": "2023-11-20T10:30:00",
+      "Foto": "base64_encoded_image_data",
+      "Digitais": ["base64_encoded_image_data1", "base64_encoded_image_data2"]
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="agendamento-pratico">
+            <h2>Consulta de Agendamento Prático</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">GET /api/consulta/agendamento-pratico?cnpj={cnpj}&data={data}&placa={placa}</div>
+                <div class="info-content">
+                    Este endpoint retorna os agendamentos de aulas práticas para um CFC em uma data específica.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="agendamento-pratico-cnpj">CNPJ:</label>
+                <input type="text" id="agendamento-pratico-cnpj" placeholder="Digite o CNPJ do CFC">
+            </div>
+            <div class="form-group">
+                <label for="agendamento-pratico-data">Data:</label>
+                <input type="date" id="agendamento-pratico-data">
+            </div>
+            <div class="form-group">
+                <label for="agendamento-pratico-placa">Placa (opcional):</label>
+                <input type="text" id="agendamento-pratico-placa" placeholder="Digite a placa do veículo">
+            </div>
+            <button onclick="consultarAgendamentoPratico()">Consultar Agendamentos</button>
+            <button onclick="mostrarDocumentacao('agendamento-pratico')">Ver Documentação</button>
+            <div class="result" id="agendamento-pratico-result"></div>
+            
+            <div class="documentation" id="agendamento-pratico-doc" style="display: none;">
+                <div class="doc-title">Documentação - Consulta Agendamento Prático</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CNPJ</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC para filtrar os agendamentos</td>
+                        </tr>
+                        <tr>
+                            <td>Data</td>
+                            <td>Date</td>
+                            <td>Sim</td>
+                            <td>Data para a qual se deseja consultar os agendamentos</td>
+                        </tr>
+                        <tr>
+                            <td>Placa</td>
+                            <td>String</td>
+                            <td>Não</td>
+                            <td>Placa do veículo. Se informado, retorna apenas os agendamentos para este veículo.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Inteiro</td>
+                            <td>Código de retorno da operação (0 = sucesso, outros = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                        <tr>
+                            <td>AgendamentosPratico</td>
+                            <td>Array</td>
+                            <td>Lista de agendamentos com campos: CPF, Renach, Placa, CPFInstutor, HoraInicio DateTime, HoraFim DateTime, CodigoAula</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+// Retorna todos os agendamentos de uma data
+GET /api/consulta/agendamento-pratico?cnpj=12.345.678/0001-90&data=2023-05-20
+
+// Retorna agendamentos para um veículo específico
+GET /api/consulta/agendamento-pratico?cnpj=12.345.678/0001-90&data=2023-05-20&placa=ABC1D23
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Consulta realizada com sucesso",
+  "AgendamentosPratico": [
+    {
+      "CPF": "123.456.789-00",
+      "Renach": "123456789",
+      "Placa": "ABC1D23",
+      "CPFInstutor": "987.654.321-00",
+      "HoraInicio": "2023-05-20T08:00:00",
+      "HoraFim": "2023-05-20T09:00:00",
+      "CodigoAula": 1001
+    },
+    {
+      "CPF": "111.222.333-44",
+      "Renach": "987654321",
+      "Placa": "XYZ9W87",
+      "CPFInstutor": "987.654.321-00",
+      "HoraInicio": "2023-05-20T09:00:00",
+      "HoraFim": "2023-05-20T10:00:00",
+      "CodigoAula": 1002
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="agendamento-teorico">
+            <h2>Consulta de Agendamento Teórico</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">GET /api/consulta/agendamento-teorico?cnpj={cnpj}&data={data}&codigoSala={codigoSala}</div>
+                <div class="info-content">
+                    Este endpoint retorna os agendamentos de aulas teóricas para um CFC em uma data específica.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="agendamento-teorico-cnpj">CNPJ:</label>
+                <input type="text" id="agendamento-teorico-cnpj" placeholder="Digite o CNPJ do CFC">
+            </div>
+            <div class="form-group">
+                <label for="agendamento-teorico-data">Data:</label>
+                <input type="date" id="agendamento-teorico-data">
+            </div>
+            <div class="form-group">
+                <label for="agendamento-teorico-codigoSala">Código da Sala (opcional):</label>
+                <input type="text" id="agendamento-teorico-codigoSala" placeholder="Digite o código da sala">
+            </div>
+            <button onclick="consultarAgendamentoTeorico()">Consultar Agendamentos</button>
+            <button onclick="mostrarDocumentacao('agendamento-teorico')">Ver Documentação</button>
+            <div class="result" id="agendamento-teorico-result"></div>
+            
+            <div class="documentation" id="agendamento-teorico-doc" style="display: none;">
+                <div class="doc-title">Documentação - Consulta Agendamento Teórico</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CNPJ</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC para filtrar os agendamentos</td>
+                        </tr>
+                        <tr>
+                            <td>Data</td>
+                            <td>Date</td>
+                            <td>Sim</td>
+                            <td>Data para a qual se deseja consultar os agendamentos</td>
+                        </tr>
+                        <tr>
+                            <td>CodigoSala</td>
+                            <td>Int</td>
+                            <td>Não</td>
+                            <td>Código da sala. Se informado, retorna apenas os agendamentos para esta sala.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Inteiro</td>
+                            <td>Código de retorno da operação (0 = sucesso, outros = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                        <tr>
+                            <td>AgendamentosTeorico</td>
+                            <td>Array</td>
+                            <td>Lista de agendamentos com campos: CPF, Renach, CodigoSala, CPFInstutor, QuantidadeAlunos, HoraInicio, HoraFim, CodigoTurma</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+// Retorna todos os agendamentos de uma data
+GET /api/consulta/agendamento-teorico?cnpj=12.345.678/0001-90&data=2023-05-20
+
+// Retorna agendamentos para uma sala específica
+GET /api/consulta/agendamento-teorico?cnpj=12.345.678/0001-90&data=2023-05-20&codigoSala=1
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Consulta realizada com sucesso",
+  "AgendamentosTeorico": [
+    {
+      "CPF": "123.456.789-00",
+      "Renach": "123456789",
+      "CodigoSala": 1,
+      "CPFInstutor": "987.654.321-00",
+      "QuantidadeAlunos": 25,
+      "HoraInicio": "2023-05-20T08:00:00",
+      "HoraFim": "2023-05-20T10:00:00",
+      "CodigoTurma": 2001
+    },
+    {
+      "CPF": "111.222.333-44",
+      "Renach": "987654321",
+      "CodigoSala": 2,
+      "CPFInstutor": "555.666.777-88",
+      "QuantidadeAlunos": 20,
+      "HoraInicio": "2023-05-20T10:00:00",
+      "HoraFim": "2023-05-20T12:00:00",
+      "CodigoTurma": 2002
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="confirmacao-pratica">
+            <h2>Confirmação de Aula Prática</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">POST /api/confirmacao/aula-pratica</div>
+                <div class="info-content">
+                    Este endpoint envia a confirmação de uma aula prática monitorada, incluindo as coletas biométricas de aluno e instrutor.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmacao-codigoAula">Código da Aula:</label>
+                <input type="number" id="confirmacao-codigoAula" placeholder="Digite o código da aula">
+            </div>
+            
+            <div class="flex-row">
+                <div>
+                    <div class="form-group">
+                        <label for="confirmacao-cpfAluno">CPF do Aluno:</label>
+                        <input type="text" id="confirmacao-cpfAluno" placeholder="Digite o CPF do aluno">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label for="confirmacao-cpfInstrutor">CPF do Instrutor:</label>
+                        <input type="text" id="confirmacao-cpfInstrutor" placeholder="Digite o CPF do instrutor">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex-row">
+                <div>
+                    <div class="form-group">
+                        <label for="confirmacao-cnpjCFC">CNPJ do CFC:</label>
+                        <input type="text" id="confirmacao-cnpjCFC" placeholder="Digite o CNPJ do CFC">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label for="confirmacao-placa">Placa do Veículo:</label>
+                        <input type="text" id="confirmacao-placa" placeholder="Digite a placa do veículo">
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Coletas Biométricas</h3>
+            
+            <div class="coleta-group">
+                <div class="coleta-title">Entrada do Instrutor</div>
+                <div class="form-group">
+                    <label for="confirmacao-entradaInstrutor-hora">Hora:</label>
+                    <input type="datetime-local" id="confirmacao-entradaInstrutor-hora">
+                </div>
+                <div class="form-group">
+                    <label for="confirmacao-entradaInstrutor-tipo">Tipo de Coleta:</label>
+                    <select id="confirmacao-entradaInstrutor-tipo">
+                        <option value="Digital">Digital</option>
+                        <option value="Foto">Foto</option>
+                    </select>
+                </div>
+                <div class="coleta-image" id="confirmacao-entradaInstrutor-imagem">
+                    <span>Imagem da digital/foto</span>
+                </div>
+            </div>
+            
+            <div class="coleta-group">
+                <div class="coleta-title">Saída do Instrutor</div>
+                <div class="form-group">
+                    <label for="confirmacao-saidaInstrutor-hora">Hora:</label>
+                    <input type="datetime-local" id="confirmacao-saidaInstrutor-hora">
+                </div>
+                <div class="form-group">
+                    <label for="confirmacao-saidaInstrutor-tipo">Tipo de Coleta:</label>
+                    <select id="confirmacao-saidaInstrutor-tipo">
+                        <option value="Digital">Digital</option>
+                        <option value="Foto">Foto</option>
+                    </select>
+                </div>
+                <div class="coleta-image" id="confirmacao-saidaInstrutor-imagem">
+                    <span>Imagem da digital/foto</span>
+                </div>
+            </div>
+            
+            <div class="coleta-group">
+                <div class="coleta-title">Entrada do Aluno</div>
+                <div class="form-group">
+                    <label for="confirmacao-entradaAluno-hora">Hora:</label>
+                    <input type="datetime-local" id="confirmacao-entradaAluno-hora">
+                </div>
+                <div class="form-group">
+                    <label for="confirmacao-entradaAluno-tipo">Tipo de Coleta:</label>
+                    <select id="confirmacao-entradaAluno-tipo">
+                        <option value="Digital">Digital</option>
+                        <option value="Foto">Foto</option>
+                    </select>
+                </div>
+                <div class="coleta-image" id="confirmacao-entradaAluno-imagem">
+                    <span>Imagem da digital/foto</span>
+                </div>
+            </div>
+            
+            <div class="coleta-group">
+                <div class="coleta-title">Saída do Aluno</div>
+                <div class="form-group">
+                    <label for="confirmacao-saidaAluno-hora">Hora:</label>
+                    <input type="datetime-local" id="confirmacao-saidaAluno-hora">
+                </div>
+                <div class="form-group">
+                    <label for="confirmacao-saidaAluno-tipo">Tipo de Coleta:</label>
+                    <select id="confirmacao-saidaAluno-tipo">
+                        <option value="Digital">Digital</option>
+                        <option value="Foto">Foto</option>
+                    </select>
+                </div>
+                <div class="coleta-image" id="confirmacao-saidaAluno-imagem">
+                    <span>Imagem da digital/foto</span>
+                </div>
+            </div>
+            
+            <button onclick="confirmarAulaPratica()">Confirmar Aula Prática</button>
+            <button onclick="mostrarDocumentacao('confirmacao-pratica')">Ver Documentação</button>
+            <div class="result" id="confirmacao-pratica-result"></div>
+            
+            <div class="documentation" id="confirmacao-pratica-doc" style="display: none;">
+                <div class="doc-title">Documentação - Confirmação Aula Prática</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoAula</td>
+                            <td>Int</td>
+                            <td>Sim</td>
+                            <td>Código único identificador da aula</td>
+                        </tr>
+                        <tr>
+                            <td>CPFAluno</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CPF do aluno que participou da aula</td>
+                        </tr>
+                        <tr>
+                            <td>CPFInstrutor</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CPF do instrutor que ministrou a aula</td>
+                        </tr>
+                        <tr>
+                            <td>CNPJCFC</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC onde a aula foi realizada</td>
+                        </tr>
+                        <tr>
+                            <td>Placa</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>Placa do veículo utilizado na aula</td>
+                        </tr>
+                        <tr>
+                            <td>EntradaInstrutor</td>
+                            <td>Object</td>
+                            <td>Sim</td>
+                            <td>Dados de coleta biométrica do instrutor no início da aula</td>
+                        </tr>
+                        <tr>
+                            <td>SaidaInstrutor</td>
+                            <td>Object</td>
+                            <td>Sim</td>
+                            <td>Dados de coleta biométrica do instrutor no fim da aula</td>
+                        </tr>
+                        <tr>
+                            <td>EntradaAluno</td>
+                            <td>Object</td>
+                            <td>Sim</td>
+                            <td>Dados de coleta biométrica do aluno no início da aula</td>
+                        </tr>
+                        <tr>
+                            <td>SaidaAluno</td>
+                            <td>Object</td>
+                            <td>Sim</td>
+                            <td>Dados de coleta biométrica do aluno no fim da aula</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>DigitalAlunoInicio</td>
+                            <td>Enum</td>
+                            <td>Status da digital do aluno no início (Invalido/NaoExisteBiometria)</td>
+                        </tr>
+                        <tr>
+                            <td>DigitalAlunoFim</td>
+                            <td>Enum</td>
+                            <td>Status da digital do aluno no fim (Invalido/NaoExisteBiometria)</td>
+                        </tr>
+                        <tr>
+                            <td>DigitalInstrutorInicio</td>
+                            <td>Enum</td>
+                            <td>Status da digital do instrutor no início (Invalido/NaoExisteBiometria)</td>
+                        </tr>
+                        <tr>
+                            <td>DigitalInstrutorFim</td>
+                            <td>Enum</td>
+                            <td>Status da digital do instrutor no fim (Invalido/NaoExisteBiometria)</td>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Int</td>
+                            <td>Código de retorno da operação (0 = sucesso, 1 = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+POST /api/confirmacao/aula-pratica
+{
+  "CodigoAula": 1001,
+  "CPFAluno": "123.456.789-00",
+  "CPFInstrutor": "987.654.321-00",
+  "CNPJCFC": "12.345.678/0001-90",
+  "Placa": "ABC1D23",
+  "EntradaInstrutor": {
+    "Coleta": {
+      "Hora": "2023-05-20T08:00:00",
+      "Tipo": "Digital",
+      "Digital": "base64_encoded_image_data",
+      "Foto": null
+    }
+  },
+  "SaidaInstrutor": {
+    "Coleta": {
+      "Hora": "2023-05-20T09:00:00",
+      "Tipo": "Digital",
+      "Digital": "base64_encoded_image_data",
+      "Foto": null
+    }
+  },
+  "EntradaAluno": {
+    "Coleta": {
+      "Hora": "2023-05-20T08:00:00",
+      "Tipo": "Foto",
+      "Digital": null,
+      "Foto": "base64_encoded_image_data"
+    }
+  },
+  "SaidaAluno": {
+    "Coleta": {
+      "Hora": "2023-05-20T09:00:00",
+      "Tipo": "Foto",
+      "Digital": null,
+      "Foto": "base64_encoded_image_data"
+    }
+  }
+}
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "DigitalAlunoInicio": "NaoExisteBiometria",
+  "DigitalAlunoFim": "NaoExisteBiometria",
+  "DigitalInstrutorInicio": "Valido",
+  "DigitalInstrutorFim": "Valido",
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Aula confirmada com sucesso"
+}
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Observações</div>
+                    <p>A aula não será aceita se a digital não for validada e não houver foto no envio.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="confirmacao-teorica">
+            <h2>Confirmação de Aula Teórica</h2>
+            
+            <div class="info-box">
+                <div class="info-title">Endpoint</div>
+                <div class="endpoint">POST /api/confirmacao/aula-teorica</div>
+                <div class="info-content">
+                    Este endpoint envia a confirmação de uma aula teórica monitorada.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmacao-teorica-codigoTurma">Código da Turma:</label>
+                <input type="number" id="confirmacao-teorica-codigoTurma" placeholder="Digite o código da turma">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmacao-teorica-codigoSala">Código da Sala:</label>
+                <input type="number" id="confirmacao-teorica-codigoSala" placeholder="Digite o código da sala">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmacao-teorica-cpfInstrutor">CPF do Instrutor:</label>
+                <input type="text" id="confirmacao-teorica-cpfInstrutor" placeholder="Digite o CPF do instrutor">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmacao-teorica-cnpjCFC">CNPJ do CFC:</label>
+                <input type="text" id="confirmacao-teorica-cnpjCFC" placeholder="Digite o CNPJ do CFC">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmacao-teorica-quantidadeAlunos">Quantidade de Alunos Monitorados:</label>
+                <input type="number" id="confirmacao-teorica-quantidadeAlunos" placeholder="Digite a quantidade de alunos">
+            </div>
+            
+            <div class="flex-row">
+                <div>
+                    <div class="form-group">
+                        <label for="confirmacao-teorica-horaInicio">Hora de Início:</label>
+                        <input type="datetime-local" id="confirmacao-teorica-horaInicio">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label for="confirmacao-teorica-horaFim">Hora de Fim:</label>
+                        <input type="datetime-local" id="confirmacao-teorica-horaFim">
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="confirmarAulaTeorica()">Confirmar Aula Teórica</button>
+            <button onclick="mostrarDocumentacao('confirmacao-teorica')">Ver Documentação</button>
+            <div class="result" id="confirmacao-teorica-result"></div>
+            
+            <div class="documentation" id="confirmacao-teorica-doc" style="display: none;">
+                <div class="doc-title">Documentação - Confirmação Aula Teórica</div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoTurma</td>
+                            <td>Int</td>
+                            <td>Sim</td>
+                            <td>Código único identificador da turma</td>
+                        </tr>
+                        <tr>
+                            <td>CodigoSala</td>
+                            <td>Int</td>
+                            <td>Sim</td>
+                            <td>Código da sala onde a aula foi ministrada</td>
+                        </tr>
+                        <tr>
+                            <td>CPFInstrutor</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CPF do instrutor que ministrou a aula</td>
+                        </tr>
+                        <tr>
+                            <td>CNPJCFC</td>
+                            <td>String</td>
+                            <td>Sim</td>
+                            <td>CNPJ do CFC onde a aula foi realizada</td>
+                        </tr>
+                        <tr>
+                            <td>QuantidadeAlunosMonitorado</td>
+                            <td>int</td>
+                            <td>Sim</td>
+                            <td>Quantidade de alunos monitorados presentes na aula</td>
+                        </tr>
+                        <tr>
+                            <td>HoraInicio</td>
+                            <td>DateTime</td>
+                            <td>Sim</td>
+                            <td>Data e hora de início da aula</td>
+                        </tr>
+                        <tr>
+                            <td>HoraFim</td>
+                            <td>DateTime</td>
+                            <td>Sim</td>
+                            <td>Data e hora de término da aula</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Saída</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>CodigoRetorno</td>
+                            <td>Int</td>
+                            <td>Código de retorno da operação (0 = sucesso, 1 = erro)</td>
+                        </tr>
+                        <tr>
+                            <td>MensagemRetorno</td>
+                            <td>String</td>
+                            <td>Mensagem descritiva sobre o resultado da operação</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Requisição</div>
+                    <div class="result-content">
+POST /api/confirmacao/aula-teorica
+{
+  "CodigoTurma": 2001,
+  "CodigoSala": 1,
+  "CPFInstrutor": "987.654.321-00",
+  "CNPJCFC": "12.345.678/0001-90",
+  "QuantidadeAlunosMonitorado": 25,
+  "HoraInicio": "2023-05-20T08:00:00",
+  "HoraFim": "2023-05-20T10:00:00"
+}
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="result-content">
+{
+  "CodigoRetorno": 0,
+  "MensagemRetorno": "Aula teórica confirmada com sucesso"
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-button-container">
+        <a href="Menu.html" class="back-button">Voltar para o Menu</a>
+    </div>
+
+    <script>
+        // Gerenciamento das abas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+    
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // Função para mostrar/ocultar documentação
+        function mostrarDocumentacao(tipo) {
+            const docElement = document.getElementById(`${tipo}-doc`);
+            if (docElement.style.display === 'none') {
+                docElement.style.display = 'block';
+            } else {
+                docElement.style.display = 'none';
+            }
+        }
+        
+       
+        function consultarCFC() {
+            const cnpj = document.getElementById('cfc-cnpj').value;
+            const resultDiv = document.getElementById('cfc-result');
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Consulta realizada com sucesso",
+                CFCs: [
+                    {
+                        CNPJ: "12.345.678/0001-90",
+                        RazaoSocial: "Auto Escola Excelência Ltda",
+                        NomeFantasia: "Auto Escola Excelência",
+                        Email: "contato@autoescolaexcelencia.com.br",
+                        Categoria: "AB",
+                        CodigoCFC: 1234
+                    },
+                    {
+                        CNPJ: "98.765.432/0001-10",
+                        RazaoSocial: "CFC Bom Condutor S/A",
+                        NomeFantasia: "CFC Bom Condutor",
+                        Email: "contato@cfcbomcondutor.com.br",
+                        Categoria: "B",
+                        CodigoCFC: 5678
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Resultado da Consulta</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+        
+        function consultarInstrutor() {
+            const cnpj = document.getElementById('instrutor-cnpj').value;
+            const cpf = document.getElementById('instrutor-cpf').value;
+            const resultDiv = document.getElementById('instrutor-result');
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Consulta realizada com sucesso",
+                Instrutores: [
+                    {
+                        CPF: "123.456.789-00",
+                        Nome: "Carlos Silva",
+                        Categoria: "AB",
+                        Foto: "base64_encoded_image_data"
+                    },
+                    {
+                        CPF: "987.654.321-00",
+                        Nome: "Ana Santos",
+                        Categoria: "B",
+                        Foto: "base64_encoded_image_data"
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Resultado da Consulta</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+        
+        function consultarVeiculo() {
+            const cnpj = document.getElementById('veiculo-cnpj').value;
+            const placa = document.getElementById('veiculo-placa').value;
+            const resultDiv = document.getElementById('veiculo-result');
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Consulta realizada com sucesso",
+                Veiculos: [
+                    {
+                        Placa: "ABC1D23",
+                        Categoria: "B"
+                    },
+                    {
+                        Placa: "XYZ9W87",
+                        Categoria: "A"
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Resultado da Consulta</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+        
+        function consultarSala() {
+            const cnpj = document.getElementById('sala-cnpj').value;
+            const codigoSala = document.getElementById('sala-codigo').value;
+            const resultDiv = document.getElementById('sala-result');
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Consulta realizada com sucesso",
+                Salas: [
+                    {
+                        Descricao: "Sala Principal",
+                        Capacidade: 30,
+                        CodigoSala: "SALA01"
+                    },
+                    {
+                        Descricao: "Sala de Vídeo",
+                        Capacidade: 20,
+                        CodigoSala: "SALA02"
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Resultado da Consulta</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+        
+        function consultarCandidato() {
+            const cpf = document.getElementById('candidato-cpf').value;
+            const cnpj = document.getElementById('candidato-cnpj').value;
+            const resultDiv = document.getElementById('candidato-result');
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Consulta realizada com sucesso",
+                Candidatos: [
+                    {
+                        CPF: "123.456.789-00",
+                        Renach: "123456789",
+                        Nome: "João da Silva",
+                        DataAbertura: "2023-01-15",
+                        Curso: {
+                            Teorico: true,
+                            PraticoB: true,
+                            C: false,
+                            D: false,
+                            E: false
+                        },
+                        EmissaoLADV: "2023-05-20T10:30:00",
+                        VencimentoLADV: "2023-11-20T10:30:00",
+                        Foto: "base64_encoded_image_data",
+                        Digitais: ["base64_encoded_image_data1", "base64_encoded_image_data2"]
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Resultado da Consulta</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+        
+        function consultarAgendamentoPratico() {
+            const cnpj = document.getElementById('agendamento-pratico-cnpj').value;
+            const data = document.getElementById('agendamento-pratico-data').value;
+            const placa = document.getElementById('agendamento-pratico-placa').value;
+            const resultDiv = document.getElementById('agendamento-pratico-result');
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Consulta realizada com sucesso",
+                AgendamentosPratico: [
+                    {
+                        CPF: "123.456.789-00",
+                        Renach: "123456789",
+                        Placa: "ABC1D23",
+                        CPFInstutor: "987.654.321-00",
+                        HoraInicio: `${data || '2023-05-20'}T08:00:00`,
+                        HoraFim: `${data || '2023-05-20'}T09:00:00`,
+                        CodigoAula: 1001
+                    },
+                    {
+                        CPF: "111.222.333-44",
+                        Renach: "987654321",
+                        Placa: "XYZ9W87",
+                        CPFInstutor: "987.654.321-00",
+                        HoraInicio: `${data || '2023-05-20'}T09:00:00`,
+                        HoraFim: `${data || '2023-05-20'}T10:00:00`,
+                        CodigoAula: 1002
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Resultado da Consulta</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+
+        function consultarAgendamentoTeorico() {
+            const cnpj = document.getElementById('agendamento-teorico-cnpj').value;
+            const data = document.getElementById('agendamento-teorico-data').value;
+            const codigoSala = document.getElementById('agendamento-teorico-codigoSala').value;
+            const resultDiv = document.getElementById('agendamento-teorico-result');
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Consulta realizada com sucesso",
+                AgendamentosTeorico: [
+                    {
+                        CPF: "123.456.789-00",
+                        Renach: "123456789",
+                        CodigoSala: 1,
+                        CPFInstutor: "987.654.321-00",
+                        QuantidadeAlunos: 25,
+                        HoraInicio: `${data || '2023-05-20'}T08:00:00`,
+                        HoraFim: `${data || '2023-05-20'}T10:00:00`,
+                        CodigoTurma: 2001
+                    },
+                    {
+                        CPF: "111.222.333-44",
+                        Renach: "987654321",
+                        CodigoSala: 2,
+                        CPFInstutor: "555.666.777-88",
+                        QuantidadeAlunos: 20,
+                        HoraInicio: `${data || '2023-05-20'}T10:00:00`,
+                        HoraFim: `${data || '2023-05-20'}T12:00:00`,
+                        CodigoTurma: 2002
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Resultado da Consulta</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+
+        function confirmarAulaPratica() {
+            const resultDiv = document.getElementById('confirmacao-pratica-result');
+            
+            
+            const buildColeta = (horaId, tipoId) => {
+                const tipo = document.getElementById(tipoId).value;
+                const horaValue = document.getElementById(horaId).value || new Date().toISOString().slice(0, 16);
+                return {
+                    Hora: horaValue,
+                    Tipo: tipo,
+                    Digital: tipo === 'Digital' ? "base64_encoded_image_data..." : null,
+                    Foto: tipo === 'Foto' ? "base64_encoded_image_data..." : null
+                };
+            };
+
+            const requestBody = {
+                CodigoAula: parseInt(document.getElementById('confirmacao-codigoAula').value) || 1001,
+                CPFAluno: document.getElementById('confirmacao-cpfAluno').value || "123.456.789-00",
+                CPFInstrutor: document.getElementById('confirmacao-cpfInstrutor').value || "987.654.321-00",
+                CNPJCFC: document.getElementById('confirmacao-cnpjCFC').value || "12.345.678/0001-90",
+                Placa: document.getElementById('confirmacao-placa').value || "ABC1D23",
+                EntradaInstrutor: { Coleta: buildColeta('confirmacao-entradaInstrutor-hora', 'confirmacao-entradaInstrutor-tipo') },
+                SaidaInstrutor: { Coleta: buildColeta('confirmacao-saidaInstrutor-hora', 'confirmacao-saidaInstrutor-tipo') },
+                EntradaAluno: { Coleta: buildColeta('confirmacao-entradaAluno-hora', 'confirmacao-entradaAluno-tipo') },
+                SaidaAluno: { Coleta: buildColeta('confirmacao-saidaAluno-hora', 'confirmacao-saidaAluno-tipo') }
+            };
+            
+            // Simulação de resposta
+            const response = {
+                DigitalAlunoInicio: "NaoExisteBiometria",
+                DigitalAlunoFim: "NaoExisteBiometria",
+                DigitalInstrutorInicio: "Valido",
+                DigitalInstrutorFim: "Valido",
+                CodigoRetorno: 0,
+                MensagemRetorno: "Aula confirmada com sucesso"
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Corpo da Requisição (POST)</div>
+                <div class="result-content">${JSON.stringify(requestBody, null, 2)}</div>
+                <br>
+                <div class="result-title">Resposta do Servidor</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+
+        function confirmarAulaTeorica() {
+            const resultDiv = document.getElementById('confirmacao-teorica-result');
+            
+            const requestBody = {
+                CodigoTurma: parseInt(document.getElementById('confirmacao-teorica-codigoTurma').value) || 2001,
+                CodigoSala: parseInt(document.getElementById('confirmacao-teorica-codigoSala').value) || 1,
+                CPFInstrutor: document.getElementById('confirmacao-teorica-cpfInstrutor').value || "987.654.321-00",
+                CNPJCFC: document.getElementById('confirmacao-teorica-cnpjCFC').value || "12.345.678/0001-90",
+                QuantidadeAlunosMonitorado: parseInt(document.getElementById('confirmacao-teorica-quantidadeAlunos').value) || 25,
+                HoraInicio: document.getElementById('confirmacao-teorica-horaInicio').value || new Date().toISOString().slice(0, 16),
+                HoraFim: document.getElementById('confirmacao-teorica-horaFim').value || new Date().toISOString().slice(0, 16)
+            };
+            
+            // Simulação de resposta
+            const response = {
+                CodigoRetorno: 0,
+                MensagemRetorno: "Aula teórica confirmada com sucesso"
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">Corpo da Requisição (POST)</div>
+                <div class="result-content">${JSON.stringify(requestBody, null, 2)}</div>
+                <br>
+                <div class="result-title">Resposta do Servidor</div>
+                <div class="result-content">${JSON.stringify(response, null, 2)}</div>
+            `;
+            resultDiv.className = 'result success';
+        }
+
+        // Inicializa a primeira aba como ativa ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+</html>

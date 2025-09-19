@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acompanhamento do Dia</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        h2 {
+            color: #0056b3;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        p.details {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .state-section {
+            background-color: #f7f9fc;
+            border: 1px solid #e1e6ec;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .state-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        
+        .state-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        .summary-item strong {
+            display: block;
+            font-size: 16px;
+            color: #0056b3;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .badge-estavel { background-color: #28a745; }
+        .badge-potencial { background-color: #ffc107; }
+        .badge-incidente { background-color: #fd7e14; }
+        .badge-critico { background-color: #dc3545; }
+        
+        .agente-item {
+            margin-top: 15px;
+            padding-left: 10px;
+            border-left: 2px solid #ccc;
+        }
+        
+        .agente-item p {
+            font-size: 14px;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #6c757d;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #0069d9, #004da3);
+        }
+         .observacao-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Acompanhamento do Dia</h1>
+            <p class="details">Dados consolidados de todos os estados registrados na data de <span id="data-atual"></span>.</p>
+        </header>
+
+        <div class="main-content" id="acompanhamento-content">
+            </div>
+        <a href="index.html"><button>Voltar para a Página Inicial</button></a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAcompanhamento();
+        });
+
+        async function fetchAulasData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/aulas');
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                } else {
+                    console.error('Erro ao buscar dados do servidor.');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+                return [];
+            }
+        }
+
+        async function renderAcompanhamento() {
+            const allData = await fetchAulasData();
+            const today = new Date().toISOString().slice(0, 10);
+            document.getElementById('data-atual').textContent = new Date().toLocaleDateString('pt-BR');
+
+            const contentDiv = document.getElementById('acompanhamento-content');
+            contentDiv.innerHTML = '';
+
+            const statusLabels = {
+                'estavel': 'Estável',
+                'potencial': 'Potencial Incidente',
+                'incidente': 'Incidente Identificado',
+                'critico': 'Crítico'
+            };
+            const statusClasses = {
+                'estavel': 'badge-estavel',
+                'potencial': 'badge-potencial',
+                'incidente': 'badge-incidente',
+                'critico': 'badge-critico'
+            };
+
+            const statesData = {};
+            let hasData = false;
+            
+            allData.forEach(item => {
+                if (item.data === today) {
+                    hasData = true;
+                    if (!statesData[item.estado]) {
+                        statesData[item.estado] = { total: 0, execucao: 0, naoEnviadas: 0, recusadas: 0, processamento: 0, agentes: [] };
+                    }
+                    
+                    statesData[item.estado].total += item.total;
+                    statesData[item.estado].execucao += item.execucao;
+                    statesData[item.estado].naoEnviadas += item.naoEnviadas;
+                    statesData[item.estado].recusadas += item.recusadas;
+                    statesData[item.estado].processamento += item.processamento;
+                    statesData[item.estado].agentes.push({
+                        nome: item.agente,
+                        data: item,
+                        tipoRegistro: item.tipoRegistro
+                    });
+                }
+            });
+
+            if (!hasData) {
+                contentDiv.innerHTML = '<div class="no-data">Nenhum dado registrado para o dia de hoje.</div>';
+                return;
+            }
+
+            for (const estado in statesData) {
+                const stateSection = document.createElement('div');
+                stateSection.className = 'state-section';
+
+                const statusCounts = statesData[estado].agentes.reduce((acc, agente) => {
+                    acc[agente.data.status] = (acc[agente.data.status] || 0) + 1;
+                    return acc;
+                }, {});
+
+                let estadoStatus = 'estavel';
+                if (statusCounts['critico'] > 0) {
+                    estadoStatus = 'critico';
+                } else if (statusCounts['incidente'] > 0) {
+                    estadoStatus = 'incidente';
+                } else if (statusCounts['potencial'] > 0) {
+                    estadoStatus = 'potencial';
+                }
+                
+                stateSection.innerHTML = `
+                    <div class="state-title">
+                        ${estado} 
+                        <span class="status-badge ${statusClasses[estadoStatus]}">${statusLabels[estadoStatus]}</span>
+                    </div>
+                    <div class="state-summary">
+                        <div class="summary-item">Total de Aulas: <strong>${statesData[estado].total}</strong></div>
+                        <div class="summary-item">Em Execução: <strong>${statesData[estado].execucao}</strong></div>
+                        <div class="summary-item">Não Enviadas: <strong>${statesData[estado].naoEnviadas}</strong></div>
+                        <div class="summary-item">Recusadas: <strong>${statesData[estado].recusadas}</strong></div>
+                        <div class="summary-item">Em Processamento: <strong>${statesData[estado].processamento}</strong></div>
+                    </div>
+                    ${statesData[estado].agentes.map(agente => `
+                        <div class="agente-item">
+                            <p><strong>Agente:</strong> ${agente.nome} (${agente.tipoRegistro}) - <span class="status-badge ${statusClasses[agente.data.status]}">${statusLabels[agente.data.status]}</span></p>
+                            <ul>
+                                <li>Total: ${agente.data.total}</li>
+                                <li>Em Execução: ${agente.data.execucao}</li>
+                                <li>Não Enviadas: ${agente.data.naoEnviadas}</li>
+                                <li>Recusadas: ${agente.data.recusadas}</li>
+                                <li>Em Processamento: ${agente.data.processamento}</li>
+                                ${agente.data.observacao ? `<li class="observacao-box">Observação: ${agente.data.observacao}</li>` : ''}
+                            </ul>
+                        </div>
+                    `).join('')}
+                `;
+                contentDiv.appendChild(stateSection);
+            }
+        }
+    </script>
+</body>
+</html>

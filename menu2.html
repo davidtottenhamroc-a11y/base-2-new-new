@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base para registro diário N2 - Seleção de Agente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #001f3f; /* Azul escuro principal */
+            --text-color-light: #f4f4f4;
+            --text-color-dark: #1f1f1f;
+            --card-background: rgba(255, 255, 255, 0.1);
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color-light);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-background);
+            border-radius: 15px;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            padding: 40px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 5px;
+            color: var(--text-color-light);
+        }
+
+        .details {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        .selection-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            text-align: left;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--text-color-dark);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .menu-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .menu-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-button.primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+        }
+        .menu-button.primary:hover {
+            background: linear-gradient(135deg, #0069d9, #004da3);
+        }
+        
+        .menu-button.info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+        .menu-button.info:hover {
+            background: linear-gradient(135deg, #117a8b, #0f6c7c);
+        }
+
+        .menu-button.incidente {
+            background: linear-gradient(135deg, #ff9800, #dc3545);
+        }
+        .menu-button.incidente:hover {
+            background: linear-gradient(135deg, #e68a00, #c82333);
+        }
+        
+        .menu-button.success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+        .menu-button.success:hover {
+            background: linear-gradient(135deg, #218838, #1c7430);
+        }
+
+        .menu-button.danger {
+            background: #dc3545;
+        }
+        .menu-button.danger:hover {
+            background: #c82333;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .menu-button.dark {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+        }
+        .menu-button.dark:hover {
+            background: linear-gradient(135deg, #2c3e50, #1e2b38);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">VSoft</div>
+        <h1>Base para registro diário N2</h1>
+        <p class="details">Selecione o estado e o agente para continuar.</p>
+        
+        <div class="selection-form">
+            <div class="form-group">
+                <label for="agente-select">Agente:</label>
+                <select id="agente-select">
+                    <option value="">Selecione um agente...</option>
+                    <option value="Pricilla">Pricilla</option>
+                    <option value="Hyuri">Hyuri</option>
+                    <option value="David">David</option>
+                    <option value="Renata">Renata</option>
+                    <option value="Henrique">Henrique</option>
+                    <option value="Fernanda">Fernanda</option>
+                    <option value="Lara">Lara</option>
+                    <option value="Bianca">Bianca</option>
+                    <option value="Samuel">Samuel</option>
+                    <option value="Lucas Eduardo">Lucas Eduardo</option>
+                    <option value="Wesley">Wesley</option>
+                </select>
+            </div>
+            <div class="form-group" id="estado-group">
+                <label for="estado-select">Estado:</label>
+                <select id="estado-select">
+                    <option value="">Selecione um estado...</option>
+                    <option value="Pernambuco">Pernambuco</option>
+                    <option value="Rio Grande do Norte">Rio Grande do Norte</option>
+                    <option value="Paraiba">Paraíba</option>
+                    <option value="Bahia">Bahia</option>
+                    <option value="Minas Gerais">Minas Gerais</option>
+                    <option value="Sergipe">Sergipe</option>
+                    <option value="Goias">Goiás</option>
+                    <option value="Maranhão">Maranhão</option>
+                    <option value="Alagoas">Alagoas</option>
+                </select>
+            </div>
+            <div class="form-group" id="senha-group" style="display: none;">
+                <label for="senha-input">Senha:</label>
+                <input type="password" id="senha-input">
+            </div>
+        </div>
+        
+        <div class="menu-options">
+            <button class="menu-button primary" onclick="salvarSelecao('registro.html')">Registrar Dia</button>
+            <button class="menu-button primary" onclick="salvarSelecao('relatorios.html')">Página de Relatórios</button>
+            <button class="menu-button success" onclick="salvarSelecao('acompanhamento_dia.html')">Acompanhamento do Dia</button>
+            <button class="menu-button incidente" onclick="salvarSelecao('registro_incidente.html')">Registrar Ocorrências</button>
+            <button class="menu-button incidente" onclick="salvarSelecao('relatorio_incidentes.html')">Relatório de Ocorrências</button>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="menu.html" class="menu-button dark">Voltar para o Menu</a>
+        </div>
+
+    </div>
+    <script>
+        document.getElementById('agente-select').addEventListener('change', (e) => {
+            const agente = e.target.value;
+            const estadoGroup = document.getElementById('estado-group');
+            const senhaGroup = document.getElementById('senha-group');
+
+            if (agente === 'Wesley') {
+                estadoGroup.style.display = 'none';
+                senhaGroup.style.display = 'block';
+            } else {
+                estadoGroup.style.display = 'block';
+                senhaGroup.style.display = 'none';
+            }
+        });
+
+        function salvarSelecao(destino) {
+            const agente = document.getElementById('agente-select').value;
+            const estado = document.getElementById('estado-select').value;
+            const senha = document.getElementById('senha-input').value;
+            
+            const isIncidentPage = destino === 'registro_incidente.html' || destino === 'relatorio_incidentes.html';
+            const isGeneralPage = isIncidentPage || destino === 'acompanhamento_dia.html';
+
+            if (!isGeneralPage) {
+                if (!agente) {
+                    alert('Por favor, selecione um agente.');
+                    return;
+                }
+                if (agente !== 'Wesley' && !estado) {
+                    alert('Por favor, selecione um estado.');
+                    return;
+                }
+            }
+
+            if (agente === 'Wesley') {
+                if (senha !== 'wesley1234') {
+                    alert('Senha incorreta para Wesley.');
+                    return;
+                }
+                localStorage.setItem('agenteSelecionado', 'Wesley');
+                localStorage.setItem('estadoSelecionado', 'Todos');
+            } else {
+                localStorage.setItem('agenteSelecionado', agente);
+                if (estado) {
+                    localStorage.setItem('estadoSelecionado', estado);
+                }
+            }
+            
+            window.location.href = destino;
+        }
+    </script>
+</body>
+</html>

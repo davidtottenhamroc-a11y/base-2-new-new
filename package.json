@@ -1,0 +1,14 @@
+{
+  "name": "base-vsoft",
+  "version": "1.0.0",
+  "description": "Base de ferramentas e dashboards para o time de Suporte N2",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.4.1",
+    "cors": "^2.8.5"
+  }
+}

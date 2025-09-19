@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Aulas - Monitoramento Diário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .main-content {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .panel {
+            background-color: #f7f9fc;
+            border: 1px solid #e1e6ec;
+            padding: 20px;
+            border-radius: 8px;
+            flex: 1;
+            max-width: 800px;
+        }
+        .panel-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #0069d9, #004da3);
+        }
+        .dashboard-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .dashboard-controls button {
+            flex: 1;
+        }
+        .chart-container {
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+        }
+        .chart-container canvas {
+            max-width: 400px;
+            max-height: 300px;
+        }
+        .status-legend {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #e9ecef;
+            font-weight: 600;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f6f6f6;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .button-group a, .button-group button {
+            flex: 1;
+        }
+        #pdf-header {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #pdf-header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        #pdf-header p {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .filtro-mensal {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filtro-mensal select, .filtro-mensal button, .filtro-mensal input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 id="agente-estado-header">Dashboard de Monitoramento de Aulas</h1>
+            <p class="description">Visualize relatórios de desempenho semanal e mensal.</p>
+        </header>
+
+        <div class="main-content">
+            <div class="panel" id="dashboard-panel">
+                <div class="panel-title">Relatórios de Desempenho</div>
+                <div class="dashboard-controls">
+                    <button id="btn-semanal" onclick="renderDashboard('semanal')">Relatório Semanal</button>
+                    <button id="btn-mensal" onclick="renderDashboard('mensal')">Relatório Mensal</button>
+                    <button id="btn-agente" onclick="renderDashboard('agente')" style="display:none;">Relatório por Agente</button>
+                    <button id="btn-estado" onclick="renderDashboard('estado')" style="display:none;">Relatório por Estado</button>
+                </div>
+                <div class="filtro-mensal">
+                    <label for="data-inicio">De:</label>
+                    <input type="date" id="data-inicio">
+                    <label for="data-fim">Até:</label>
+                    <input type="date" id="data-fim">
+                    <button onclick="renderDashboard('custom')">Aplicar Filtro</button>
+                </div>
+                 <div class="filtro-mensal" id="filtro-estado-wesley" style="display:none;">
+                    <label for="estado-filtro-select">Filtrar Estado:</label>
+                    <select id="estado-filtro-select">
+                        <option value="Todos">Todos os Estados</option>
+                        <option value="Pernambuco">Pernambuco</option>
+                        <option value="Rio Grande do Norte">Rio Grande do Norte</option>
+                        <option value="Paraiba">Paraíba</option>
+                        <option value="Bahia">Bahia</option>
+                        <option value="Minas Gerais">Minas Gerais</option>
+                        <option value="Sergipe">Sergipe</option>
+                        <option value="Goias">Goiás</option>
+                        <option value="Maranhão">Maranhão</option>
+                        <option value="Alagoas">Alagoas</option>
+                    </select>
+                    <button onclick="renderDashboard('geral')">Aplicar</button>
+                </div>
+                
+                <div id="print-area">
+                    <div id="pdf-header">
+                        <h2>Relatório de Aulas - <span id="periodo-relatorio">Semanal</span></h2>
+                        <p>Gerado em: <span id="data-geracao"></span></p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="aulasChart"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                    <div id="statusLegend" class="status-legend"></div>
+                    
+                    <h3 style="margin-top: 30px;">Dados Diários</h3>
+                    <table id="dataTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Registro</th>
+                                <th>Total</th>
+                                <th>Execução</th>
+                                <th>Não Enviadas</th>
+                                <th>Recusadas</th>
+                                <th>Processamento</th>
+                                <th>Status</th>
+                                <th>Observação</th>
+                                <th class="coluna-agente" style="display:none;">Agente</th>
+                                <th class="coluna-estado" style="display:none;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="gerarPDF()" style="margin-top: 20px;">Gerar Relatório em PDF</button>
+                    <a href="index.html" style="text-decoration: none;"><button type="button" style="margin-top: 20px;">Voltar</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let aulasChart, statusChart;
+        let allAulasData = [];
+        const agente = localStorage.getItem('agenteSelecionado');
+        const estado = localStorage.getItem('estadoSelecionado');
+        let currentPeriodo = 'semanal';
+
+        const aulasChartCanvas = document.getElementById('aulasChart').getContext('2d');
+        const statusChartCanvas = document.getElementById('statusChart').getContext('2d');
+        const statusLegend = document.getElementById('statusLegend');
+        const dataTableBody = document.querySelector('#dataTable tbody');
+        const periodoRelatorio = document.getElementById('periodo-relatorio');
+        const dataGeracao = document.getElementById('data-geracao');
+        const dataInicioInput = document.getElementById('data-inicio');
+        const dataFimInput = document.getElementById('data-fim');
+        const btnAgente = document.getElementById('btn-agente');
+        const btnEstado = document.getElementById('btn-estado');
+        const filtroEstadoWesley = document.getElementById('filtro-estado-wesley');
+        const estadoFiltroSelect = document.getElementById('estado-filtro-select');
+        
+        const statusColors = {
+            'estavel': '#28a745',
+            'potencial': '#ffc107',
+            'incidente': '#fd7e14',
+            'critico': '#dc3545'
+        };
+
+        const statusLabels = {
+            'estavel': 'Estável',
+            'potencial': 'Potencial Incidente',
+            'incidente': 'Incidente Identificado',
+            'critico': 'Crítico'
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!agente) {
+                alert('Agente não selecionado. Por favor, volte para a página inicial.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            allAulasData = await fetchAulasData();
+            
+            if (agente === 'Wesley') {
+                document.getElementById('agente-estado-header').textContent = `Dashboard Geral - Todos os Estados`;
+                btnAgente.style.display = 'none';
+                btnEstado.style.display = 'none';
+                filtroEstadoWesley.style.display = 'flex';
+                renderDashboard('geral');
+            } else {
+                if (!estado) {
+                    alert('Estado não selecionado. Por favor, volte para a página inicial.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                document.getElementById('agente-estado-header').textContent = `Dashboard de ${agente} (${estado})`;
+                btnAgente.style.display = 'inline-block';
+                btnEstado.style.display = 'inline-block';
+                renderDashboard('agente');
+            }
+            
+            const today = new Date().toISOString().slice(0, 10);
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 6);
+            dataFimInput.value = today;
+            dataInicioInput.value = lastWeek.toISOString().slice(0, 10);
+        });
+        
+        async function fetchAulasData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/aulas');
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                } else {
+                    console.error('Erro ao buscar dados do servidor.');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+                return [];
+            }
+        }
+        
+        function renderDashboard(filterType) {
+            currentPeriodo = filterType;
+            let dataToFilter = allAulasData;
+
+            const agente = localStorage.getItem('agenteSelecionado');
+            const estado = localStorage.getItem('estadoSelecionado');
+            
+            if (filterType === 'agente') {
+                dataToFilter = dataToFilter.filter(item => item.agente === agente && item.estado === estado);
+                document.getElementById('agente-estado-header').textContent = `Dashboard de ${agente} (${estado})`;
+            } else if (filterType === 'estado') {
+                dataToFilter = dataToFilter.filter(item => item.estado === estado);
+                 document.getElementById('agente-estado-header').textContent = `Dashboard do Estado de ${estado}`;
+            } else if (filterType === 'geral' && agente === 'Wesley') {
+                 const estadoFiltrado = estadoFiltroSelect.value;
+                 if (estadoFiltrado && estadoFiltrado !== 'Todos') {
+                     dataToFilter = dataToFilter.filter(item => item.estado === estadoFiltrado);
+                     document.getElementById('agente-estado-header').textContent = `Dashboard do Estado de ${estadoFiltrado}`;
+                 } else {
+                    document.getElementById('agente-estado-header').textContent = `Dashboard Geral - Todos os Estados`;
+                 }
+            }
+
+            let startDate, endDate;
+            const today = new Date();
+            
+            if (filterType === 'custom' && dataInicioInput.value && dataFimInput.value) {
+                startDate = new Date(dataInicioInput.value);
+                endDate = new Date(dataFimInput.value);
+            } else if (filterType === 'semanal') {
+                endDate = today;
+                startDate = new Date();
+                startDate.setDate(today.getDate() - 6);
+            } else if (filterType === 'mensal') {
+                endDate = today;
+                startDate = new Date();
+                startDate.setDate(today.getDate() - 29);
+            } else {
+                endDate = today;
+                startDate = new Date();
+                startDate.setDate(today.getDate() - 6);
+                filterType = 'semanal';
+            }
+            endDate.setHours(23, 59, 59, 999);
+
+            const filteredData = dataToFilter
+                .filter(item => {
+                    const dataDate = new Date(item.data);
+                    return dataDate >= startDate && dataDate <= endDate;
+                })
+                .sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            if (filteredData.length === 0) {
+                 alert('Nenhum registro encontrado para o período selecionado.');
+            }
+
+            const labels = filteredData.map(item => new Date(item.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }));
+            const totalAulas = filteredData.map(item => item.total);
+            const aulasNaoEnviadas = filteredData.map(item => item.naoEnviadas);
+            const aulasRecusadas = filteredData.map(item => item.recusadas);
+            const aulasEmProcessamento = filteredData.map(item => item.processamento);
+            const statusCounts = filteredData.reduce((acc, item) => {
+                acc[item.status] = (acc[item.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            if (aulasChart) aulasChart.destroy();
+            aulasChart = new Chart(aulasChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Total de Aulas', data: totalAulas, borderColor: '#0056b3', fill: false, tension: 0.1 },
+                        { label: 'Não Enviadas', data: aulasNaoEnviadas, borderColor: '#dc3545', fill: false, tension: 0.1 },
+                        { label: 'Recusadas', data: aulasRecusadas, borderColor: '#6c757d', fill: false, tension: 0.1 },
+                        { label: 'Em Processamento', data: aulasEmProcessamento, borderColor: '#ffc107', fill: false, tension: 0.1 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: `Desempenho das Aulas (${filterType})` }
+                    }
+                }
+            });
+
+            const statusLabelsData = Object.keys(statusCounts).map(status => statusLabels[status]);
+            const statusValuesData = Object.values(statusCounts);
+            const statusColorsData = Object.keys(statusCounts).map(status => statusColors[status]);
+            
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(statusChartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabelsData,
+                    datasets: [{
+                        label: 'Status da Operação',
+                        data: statusValuesData,
+                        backgroundColor: statusColorsData,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: `Status da Operação (${filterType})` }
+                    }
+                }
+            });
+            
+            updateStatusLegend(statusCounts);
+            updateDataTable(filteredData, filterType);
+            
+            periodoRelatorio.textContent = (filterType === 'custom') ? `De ${new Date(startDate).toLocaleDateString()} a ${new Date(endDate).toLocaleDateString()}` : filterType;
+            dataGeracao.textContent = new Date().toLocaleDateString('pt-BR');
+        }
+
+        function updateStatusLegend(counts) {
+            statusLegend.innerHTML = '';
+            for (const status in counts) {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `
+                    <div class="legend-color" style="background-color: ${statusColors[status]};"></div>
+                    <span>${statusLabels[status]} (${counts[status]} dia${counts[status] > 1 ? 's' : ''})</span>
+                `;
+                statusLegend.appendChild(item);
+            }
+        }
+        
+        function updateDataTable(data, filterType) {
+            const tableHeaders = ['Data', 'Registro', 'Total', 'Execução', 'Não Enviadas', 'Recusadas', 'Processamento', 'Status', 'Observação'];
+            if (filterType === 'estado' || (agente === 'Wesley' && estadoFiltroSelect.value !== 'Todos')) {
+                 tableHeaders.push('Agente');
+            } else if (filterType === 'geral' && estadoFiltroSelect.value === 'Todos') {
+                 tableHeaders.push('Agente');
+                 tableHeaders.push('Estado');
+            }
+            
+            let tableHtml = `<thead><tr>${tableHeaders.map(header => `<th>${header}</th>`).join('')}</tr></thead>`;
+            
+            let tbodyHtml = '';
+            data.forEach((values) => {
+                tbodyHtml += `
+                    <tr>
+                        <td>${new Date(values.data).toLocaleDateString('pt-BR')}</td>
+                        <td>${values.tipoRegistro}</td>
+                        <td>${values.total}</td>
+                        <td>${values.execucao}</td>
+                        <td>${values.naoEnviadas}</td>
+                        <td>${values.recusadas}</td>
+                        <td>${values.processamento}</td>
+                        <td>${statusLabels[values.status]}</td>
+                        <td>${values.observacao || '-'}</td>
+                        ${(filterType === 'estado') ? `<td>${values.agente}</td>` : ''}
+                        ${(filterType === 'geral' && estadoFiltroSelect.value === 'Todos') ? `<td>${values.agente}</td><td>${values.estado}</td>` : ''}
+                    </tr>
+                `;
+            });
+            tableHtml += `<tbody>${tbodyHtml}</tbody>`;
+            dataTableBody.innerHTML = tableHtml;
+        }
+
+        async function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const printArea = document.getElementById('print-area');
+            const pdfHeader = document.getElementById('pdf-header');
+
+            pdfHeader.style.display = 'block';
+
+            await html2canvas(printArea, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const imgWidth = 210; 
+                const pageHeight = 295;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+
+                doc.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+
+                doc.save(`relatorio-aulas-${periodoRelatorio.textContent.toLowerCase()}.pdf`);
+            });
+            
+            pdfHeader.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

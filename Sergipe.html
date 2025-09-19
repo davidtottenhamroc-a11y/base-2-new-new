@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Técnica - Detran-SE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0d1a2a; /* Fundo azul escuro */
+            color: #f4f4f4; /* Cor do texto para contraste */
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            background: rgba(255, 255, 255, 0.2);
+            color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #f4f4f4;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1f1f1f;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #3498db;
+        }
+
+        .result.success {
+            border-left-color: #28a745;
+        }
+
+        .result.error {
+            border-left-color: #dc3545;
+        }
+
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+        }
+
+        .result-content {
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            color: #f4f4f4;
+        }
+
+        .info-box {
+            background: rgba(52, 152, 219, 0.2);
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+        }
+
+        .info-content {
+            line-height: 1.5;
+        }
+
+        .endpoint {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .documentation {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6f42c1;
+        }
+
+        .doc-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+            font-size: 18px;
+        }
+
+        .doc-section {
+            margin-bottom: 15px;
+        }
+
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f4f4f4;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .param-table th, .param-table td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            text-align: left;
+        }
+
+        .param-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            color: #f4f4f4;
+        }
+
+        .param-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Documentação Técnica - Detran-SE</h1>
+            <p class="description">
+                Este pacote de integração atua como um wrapper para simplificar a comunicação com os endpoints oficiais do Detran Sergipe, encapsulando o fluxo de autenticação e as requisições HTTP. O gerenciamento de autenticação é feito pela classe **TokenSE**, que é responsável por obter e gerenciar o token JWT (JSON Web Token).
+            </p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="veiculo">Consulta Veículos</div>
+            <div class="tab" data-tab="cfc">Consulta CFCs</div>
+            <div class="tab" data-tab="instrutor">Consulta Instrutores</div>
+            <div class="tab" data-tab="candidato">Consulta Candidato</div>
+            <div class="tab" data-tab="envio-aulas">Envio de Aulas</div>
+        </div>
+
+        <div class="tab-content active" id="veiculo">
+            <h2>Consulta de Veículos por CFC</h2>
+
+            <div class="info-box">
+                <div class="info-title">Visão Geral da Consulta</div>
+                <div class="info-content">
+                    Este é um endpoint crucial para a gestão de frotas de um Centro de Formação de Condutores (CFC). Ele permite que você retorne todos os veículos associados a um CFC específico, com a opção de filtrar a busca por uma placa para obter informações detalhadas, como chassi, categoria, tipo, cor, ano de fabricação e situação do licenciamento.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="veiculo-codigoCfc">Código do CFC (obrigatório):</label>
+                <input type="text" id="veiculo-codigoCfc" placeholder="Ex: CFC12345" required>
+            </div>
+            <div class="form-group">
+                <label for="veiculo-placa">Placa (opcional):</label>
+                <input type="text" id="veiculo-placa" placeholder="Ex: ABC1D23">
+            </div>
+            <button onclick="consultarVeiculos()">Consultar Veículos</button>
+            <button onclick="mostrarDocumentacao('veiculo')">Ver Documentação</button>
+            <div class="result" id="veiculo-result"></div>
+            
+            <div class="documentation" id="veiculo-doc" style="display: none;">
+                <div class="doc-title">Documentação Detalhada - Veículos</div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoint</div>
+                    <div class="endpoint">GET /Monitoramento/veiculo/{codigoCfc}</div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada na URL</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>codigoCfc</td>
+                            <td>string</td>
+                            <td>Sim</td>
+                            <td>Código do CFC no Detran-SE.</td>
+                        </tr>
+                        <tr>
+                            <td>placa</td>
+                            <td>string</td>
+                            <td>Não</td>
+                            <td>Filtro por placa específica.</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta (VeiculoResponse)</div>
+                    <pre class="result-content">
+{
+  "Erro": 0,
+  "Mensagem": "",
+  "CnpjEmpresaMonitoramento": 12345678000190,
+  "CodigoCfc": "CFC54321",
+  "Placa": "ABC1D23",
+  "QuantidadeVeiculos": 3,
+  "Veiculos": [
+    {
+      "Placa": "ABC1D23",
+      "Chassi": "9BWZZZ377VT004251",
+      "Categoria": "B",
+      "Situacao": "S",
+      "ObservacaoVeiculo": "string",
+      "Adaptado": "N",
+      "Cor": "Prata",
+      "Tipo": "Automóvel",
+      "AnoFabricacao": 2020,
+      "MarcaModelo": "Fiat Argo"
+    }
+  ]
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="cfc">
+            <h2>Consulta de Centros de Formação (CFCs)</h2>
+
+            <div class="info-box">
+                <div class="info-title">Visão Geral da Consulta</div>
+                <div class="info-content">
+                    Este endpoint é a porta de entrada para buscar informações cadastrais e de credenciamento dos CFCs. A API permite listar todos os CFCs ou filtrar por um código específico. As informações retornadas incluem detalhes de contato (endereço, telefone, e-mail), a situação do credenciamento e os dados dos diretores, que são essenciais para a verificação de credenciais e a conformidade regulatória.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cfc-codigoCfc">Código do CFC (opcional):</label>
+                <input type="text" id="cfc-codigoCfc" placeholder="Ex: CFC12345">
+            </div>
+            <button onclick="consultarCfc()">Consultar CFCs</button>
+            <button onclick="mostrarDocumentacao('cfc')">Ver Documentação</button>
+            <div class="result" id="cfc-result"></div>
+            
+            <div class="documentation" id="cfc-doc" style="display: none;">
+                <div class="doc-title">Documentação Detalhada - CFCs</div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoint</div>
+                    <div class="endpoint">GET /Monitoramento/Cfc</div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada na URL</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>codigoCfc</td>
+                            <td>string</td>
+                            <td>Não</td>
+                            <td>Filtro por código do CFC.</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta (CentroFormacaoSEResponse)</div>
+                    <pre class="result-content">
+{
+  "Erro": 0,
+  "Mensagem": "",
+  "Cnpj": 15189798000139,
+  "CodigoCfcInterno": "SE001",
+  "QuantidadeCfcs": 1,
+  "CentrosDeFormacao": [
+    {
+      "Codigo": "CFC12345",
+      "Nome": "CENTRO DE FORMACAO DE CONDUTORES EXEMPLO LTDA",
+      "Cnpj": 12345678000190,
+      "Situacao": "Ativo",
+      "VencimentoCredenciamento": "2025-12-31T00:00:00",
+      "DataBloqueioTeorica": null,
+      "DataBloqueioPratica": null,
+      "CategoriaSuspensa": "X",
+      "Tipo": "TP",
+      "Endereco": "RUA DAS FLORES",
+      "NumeroEndereco": "123",
+      "Bairro": "CENTRO",
+      "CodigoMunicipio": 1234,
+      "Municipio": "ARACAJU",
+      "Uf": "SE",
+      "Cep": 49000000,
+      "NomeDiretorGeral": "JOAO DA SILVA",
+      "CpfDiretorGeral": 12345678901,
+      "NomeDiretorEnsino": "MARIA SOUZA",
+      "CpfDiretorEnsino": 98765432109,
+      "Telefone1": "7933334444",
+      "Telefone2": "7999998888",
+      "Email": "contato@cfcexemplo.com.br",
+      "ResponsavelTecnico": "CARLOS TECNICO",
+      "CapacidadeSalaPresencial": "30",
+      "CapacidadeSalaRemota": "100",
+      "CategoriasPratica": "A,B,AB",
+      "LatitudeAula2R": -10.123456,
+      "LongitudeAula2R": -37.123456,
+      "LatitudeAula4R": -10.234567,
+      "LongitudeAula4R": -37.234567
+    }
+  ]
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="instrutor">
+            <h2>Consulta de Instrutores por CFC</h2>
+
+            <div class="info-box">
+                <div class="info-title">Visão Geral da Consulta</div>
+                <div class="info-content">
+                    Este endpoint é utilizado para validar e consultar os instrutores credenciados em um CFC. É possível listar todos os instrutores ativos de uma unidade ou buscar um instrutor específico por seu registro profissional. A resposta retorna dados profissionais, como situação de credenciamento, categorias habilitadas e datas de vencimento, além dos templates biométricos (digitais e foto) que são essenciais para a autenticação durante o envio de aulas.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="instrutor-codigoCfc">Código do CFC (obrigatório):</label>
+                <input type="text" id="instrutor-codigoCfc" placeholder="Ex: CFC12345" required>
+            </div>
+            <div class="form-group">
+                <label for="instrutor-registro">Registro do Instrutor (opcional):</label>
+                <input type="text" id="instrutor-registro" placeholder="Ex: 123456">
+            </div>
+            <button onclick="consultarInstrutores()">Consultar Instrutores</button>
+            <button onclick="mostrarDocumentacao('instrutor')">Ver Documentação</button>
+            <div class="result" id="instrutor-result"></div>
+
+            <div class="documentation" id="instrutor-doc" style="display: none;">
+                <div class="doc-title">Documentação Detalhada - Instrutores</div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoint</div>
+                    <div class="endpoint">GET /Monitoramento/Instrutor/{codigoCfc}</div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada na URL</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                        </tr>
+                        <tr>
+                            <td>codigoCfc</td>
+                            <td>string</td>
+                            <td>Sim</td>
+                            <td>Código do CFC no Detran-SE.</td>
+                        </tr>
+                        <tr>
+                            <td>registroInstrutor</td>
+                            <td>string</td>
+                            <td>Não</td>
+                            <td>Filtro por registro de instrutor específico.</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta (InstrutorSEResponse)</div>
+                    <pre class="result-content">
+{
+  "Erro": 0,
+  "Mensagem": "",
+  "Cnpj": 12345678000190,
+  "CodigoCfcInterno": "CFC54321",
+  "RegistroInstrutor": 987654,
+  "QuantidadeInstrutores": 2,
+  "Instrutores": [
+    {
+      "Cpf": 98765432109,
+      "Registro": 123456,
+      "Codigo": 37,
+      "Nome": "JOSÉ CARLOS OLIVEIRA",
+      "Email": "jose.oliveira@cfcexemplo.com.br",
+      "Situacao": "Ativo",
+      "Tipo": "Substituto",
+      "Categoria": "B",
+      "VencimentoCredenciamento": "2024-11-30T00:00:00",
+      "VencimentoHabilitacao": "2025-03-20T00:00:00",
+      "Digital1": "BASE64_ENCODED_DATA",
+      "Digital2": "BASE64_ENCODED_DATA",
+      "Foto": "BASE64_ENCODED_DATA"
+    }
+  ]
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="candidato">
+            <h2>Consulta de Candidato por CPF</h2>
+
+            <div class="info-box">
+                <div class="info-title">Visão Geral da Consulta</div>
+                <div class="info-content">
+                    Este endpoint permite a verificação do processo de habilitação de um candidato junto ao Detran-SE. Ao fornecer o CPF, tipo de aula, categoria e código do CFC, é possível obter os dados do processo, como o número do Renach, o nome completo e as datas de validade do processo. A resposta também pode incluir a biometria facial e digital do candidato, que são cruciais para confirmar sua identidade antes e depois das aulas.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="candidato-cpf">CPF do Candidato (obrigatório):</label>
+                <input type="text" id="candidato-cpf" placeholder="Ex: 12345678901" required>
+            </div>
+            <div class="form-group">
+                <label for="candidato-tipoAula">Tipo de Aula (obrigatório):</label>
+                <select id="candidato-tipoAula" required>
+                    <option value="">Selecione...</option>
+                    <option value="T">Teórica</option>
+                    <option value="P">Prática</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="candidato-categoria">Categoria (obrigatório):</label>
+                <input type="text" id="candidato-categoria" placeholder="Ex: B" required>
+            </div>
+            <div class="form-group">
+                <label for="candidato-codigoCfc">Código do CFC (obrigatório):</label>
+                <input type="text" id="candidato-codigoCfc" placeholder="Ex: CFC12345" required>
+            </div>
+            <button onclick="consultarCandidato()">Consultar Candidato</button>
+            <button onclick="mostrarDocumentacao('candidato')">Ver Documentação</button>
+            <div class="result" id="candidato-result"></div>
+
+            <div class="documentation" id="candidato-doc" style="display: none;">
+                <div class="doc-title">Documentação Detalhada - Candidato</div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoint</div>
+                    <div class="endpoint">GET /Monitoramento/Cpf/{cpf}/{tipoAula}/{categoria}/{codigoCfc}</div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros de Entrada na URL</div>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Tipo</th>
+                            <th>Obrigatório</th>
+                            <th>Descrição</th>
+                            <th>Valores Válidos</th>
+                        </tr>
+                        <tr>
+                            <td>cpf</td>
+                            <td>string</td>
+                            <td>Sim</td>
+                            <td>CPF do candidato (somente números).</td>
+                            <td>11 dígitos</td>
+                        </tr>
+                        <tr>
+                            <td>tipoAula</td>
+                            <td>string</td>
+                            <td>Sim</td>
+                            <td>Tipo de aula.</td>
+                            <td>"T" (Teórica), "P" (Prática)</td>
+                        </tr>
+                        <tr>
+                            <td>categoria</td>
+                            <td>string</td>
+                            <td>Sim</td>
+                            <td>Categoria desejada.</td>
+                            <td>"A", "B", "AB", "ACC"</td>
+                        </tr>
+                        <tr>
+                            <td>codigoCfc</td>
+                            <td>string</td>
+                            <td>Sim</td>
+                            <td>Código do CFC no Detran-SE.</td>
+                            <td>Alfanumérico</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Exemplo de Resposta (CandidatoSEResponse)</div>
+                    <pre class="result-content">
+{
+  "Erro": 0,
+  "Mensagem": "",
+  "Cnpj": 12345678000190,
+  "Cpf": 12345678901,
+  "TipoAula": "P",
+  "Categoria": "B",
+  "CodigoCfc": "CFC54321",
+  "Renach": "SE123456789",
+  "NumeroProcesso": 987654,
+  "Nome": "FULANO DA SILVA SOUZA",
+  "DataAberturaProcesso": "2023-05-15",
+  "DataValidadeProcesso": "2024-05-15",
+  "CnhSocial": "N",
+  "PossuiPcd": "N",
+  "StDigital1": "BASE64_ENCODED_DATA",
+  "StDigital2": "BASE64_ENCODED_DATA",
+  "Face": "BASE64_ENCODED_DATA"
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="envio-aulas">
+            <h2>Envio de Aulas (Teórica e Prática)</h2>
+
+            <div class="info-box">
+                <div class="info-title">Visão Geral do Envio de Aulas</div>
+                <div class="info-content">
+                    Este é um dos endpoints mais importantes da API, usado para registrar oficialmente uma aula (teórica ou prática) no sistema do Detran-SE. A requisição `POST` deve conter um corpo (body) com todos os detalhes da aula, incluindo CPF do aluno, tipo de aula, código do CFC, registro do instrutor, datas, horários e, para aulas práticas, a placa do veículo.
+                    É crucial garantir que os dados sejam enviados no formato correto, pois este é o passo final para a validação da carga horária do aluno. A API retorna o status da operação para confirmar se a aula foi cadastrada com sucesso ou se houve algum erro.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="envio-cpf">CPF do Aluno (obrigatório):</label>
+                <input type="text" id="envio-cpf" placeholder="Ex: 12345678901" required>
+            </div>
+            <div class="form-group">
+                <label for="envio-tipoAula">Tipo de Aula (obrigatório):</label>
+                <select id="envio-tipoAula" required>
+                    <option value="">Selecione...</option>
+                    <option value="T">Teórica</option>
+                    <option value="P">Prática</option>
+                </select>
+            </div>
+            <div class="form-group" id="envio-categoria-group">
+                <label for="envio-categoria">Categoria:</label>
+                <input type="text" id="envio-categoria" placeholder="Ex: B">
+            </div>
+            <div class="form-group">
+                <label for="envio-codigoCfc">Código do CFC (obrigatório):</label>
+                <input type="text" id="envio-codigoCfc" placeholder="Ex: CFC54321" required>
+            </div>
+            <div class="form-group">
+                <label for="envio-registroInstrutor">Registro do Instrutor (obrigatório):</label>
+                <input type="number" id="envio-registroInstrutor" placeholder="Ex: 12345" required>
+            </div>
+            <div class="form-group">
+                <label for="envio-dataAula">Data da Aula (obrigatório):</label>
+                <input type="date" id="envio-dataAula" required>
+            </div>
+            <div class="form-group">
+                <label for="envio-horaInicio">Hora de Início (obrigatório):</label>
+                <input type="time" id="envio-horaInicio" required>
+            </div>
+            <div class="form-group">
+                <label for="envio-horaFim">Hora de Fim (obrigatório):</label>
+                <input type="time" id="envio-horaFim" required>
+            </div>
+            <div class="form-group" id="envio-codigoMateria-group">
+                <label for="envio-codigoMateria">Código da Matéria (para Teórica):</label>
+                <input type="text" id="envio-codigoMateria" placeholder="Ex: L">
+            </div>
+            <div class="form-group" id="envio-placa-group">
+                <label for="envio-placa">Placa do Veículo (para Prática):</label>
+                <input type="text" id="envio-placa" placeholder="Ex: ABC1D23">
+            </div>
+            <button onclick="enviarAula()">Enviar Aula</button>
+            <button onclick="mostrarDocumentacao('envio-aulas')">Ver Documentação</button>
+            <div class="result" id="envio-aulas-result"></div>
+
+            <div class="documentation" id="envio-aulas-doc" style="display: none;">
+                <div class="doc-title">Documentação Detalhada - Envio de Aulas</div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoint</div>
+                    <div class="endpoint">POST /Monitoramento/aula/cadastrar</div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Estrutura do Body (AulaEnvioModel)</div>
+                    <pre class="result-content">
+{
+  "cpf": "12345678901",
+  "tipoAula": "P",
+  "categoria": "B",
+  "codigoCfc": "CFC54321",
+  "registroInstrutor": 12345,
+  "dataAula": 20230815,
+  "horaInicio": 830,
+  "horaFim": 930,
+  "codigoMateria": "L",
+  "placa": "ABC1D23"
+}
+                    </pre>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Observações Importantes</div>
+                    <ul>
+                        <li>O campo **categoria** é obrigatório apenas para aulas práticas ("P").</li>
+                        <li>O campo **codigoMateria** é obrigatório para aulas teóricas ("T", "A", "R").</li>
+                        <li>O campo **placa** é obrigatório para aulas práticas ("P").</li>
+                        <li>Campos que não são obrigatórios devem ser enviados com uma string vazia se não forem aplicáveis.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="back-button-container">
+        <a href="Menu.html" class="back-button">Voltar para o Menu</a>
+    </div>
+
+    <script>
+        // Gerenciamento das abas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                // Oculta a documentação ao mudar de aba
+                document.querySelectorAll('.documentation').forEach(doc => doc.style.display = 'none');
+            });
+        });
+        
+        // Função para mostrar/ocultar documentação
+        function mostrarDocumentacao(tipo) {
+            const docElement = document.getElementById(`${tipo}-doc`);
+            if (docElement.style.display === 'none' || !docElement.style.display) {
+                docElement.style.display = 'block';
+            } else {
+                docElement.style.display = 'none';
+            }
+        }
+
+        // Lógica de simulação para os novos endpoints
+        function consultarVeiculos() {
+            const codigoCfc = document.getElementById('veiculo-codigoCfc').value;
+            const placa = document.getElementById('veiculo-placa').value;
+            const resultDiv = document.getElementById('veiculo-result');
+            
+            if (!codigoCfc) {
+                resultDiv.innerHTML = '<div class="result-title">Erro</div><div class="result-content">O campo "Código do CFC" é obrigatório.</div>';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            const response = {
+                "Erro": 0,
+                "Mensagem": "Consulta realizada com sucesso",
+                "CnpjEmpresaMonitoramento": 12345678000190,
+                "CodigoCfc": codigoCfc,
+                "Placa": placa || null,
+                "QuantidadeVeiculos": 1,
+                "Veiculos": [
+                    {
+                        "Placa": placa || "ABC1D23",
+                        "Chassi": "9BWZZZ377VT004251",
+                        "Categoria": "B",
+                        "Situacao": "S",
+                        "ObservacaoVeiculo": "",
+                        "Adaptado": "N",
+                        "Cor": "Prata",
+                        "Tipo": "Automóvel",
+                        "AnoFabricacao": 2020,
+                        "MarcaModelo": "Fiat Argo"
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `<div class="result-title">Resultado da Consulta</div><div class="result-content">${JSON.stringify(response, null, 2)}</div>`;
+            resultDiv.className = 'result success';
+        }
+
+        function consultarCfc() {
+            const codigoCfc = document.getElementById('cfc-codigoCfc').value;
+            const resultDiv = document.getElementById('cfc-result');
+
+            const response = {
+                "Erro": 0,
+                "Mensagem": "Consulta realizada com sucesso",
+                "Cnpj": 15189798000139,
+                "CodigoCfcInterno": codigoCfc || "SE001",
+                "QuantidadeCfcs": 1,
+                "CentrosDeFormacao": [
+                    {
+                        "Codigo": codigoCfc || "CFC12345",
+                        "Nome": "CENTRO DE FORMACAO DE CONDUTORES EXEMPLO LTDA",
+                        "Cnpj": 12345678000190,
+                        "Situacao": "Ativo",
+                        "VencimentoCredenciamento": "2025-12-31T00:00:00",
+                        "DataBloqueioTeorica": null,
+                        "DataBloqueioPratica": null,
+                        "CategoriaSuspensa": "X",
+                        "Tipo": "TP",
+                        "Endereco": "RUA DAS FLORES",
+                        "NumeroEndereco": "123",
+                        "Bairro": "CENTRO",
+                        "CodigoMunicipio": 1234,
+                        "Municipio": "ARACAJU",
+                        "Uf": "SE",
+                        "Cep": 49000000,
+                        "NomeDiretorGeral": "JOAO DA SILVA",
+                        "CpfDiretorGeral": 12345678901,
+                        "NomeDiretorEnsino": "MARIA SOUZA",
+                        "CpfDiretorEnsino": 98765432109,
+                        "Telefone1": "7933334444",
+                        "Telefone2": "7999998888",
+                        "Email": "contato@cfcexemplo.com.br",
+                        "ResponsavelTecnico": "CARLOS TECNICO",
+                        "CapacidadeSalaPresencial": "30",
+                        "CapacidadeSalaRemota": "100",
+                        "CategoriasPratica": "A,B,AB",
+                        "LatitudeAula2R": -10.123456,
+                        "LongitudeAula2R": -37.123456,
+                        "LatitudeAula4R": -10.234567,
+                        "LongitudeAula4R": -37.234567
+                    }
+                ]
+            };
+            
+            resultDiv.innerHTML = `<div class="result-title">Resultado da Consulta</div><div class="result-content">${JSON.stringify(response, null, 2)}</div>`;
+            resultDiv.className = 'result success';
+        }
+
+        function consultarInstrutores() {
+            const codigoCfc = document.getElementById('instrutor-codigoCfc').value;
+            const registroInstrutor = document.getElementById('instrutor-registro').value;
+            const resultDiv = document.getElementById('instrutor-result');
+
+            if (!codigoCfc) {
+                resultDiv.innerHTML = '<div class="result-title">Erro</div><div class="result-content">O campo "Código do CFC" é obrigatório.</div>';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            const response = {
+                "Erro": 0,
+                "Mensagem": "Consulta realizada com sucesso",
+                "Cnpj": 12345678000190,
+                "CodigoCfcInterno": codigoCfc,
+                "RegistroInstrutor": registroInstrutor || null,
+                "QuantidadeInstrutores": 1,
+                "Instrutores": [
+                    {
+                        "Cpf": 98765432109,
+                        "Registro": registroInstrutor || 123456,
+                        "Codigo": 37,
+                        "Nome": "JOSÉ CARLOS OLIVEIRA",
+                        "Email": "jose.oliveira@cfcexemplo.com.br",
+                        "Situacao": "Ativo",
+                        "Tipo": "Substituto",
+                        "Categoria": "B",
+                        "VencimentoCredenciamento": "2024-11-30T00:00:00",
+                        "VencimentoHabilitacao": "2025-03-20T00:00:00",
+                        "Digital1": "BASE64_ENCODED_DATA",
+                        "Digital2": "BASE64_ENCODED_DATA",
+                        "Foto": "BASE64_ENCODED_DATA"
+                    }
+                ]
+            };
+
+            resultDiv.innerHTML = `<div class="result-title">Resultado da Consulta</div><div class="result-content">${JSON.stringify(response, null, 2)}</div>`;
+            resultDiv.className = 'result success';
+        }
+
+        function consultarCandidato() {
+            const cpf = document.getElementById('candidato-cpf').value;
+            const tipoAula = document.getElementById('candidato-tipoAula').value;
+            const categoria = document.getElementById('candidato-categoria').value;
+            const codigoCfc = document.getElementById('candidato-codigoCfc').value;
+            const resultDiv = document.getElementById('candidato-result');
+            
+            if (!cpf || !tipoAula || !categoria || !codigoCfc) {
+                resultDiv.innerHTML = '<div class="result-title">Erro</div><div class="result-content">Todos os campos são obrigatórios.</div>';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            const response = {
+                "Erro": 0,
+                "Mensagem": "Consulta realizada com sucesso",
+                "Cnpj": 12345678000190,
+                "Cpf": parseInt(cpf),
+                "TipoAula": tipoAula,
+                "Categoria": categoria,
+                "CodigoCfc": codigoCfc,
+                "Renach": "SE123456789",
+                "NumeroProcesso": 987654,
+                "Nome": "FULANO DA SILVA SOUZA",
+                "DataAberturaProcesso": "2023-05-15",
+                "DataValidadeProcesso": "2024-05-15",
+                "CnhSocial": "N",
+                "PossuiPcd": "N",
+                "StDigital1": "BASE64_ENCODED_DATA",
+                "StDigital2": "BASE64_ENCODED_DATA",
+                "Face": "BASE64_ENCODED_DATA"
+            };
+
+            resultDiv.innerHTML = `<div class="result-title">Resultado da Consulta</div><div class="result-content">${JSON.stringify(response, null, 2)}</div>`;
+            resultDiv.className = 'result success';
+        }
+
+        function enviarAula() {
+            const cpf = document.getElementById('envio-cpf').value;
+            const tipoAula = document.getElementById('envio-tipoAula').value;
+            const categoria = document.getElementById('envio-categoria').value;
+            const codigoCfc = document.getElementById('envio-codigoCfc').value;
+            const registroInstrutor = parseInt(document.getElementById('envio-registroInstrutor').value);
+            const dataAula = document.getElementById('envio-dataAula').value.replace(/-/g, '');
+            const horaInicio = document.getElementById('envio-horaInicio').value.replace(':', '');
+            const horaFim = document.getElementById('envio-horaFim').value.replace(':', '');
+            const codigoMateria = document.getElementById('envio-codigoMateria').value;
+            const placa = document.getElementById('envio-placa').value;
+            const resultDiv = document.getElementById('envio-aulas-result');
+
+            if (!cpf || !tipoAula || !codigoCfc || isNaN(registroInstrutor) || !dataAula || !horaInicio || !horaFim ||
+                (tipoAula === 'P' && (!categoria || !placa)) || (tipoAula === 'T' && !codigoMateria)) {
+                resultDiv.innerHTML = '<div class="result-title">Erro</div><div class="result-content">Os campos obrigatórios para o tipo de aula selecionado estão faltando ou são inválidos.</div>';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            const requestBody = {
+                "cpf": cpf,
+                "tipoAula": tipoAula,
+                "categoria": tipoAula === 'P' ? categoria : null,
+                "codigoCfc": codigoCfc,
+                "registroInstrutor": registroInstrutor,
+                "dataAula": parseInt(dataAula),
+                "horaInicio": parseInt(horaInicio),
+                "horaFim": parseInt(horaFim),
+                "codigoMateria": tipoAula === 'T' ? codigoMateria : null,
+                "placa": tipoAula === 'P' ? placa : null
+            };
+
+            const response = {
+                "Erro": 0,
+                "Mensagem": "",
+                "CnpjEmpresa": 12345678000190,
+                "Cpf": parseInt(cpf),
+                "TipoAula": tipoAula,
+                "Categoria": tipoAula === 'P' ? categoria : null,
+                "CodigoCfc": codigoCfc,
+                "RegistroInstrutor": registroInstrutor,
+                "DataAula": parseInt(dataAula),
+                "HoraInicio": parseInt(horaInicio),
+                "HoraFim": parseInt(horaFim),
+                "CodigoMateria": tipoAula === 'T' ? codigoMateria : null,
+                "Placa": tipoAula === 'P' ? placa : null
+            };
+            
+            resultDiv.innerHTML = `<div class="result-title">Corpo da Requisição (POST)</div><div class="result-content">${JSON.stringify(requestBody, null, 2)}</div><br><div class="result-title">Resposta do Servidor</div><div class="result-content">${JSON.stringify(response, null, 2)}</div>`;
+            resultDiv.className = 'result success';
+        }
+
+        // Lógica para mostrar/ocultar campos condicionais no formulário de envio de aulas
+        document.getElementById('envio-tipoAula').addEventListener('change', (e) => {
+            const tipoAula = e.target.value;
+            const categoriaGroup = document.getElementById('envio-categoria-group');
+            const codigoMateriaGroup = document.getElementById('envio-codigoMateria-group');
+            const placaGroup = document.getElementById('envio-placa-group');
+
+            if (tipoAula === 'P') { // Prática
+                categoriaGroup.style.display = 'block';
+                placaGroup.style.display = 'block';
+                codigoMateriaGroup.style.display = 'none';
+            } else if (tipoAula === 'T') { // Teórica
+                categoriaGroup.style.display = 'none';
+                placaGroup.style.display = 'none';
+                codigoMateriaGroup.style.display = 'block';
+            } else {
+                categoriaGroup.style.display = 'none';
+                placaGroup.style.display = 'none';
+                codigoMateriaGroup.style.display = 'none';
+            }
+        });
+
+        // Inicializa a primeira aba como ativa ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.tab.active').click();
+            document.getElementById('envio-tipoAula').dispatchEvent(new Event('change'));
+        });
+    </script>
+</body>
+</html>

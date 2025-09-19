@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API SuperPrático - Documentação Completa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab:hover {
+            background: #e9ecef;
+        }
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            background: white;
+            color: #3498db;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .info-box.danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        .info-box.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .info-box.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .info-content {
+            line-height: 1.5;
+        }
+        .endpoint-url {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .documentation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6f42c1;
+        }
+        .doc-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        .doc-section {
+            margin-bottom: 20px;
+        }
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .param-table th, .param-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .param-table th {
+            background: #f2f2f2;
+            font-weight: 600;
+        }
+        .param-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .code-block {
+            background: #e9ecef;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        ul, ol {
+            padding-left: 20px;
+        }
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>API SuperPrático - Documentação Completa</h1>
+            <p class="description">Detalhes de endpoints para suporte e integrações, incluindo aulas práticas, bônus, reprocessamentos e alertas.</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="movimentacoes">1. Movimentações</div>
+            <div class="tab" data-tab="reenvio-aulas">2. Reenvio de Aulas Práticas</div>
+            <div class="tab" data-tab="gerenciamento-alertas">3. Gerenciamento de Alertas</div>
+            <div class="tab" data-tab="aula-pratica-detran">4. GET Aula Prática (Detran GO)</div>
+            <div class="tab" data-tab="notificacao">5. Notificação</div>
+            <div class="tab" data-tab="veiculo-obd">6. Veículo OBD</div>
+            <div class="tab" data-tab="sincronizacao-coletor">7. Sincronização (Coletor)</div>
+            <div class="tab" data-tab="aula-coletor">8. Aula (Coletor)</div>
+            <div class="tab" data-tab="aula-online">9. Aula Online</div>
+            <div class="tab" data-tab="monitoramento-resumido">10. Monitoramento Resumido</div>
+            <div class="tab" data-tab="abertura-aula">11. Fluxo Abertura de Aula</div>
+        </div>
+        
+        <div class="tab-content active" id="movimentacoes">
+            <h2>1. Movimentação de Bônus e Créditos</h2>
+            <div class="doc-section">
+                <div class="doc-section-title">1.1 Movimentação de Aulas Bônus</div>
+                <div class="info-box">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">GET /api/suportepratico/movimentacoes/movimentarBonus/{renach}/{tipoMov}/{categoria}/{quantidade}/{diasExpirarBonus}</div>
+                    <div class="info-content">
+                        <p>Função: Permite adicionar ou remover aulas bônus do saldo de um processo de aluno. Ao adicionar, é obrigatório definir um prazo de validade em dias. Para remoção, o sistema verifica se o saldo existente não está expirado antes de permitir a operação.</p>
+                        <p>Autenticação: Requer autenticação por token.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">Parâmetros (na URL)</div>
+                <table class="param-table">
+                    <tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr>
+                    <tr><td>renach</td><td>string</td><td>Sim</td><td>O número do RENACH do processo do aluno.</td></tr>
+                    <tr><td>tipoMov</td><td>enum</td><td>Sim</td><td>Ação a ser realizada: **Credito** (adicionar) ou **Debito** (remover).</td></tr>
+                    <tr><td>categoria</td><td>enum</td><td>Sim</td><td>A categoria do bônus: **DuasRodas** ou **QuatroRodas**.</td></tr>
+                    <tr><td>quantidade</td><td>int</td><td>Sim</td><td>O número de aulas bônus a serem adicionadas ou removidas. Deve ser maior que zero.</td></tr>
+                    <tr><td>diasExpirarBonus</td><td>int</td><td>Condicional</td><td>O prazo de validade em dias. **Obrigatório para Credito**, e deve ser omitido para `Debito`.</td></tr>
+                </table>
+                <div class="doc-section-title">Exemplos de Request</div>
+                <div class="code-block">
+// Adicionar 3 aulas bônus de 2 rodas com validade de 60 dias
+GET /api/suportepratico/movimentacoes/movimentarBonus/BA123456789/Credito/DuasRodas/3/60
+
+// Remover 1 aula bônus de 4 rodas (sem diasExpirarBonus)
+GET /api/suportepratico/movimentacoes/movimentarBonus/DF987654321/Debito/QuatroRodas/1
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">1.2 Movimentação de Créditos Não Sacáveis</div>
+                <div class="info-box">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">GET /api/suportepratico/movimentacoes/movimentarCreditos/{renach}/{tipoMov}/{categoria}/{quantidade}/{justificativa}</div>
+                    <div class="info-content">
+                        <p>Função: Adiciona ou remove créditos de aulas práticas (não sacáveis) do saldo de um processo de aluno. A operação é registrada com um usuário de suporte genérico e o saldo é atualizado via trigger no banco de dados.</p>
+                        <p>Autenticação: Requer autenticação por token.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">Parâmetros (na URL)</div>
+                <table class="param-table">
+                    <tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr>
+                    <tr><td>renach</td><td>string</td><td>Sim</td><td>O número do RENACH do processo do aluno.</td></tr>
+                    <tr><td>tipoMov</td><td>enum</td><td>Sim</td><td>Ação a ser realizada: **Credito** (adicionar) ou **Debito** (remover).</td></tr>
+                    <tr><td>categoria</td><td>enum</td><td>Sim</td><td>A categoria do crédito: **DuasRodas** ou **QuatroRodas**.</td></tr>
+                    <tr><td>quantidade</td><td>int</td><td>Sim</td><td>O número de créditos a serem adicionados ou removidos. Deve ser maior que zero.</td></tr>
+                    <tr><td>justificativa</td><td>string</td><td>Sim</td><td>O motivo da movimentação, que é salvo para auditoria.</td></tr>
+                </table>
+                <div class="doc-section-title">Exemplos de Request</div>
+                <div class="code-block">
+// Adicionar 5 créditos de 4 rodas com justificativa
+GET /api/suportepratico/movimentacoes/movimentarCreditos/BA123456789/Credito/QuatroRodas/5/Ajuste conforme chamado 123
+
+// Remover 2 créditos de 2 rodas com justificativa
+GET /api/suportepratico/movimentacoes/movimentarCreditos/DF987654321/Debito/DuasRodas/2/Correcao de lancamento duplicado
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="reenvio-aulas">
+            <h2>2. Reenvio de Aulas Práticas</h2>
+            <div class="doc-section">
+                <div class="doc-section-title">2.1 Reprocessar Aulas Práticas</div>
+                <div class="info-box">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST /api/suportepratico/reenvio/reprocessar</div>
+                    <div class="info-content">
+                        <p>Função: Reprocessa uma ou mais aulas práticas para o DETRAN, com a opção de alterar horários de início/fim e/ou excluir segmentos de monitoramento antes do reprocessamento.</p>
+                        <p>Autenticação: Requer autenticação por token.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">Corpo da Requisição (JSON)</div>
+                <div class="code-block">
+{
+  "Aulas": [
+    {
+      "IdAula": "GUID da aula (string)",
+      "Inicio": "Nova data e hora de início (string, opcional) - Formato: YYYY-MM-DDTHH:mm:ss",
+      "Fim": "Nova data e hora de fim (string, opcional) - Formato: YYYY-MM-DDTHH:mm:ss",
+      "ExcluirSegmentos": "true para excluir, false para manter (boolean, opcional)"
+    }
+  ]
+}
+                </div>
+                <div class="doc-section-title">Exemplos de Request</div>
+                <div class="code-block">
+// Cenário 1: Reprocessamento Simples (sem alterar dados)
+{
+  "Aulas": [
+    { "IdAula": "21f1c0b3-2457-4704-bf8a-05297ccb4866" }
+  ]
+}
+
+// Cenário 2: Reprocessamento com Alteração de Horário Completo
+{
+  "Aulas": [
+    { "IdAula": "21f1c0b3-2457-4704-bf8a-05297ccb4866", "Inicio": "2025-08-21T08:00:00", "Fim": "2025-08-21T08:50:00" }
+  ]
+}
+                </div>
+                <div class="doc-section-title">Observações</div>
+                <ul>
+                    <li>O limite de aulas para reprocessamento é de **200 por requisição**.</li>
+                    <li>A aula será reprocessada apenas se as validações de reenvio permitirem.</li>
+                    <li>Em caso de falha de validação, o erro será detalhado na lista `Pendencias`.</li>
+                    <li>Aulas reprocessadas com sucesso terão seu `TipoSituacao` definido para `ProcessamentoPendente` (valor `5`) e campos de status de envio serão resetados.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">2.2 Obter Aulas Práticas</div>
+                <div class="info-box">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">GET /api/suportepratico/reenvio/aulas</div>
+                    <div class="info-content">
+                        <p>Função: Consulta aulas práticas de um candidato, filtrando obrigatoriamente pelo seu CPF. A busca pode ser refinada com filtros opcionais.</p>
+                        <p>Autenticação: Requer autenticação por token.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">Parâmetros (Query String)</div>
+                <table class="param-table">
+                    <tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr>
+                    <tr><td>CPF</td><td>string</td><td>Sim</td><td>CPF do candidato.</td></tr>
+                    <tr><td>DataInicio</td><td>string</td><td>Não</td><td>Data inicial da busca no formato `YYYY-MM-DDTHH:mm:ss`.</td></tr>
+                    <tr><td>DataFim</td><td>string</td><td>Não</td><td>Data final da busca no formato `YYYY-MM-DDTHH:mm:ss`.</td></tr>
+                    <tr><td>CnpjCfc</td><td>string</td><td>Não</td><td>CNPJ do CFC.</td></tr>
+                    <tr><td>Renach</td><td>string</td><td>Não</td><td>RENACH do processo.</td></tr>
+                    <tr><td>Placa</td><td>string</td><td>Não</td><td>Placa do veículo.</td></tr>
+                </table>
+                <div class="doc-section-title">Exemplos de Request</div>
+                <div class="code-block">
+// Cenário 1: Buscar todas as aulas de um aluno
+GET /api/suportepratico/reenvio/aulas?CPF=12345678900
+
+// Cenário 2: Buscar aulas em um período
+GET /api/suportepratico/reenvio/aulas?CPF=12345678900&DataInicio=2025-09-01&DataFim=2025-09-10
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">2.3 Reenviar Aulas Práticas</div>
+                <div class="info-box">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">PUT /api/suportepratico/reenvio/reenviar</div>
+                    <div class="info-content">
+                        <p>Função: Coloca uma ou mais aulas na fila de reenvio para o DETRAN.</p>
+                        <p>Autenticação: Requer autenticação por token.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">Corpo da Requisição (JSON)</div>
+                <div class="code-block">
+{
+  "IdAulas": [
+    "GUID_da_aula_1",
+    "GUID_da_aula_2"
+  ]
+}
+                </div>
+                <div class="doc-section-title">Exemplo de Response (com Pendências)</div>
+                <div class="code-block">
+{
+  "StatusReenvio": "Nenhum reenvio realizado.",
+  "Pendencias": [
+    { "IdAula": "2672dce5a49e4", "Pendencia": "ID inválido." },
+    { "IdAula": "2672dce5-a49e-42bb-b6f6-dff7e03ca34f", "NumeroAula": "224", "Pendencia": "Aula e/ou seus segmentos já foram enviados." }
+  ]
+}
+                </div>
+                <p>Observações: O limite de registros para reenvio é de **200 por requisição**.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="gerenciamento-alertas">
+            <h2>3. Gerenciamento de Alertas</h2>
+            <div class="info-box">
+                <div class="info-title">Autenticação</div>
+                <div class="info-content">
+                    É necessário um **Bearer Token** estático, obtido na tabela `ChaveAcessoApiIntegracao`.
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">3.1 Liberar Alerta</div>
+                <div class="info-box success">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST https://hml-{UF}.superprati.co/api/pratico/alerta/Liberar</div>
+                </div>
+                <p>Função: Permite liberar um alerta, registrando a ação com uma justificativa.</p>
+                <div class="doc-section-title">Corpo da Requisição (JSON)</div>
+                <div class="code-block">
+{
+  "IdAlerta": "E6545B45-5CBD-412B-8349-78C9D3382A78",
+  "UserName": "Kleber.vsoft",
+  "Justificativa": "teste de liberção",
+  "DataAtualizacao": "2023-03-13T18:00:00"
+}
+                </div>
+                <div class="doc-section-title">Validações Pré-processamento</div>
+                <p>As seguintes validações causam um erro `400 BadRequest`:</p>
+                <ul>
+                    <li>`IdAlerta` precisa ser um GUID.</li>
+                    <li>`Justificativa` precisa estar preenchida.</li>
+                    <li>`DataAtualizacao` não pode ser uma data futura.</li>
+                    <li>`UserName` precisa ser um usuário ativo com permissão.</li>
+                </ul>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">3.2 Não Liberar Alerta</div>
+                <div class="info-box danger">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST https://hml-{UF}.superprati.co/api/pratico/alerta/NaoLiberar</div>
+                </div>
+                <p>Função: Permite registrar a não liberação de um alerta. Possui a mesma estrutura de corpo da requisição e validações do endpoint `Liberar`.</p>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">3.3 Limpar Análise (Cancelar Liberação e Verificação)</div>
+                <div class="info-box success">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST api/pratico/alerta/CancelarAnaliseELiberacao</div>
+                </div>
+                <p>Função: Cancela a análise e liberação de um alerta, retornando o alerta ao seu estado original.</p>
+                <div class="doc-section-title">Corpo da Requisição (JSON)</div>
+                <div class="code-block">
+{
+  "IdAlerta": "E6545B45-5CBD-412B-8349-78C9D3382A78",
+  "UserName": "kleber.vsoft"
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="aula-pratica-detran">
+            <h2>4. GET Aula Prática (para Detran GO)</h2>
+            <div class="info-box">
+                <div class="info-title">Caminho do Recurso</div>
+                <div class="info-content">
+                    <p>Homologação: `https://hml-{uf}.superprati.co/api/pratico/integracao/aula-pratica`</p>
+                    <p>Produção: `https://{uf}.superprati.co/api/pratico/integracao/aula-pratica`</p>
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">Autenticação</div>
+                <p>**Bearer Token** (Chave de Acesso - Integração) fornecido pelo órgão externo.</p>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">Parâmetros de Consulta</div>
+                <p>A consulta pode ser feita por ID ou por uma combinação de data-hora de início e RENACH.</p>
+                <div class="code-block">
+// Consulta por ID: outros parâmetros são ignorados
+GET /aula-pratica?id=123
+
+// Consulta por data-hora e renach: os dois parâmetros são obrigatórios
+GET /aula-pratica?renach=GO283653913&dthr_inicio=2022-06-06T17:18
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">Retornos Esperados</div>
+                <ul>
+                    <li>**200 OK**: Sucesso. Retorna um objeto JSON com detalhes da aula.</li>
+                    <li>**204 No Content**: Aula não encontrada.</li>
+                    <li>**400 Bad Request**: Parâmetros inválidos.</li>
+                    <li>**401 Unauthorized**: Não autenticado.</li>
+                </ul>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">Exemplo de Resposta (200 OK)</div>
+                <div class="code-block">
+{
+  "idAula": 123,
+  "renach": "GO283653913",
+  "cpfCandidato": "202.832.680-85",
+  "dthrInicioAula": "2022-06-06T17:18",
+  "dthrFinalAula": "2022-06-06T18:09",
+  "cpfInstrutor": "964.903.721-77",
+  "numeroVIN": "9BD341ACXNY751701",
+  "cnpjCFC": "23.428.190/0001-48",
+  "qtdAlertasRegistrados": 2,
+  "cpfResponsavelAlertas": null,
+  "quilometragemInicial": 111,
+  "quilometragemFinal": 222,
+  "fotosDuranteAula": [
+    { "dthrRegistro": "2022-06-06T17:57", "fotoBase64": "base64..." }
+  ],
+  "bioCandidatoInicioAula": {
+    "fotoFacialBase64": "base64...",
+    "dedoDigital": null,
+    "imagemDigitalBase64": null
+  },
+  "bioCandidatoFinalAula": { ... },
+  "bioInstrutorInicioAula": { ... },
+  "bioInstrutorFinalAula": { ... }
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="notificacao">
+            <h2>5. Notificação</h2>
+            <div class="info-box">
+                <div class="info-title">Autenticação</div>
+                <div class="info-content">
+                    As chamadas usam **Basic Authentication** com username `com.vsoft.superpraticoinstrutor` e uma senha estática.
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">5.1 Login (Registrar Token de Notificação)</div>
+                <div class="info-box success">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST /pratico/i/login</div>
+                </div>
+                <p>Função: Registra o token do dispositivo para envio de notificações push.</p>
+                <div class="doc-section-title">Corpo da Requisição (JSON)</div>
+                <div class="code-block">
+{
+  "HardwareId": "BHG7N16831000800",
+  "Token": "dqmqBCPpop0:...",
+  "TipoDispositivo": 0
+}
+                </div>
+                <div class="doc-section-title">Detalhes dos Parâmetros</div>
+                <ul>
+                    <li>`HardwareId`: Serial identificador do dispositivo.</li>
+                    <li>`Token`: Token do Firebase.</li>
+                    <li>`TipoDispositivo`: **Android** = 0, **iOS** = 1, **Desconhecido** = 2.</li>
+                </ul>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">5.2 Desregistrar Token de Notificação</div>
+                <div class="info-box success">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST /pratico/i/unregistertag</div>
+                </div>
+                <p>Função: Utiliza os mesmos parâmetros do login para desregistrar o dispositivo.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="veiculo-obd">
+            <h2>6. Veículo OBD</h2>
+            <div class="info-box">
+                <div class="info-title">Autenticação</div>
+                <div class="info-content">
+                    **Basic Authentication** com username sendo o **CNPJ do CFC** (ex: `03776595000160`) e a senha sendo a **Chave de Acesso (Integração)** obtida no painel.
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">6.1 Autenticar</div>
+                <div class="info-box warning">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST /pratico/obd/autenticar</div>
+                </div>
+                <p>Função: Autentica um usuário cadastrado no SuperPrático com perfil Administrador ou Suporte.</p>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">6.2 Registrar</div>
+                <div class="info-box success">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">POST /pratico/obd/registrar</div>
+                </div>
+                <p>Função: Atualiza informações de Veículo com dados de OBD e/ou SuperTag.</p>
+                <div class="doc-section-title">Corpo da Requisição (JSON)</div>
+                <div class="code-block">
+{
+  "Cnpj": "00.000.000/0000-00",
+  "Mac": "92:4E:A1:0E:12:85",
+  "Placa": "AAA-0000",
+  "Vin": "9BGRD08X04G117974",
+  "TipoVeiculo": 0
+}
+                </div>
+                <p>Observação: O parâmetro `TipoVeiculo` deve ser `0` para duas rodas (uso do SuperTag) ou `1` para quatro rodas (uso do OBD).</p>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">6.3 Consultar CFC por Placa</div>
+                <div class="info-box success">
+                    <div class="info-title">Rota</div>
+                    <div class="endpoint-url">GET /pratico/obd/cfcporplaca/{id}</div>
+                </div>
+                <p>Função: Busca informações de centros de formação que possuem a placa do veículo cadastrado.</p>
+                <p>Observação: O parâmetro `{id}` deve ser o valor da placa do veículo, ex. `ABC-1234`.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="sincronizacao-coletor">
+            <h2>7. Sincronização (Coletor)</h2>
+            <div class="info-box">
+                <div class="info-title">Autenticação</div>
+                <div class="info-content">
+                    **Basic Authentication** com Username: `AUTHENTICATION` e Password: `${serial_coletor}`.
+                </div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoints de Sincronização (POST)</div>
+                    <p>Endpoints utilizados para sincronizar dados do painel para o coletor. Todos usam o método `POST` e `Content-Type: application/json`.</p>
+                    <div class="code-block">
+// 01 Sincronizar informações gerais do coletor
+POST /pratico/sync/coletor
+Body: { "Serial": "${serial_coletor}" }
+
+// 02 Sincronizar cerco do CFC
+POST /pratico/sync/cercocfc
+Body: { "Data": "01-01-2000 03:00:00" }
+
+// 03 Sincronizar faltas e seus detalhes
+POST /pratico/sync/faltadetalhada
+Body: { "Data": "01-01-2000 03:00:00" }
+
+// 04 Sincronizar planos e conteúdos
+POST /pratico/sync/planoscomconteudos
+Body: { "Data": "01-01-2000 03:00:00" }
+
+// 05 Sincronizar instrutores
+POST /pratico/sync/instrutorv2
+Body: { "Data": "01-01-2000 03:00:00" }
+
+// 06 Sincronizar instrutor individual
+POST /pratico/sync/instrutorindividualv2
+Body: { "Cpf": "999.999.999-99" }
+
+// 07 Sincronizar candidatos
+POST /pratico/sync/candidatov3
+Body: { "Data": "01-01-2000 03:00:00" }
+
+// 08 Sincronizar candidato individual
+POST /pratico/sync/candidatoindividualv3
+Body: { "Cpf": "999.999.999-99" }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="aula-coletor">
+            <h2>8. Aula (Coletor)</h2>
+            <div class="info-box">
+                <div class="info-title">Autenticação</div>
+                <div class="info-content">
+                    **Basic Authentication** com Username: `AUTHENTICATION` e Password: `${serial_coletor}`.
+                </div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoints de Gerenciamento de Aula</div>
+                    <p>Endpoints para iniciar, adicionar informações e fechar aulas. Todos utilizam o método POST.</p>
+                    <div class="code-block">
+// 01 Registrar abertura de aula
+POST /pratico/aula/iniciar
+Body inclui: CodigoAula, Verificador, CPFCandidato, CPFInstrutor, CNPJCFC, Placa, Serial, Renach, HodometroInicio, Versao, Inicio e detalhes do AparelhoInstrutor.
+
+// 02 Registrar lote localizações
+POST /pratico/aula/adicionarlotelocalizacaobson
+Content-Type: application/bson
+Body: { "Id": "0", "Aula": "${aula_guid_oid}", "Bson":"${bytes/bson???}" }
+
+// 03 Registrar falta
+POST /pratico/aula/adicionarocorrenciafalta
+Body: { "CodigoAula": "${aula_guid_oid}", "CodigoFalta":"${falta_guid_oid}", "Observacao": null, "Data": "30-11-2021 17:00:00" }
+
+// 04 Registrar desempenho
+POST /pratico/aula/adicionardesempenho
+Body: { "CodigoAula": "${aula_guid_oid}", "CodigoConteudo": "${conteudo_guid_oid}", "Data": "30-11-2021 17:00:00", "DataMarcacao": "30-11-2021 18:00:00", "Pontuacao": 5.0 }
+
+// 05 Registrar informação validação
+POST /pratico/aula/adicionarinformacaovalidacao
+Body: { "CodigoAula": "${aula_guid_oid}", "Alvo": 0, "Momento": 0, "ValidacaoSucesso": true, "Foto": "${base64/image}", "Data": "30-11-2021 17:20:00" }
+
+// 06 Registrar imagem da aula
+POST /pratico/aula/adicionarimagem
+Content-Type: multipart/form-data
+Body: Imagem: { "CodigoAula": "${aula_guid_oid}", "Data": "30-11-2021 17:20:00", "Foto": "imagem" }
+      Capture.jpg: ${bytes/imagem}
+
+// 07 Registrar fechamento de aula
+POST /pratico/aula/fechar
+Body similar à abertura, com dados de HodometroFim e Motivo de Encerramento.
+
+// 08 Registrar biometria
+POST /pratico/aula/adicionarbiometriav2
+Body: { "Alvo": 0, "CodigoAlvo": "${[cadidato/instrutor]_guid_oid}", "Data": "30-11-2021 18:00:00", "Template": "${base64/template_biopass}", "Foto": "${base64/foto}" }
+
+// 09 Obter histórico de aulas com desempenho
+POST /pratico/aula/historicocomdesempenho
+Body: { "CpfCandidato": "000.000.000-00" }
+
+// 10 Adicionar eventos do coletor
+POST /pratico/aula/adicionareventoscoletor
+Body: { "Aula": "${aula_guid_oid}", "Eventos": [{ "Data": "30-11-2021 17:20:00", "Id": "0", "Texto": "Evento de teste", "Tipo": 14 }] }
+    Tipo de Evento:
+        0: OnCreate, 1: OnStart, 2: OnResume, 3: OnPause, 4: OnDestroy, 5: OnUserLeaveHint
+        6: OnSaveInstanceState, 7: OnLowMemory, 8: OnTaskRemoved, 9: BluetoothTurnOn
+        10: BluetoothTurnOff, 11: GpsTurnOn, 12: GpsTurnOff, 13: BootCompleted
+        14: Shutdown, 15: PowerPressed, 16: BackPressed, 17: Battery
+        18: Usb, 19: VolumePressed, 20: LessonRecovery, 21: TimeProvider
+
+// 11 Executar vivacidade
+POST /pratico/aula/vivacidade
+Body: { "Foto": "${base64/image}" }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="aula-online">
+            <h2>9. Aula Online</h2>
+            <div class="info-box">
+                <div class="info-title">Autenticação</div>
+                <div class="info-content">
+                    **Basic Authentication** com Username: `A` ou `AUTHENTICATION` e Password: `${serial_coletor}`.
+                </div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoints de Aulas Online (POST)</div>
+                    <p>A funcionalidade suportada varia por estado. Todos os endpoints usam o método POST com `Content-Type: application/json`.</p>
+                    <div class="code-block">
+// 01 Obter agendamentos de aulas
+POST /ap/g
+Body: { "C": "CNPJ do CFC", "P": "Placa do veículo" }
+
+// 02 Registrar abertura de aula
+POST /ap/a
+Body: { 
+    "V": "código verificador", 
+    "P": "placa", 
+    "Ci": "CPF instrutor", 
+    "Cc": "CPF candidato", 
+    "R": "RENACH", 
+    "Cn": "CNPJ CFC", 
+    "Hi": "horário início", 
+    "O": "hodômetro inicial", 
+    "Bc": "biometria candidato inicial", 
+    "Bi": "biometria instrutor inicial", 
+    "La": "latitude", 
+    "Lo": "longitude", 
+    "Q": "quantidade aulas", 
+    "Ca": "categoria veículo", 
+    "Co": "coleção de IDs de conteúdo" 
+}
+
+// 03 Registrar fechamento de aula
+POST /ap/f
+Body: { 
+    "A": "ID da aula", 
+    "P": "placa", 
+    "Cp": "CPF instrutor", 
+    "R": "RENACH", 
+    "Cn": "CNPJ CFC", 
+    "Hf": "horário fim", 
+    "OI": "hodômetro inicial", 
+    "OF": "hodômetro final", 
+    "Bc": "biometria candidato final", 
+    "Bi": "biometria instrutor final", 
+    "La": "latitude final", 
+    "Lo": "longitude final", 
+    "D": "coleção de desempenhos", 
+    "F": "coleção de faltas" 
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="monitoramento-resumido">
+            <h2>10. Monitoramento Resumido</h2>
+            <div class="info-box">
+                <div class="info-title">Autenticação</div>
+                <div class="info-content">
+                    **Basic Authentication** com Username: `A` ou `AUTHENTICATION` e Password: `${serial_coletor}`.
+                </div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">Endpoint de Registro</div>
+                    <div class="info-box warning">
+                        <div class="info-title">Rota</div>
+                        <div class="endpoint-url">POST /m/c</div>
+                        <div class="info-content">
+                            Função: Registrar informações de monitoramento de forma resumida, usando `Content-Type: text/plain`.
+                        </div>
+                    </div>
+                    <div class="doc-section-title">Corpo da Requisição (Texto Plano)</div>
+                    <div class="code-block">
+// Formato dos campos separados por pipe (|)
+CNPJ|PLACA|HORARIO|CPF_INSTRUTOR|CPF_CANDIDATO|LATITUDE|LONGITUDE|CATEGORIA
+                    </div>
+                    <p>Exemplo de valores:</p>
+                    <ul>
+                        <li>**HORARIO**: 14 dígitos no formato `ddMMyyyyHHmmss`.</li>
+                        <li>**CATEGORIA**: A=0, B=1, C=2, D=3, E=4, ACC=5.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="abertura-aula">
+            <h2>11. Fluxo Detalhado de Abertura de Aula</h2>
+            <div class="info-box">
+                <div class="info-title">Visão Geral</div>
+                <div class="info-content">
+                    <p>O processo de abertura de aula é uma sequência rigorosa de verificações que garantem a conformidade e integridade dos dados antes do início da aula. Qualquer falha em uma etapa resulta na interrupção do processo e na exibição de uma mensagem de erro específica.</p>
+                </div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">Pré-condições e Etapas Críticas</div>
+                    <ol>
+                        <li>**Pré-condições Essenciais**: O dispositivo deve estar ligado, com bateria suficiente e o app em primeiro plano. O banco de dados local precisa estar atualizado.</li>
+                        <li>**Checagem de Ambiente**: O sistema verifica se o Coletor está ativo e não há outra aula em andamento. Caso falhe, o processo é abortado.</li>
+                        <li>**Checagem de Dados**: Valida a existência do candidato e do instrutor no banco local, além de verificar se a biometria não está expirada. Erros de identificação resultam em um `Erro 060`.</li>
+                        <li>**Checagem de Sensores**: Confirma que o GPS e a Câmera estão operacionais. É obrigatório capturar uma coordenada GPS inicial e verificar se ela está dentro da cerca geográfica.</li>
+                        <li>**Preparação da Aula**: O plano de aula é verificado e carregado para a memória do Coletor para otimizar o acesso.</li>
+                        <li>**Ações Finais**: Inicia-se a gravação de imagens, a requisição de abertura online (se aplicável) e o agendamento de validações biométricas aleatórias (para veículos A/ACC).</li>
+                    </ol>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">Tratamento de Erros e Mensagens</div>
+                    <p>Para cada etapa de validação, uma falha específica é registrada no log com detalhes técnicos. Uma mensagem clara é exibida ao usuário, como, por exemplo, o `Erro 060` para falhas de identificação.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+</html>

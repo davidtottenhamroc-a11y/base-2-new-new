@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Incidente</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #fd7e14, #dc3545);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #dc3545, #b42a35);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .button-group a, .button-group button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Registro de Incidente</h1>
+            <p class="description">Utilize esta página para registrar incidentes críticos que afetam a operação.</p>
+        </header>
+
+        <div>
+            <form id="incidente-form">
+                <div class="form-group">
+                    <label for="agente-select">Agente:</label>
+                    <select id="agente-select" required>
+                        <option value="">Selecione um agente...</option>
+                        <option value="Pricilla">Pricilla</option>
+                        <option value="Hyuri">Hyuri</option>
+                        <option value="David">David</option>
+                        <option value="Renata">Renata</option>
+                        <option value="Henrique">Henrique</option>
+                        <option value="Fernanda">Fernanda</option>
+                        <option value="Lara">Lara</option>
+                        <option value="Bianca">Bianca</option>
+                        <option value="Samuel">Samuel</option>
+                        <option value="Lucas Eduardo">Lucas Eduardo</option>
+                        <option value="Wesley">Wesley</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="estado-select">Estado:</label>
+                    <select id="estado-select" required>
+                        <option value="">Selecione um estado...</option>
+                        <option value="Pernambuco">Pernambuco</option>
+                        <option value="Rio Grande do Norte">Rio Grande do Norte</option>
+                        <option value="Paraiba">Paraíba</option>
+                        <option value="Bahia">Bahia</option>
+                        <option value="Minas Gerais">Minas Gerais</option>
+                        <option value="Sergipe">Sergipe</option>
+                        <option value="Goias">Goiás</option>
+                        <option value="Maranhão">Maranhão</option>
+                        <option value="Alagoas">Alagoas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="data-incidente">Data do Incidente:</label>
+                    <input type="date" id="data-incidente" required>
+                </div>
+                <div class="form-group">
+                    <label for="observacao-incidente">Descrição do Incidente:</label>
+                    <textarea id="observacao-incidente" rows="5" required placeholder="Descreva o que está acontecendo..."></textarea>
+                </div>
+                <button type="submit">Registrar Incidente</button>
+            </form>
+            <div class="button-group">
+                 <a href="index.html" style="text-decoration: none;"><button type="button" style="background: #6c757d;">Voltar</button></a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().slice(0, 10);
+            document.getElementById('data-incidente').value = today;
+            const agente = localStorage.getItem('agenteSelecionado');
+            const estado = localStorage.getItem('estadoSelecionado');
+            if(agente) document.getElementById('agente-select').value = agente;
+            if(estado) document.getElementById('estado-select').value = estado;
+        });
+
+        const form = document.getElementById('incidente-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const agente = document.getElementById('agente-select').value;
+            const estado = document.getElementById('estado-select').value;
+            const data = document.getElementById('data-incidente').value;
+            const observacao = document.getElementById('observacao-incidente').value;
+
+            const novoIncidente = {
+                agente,
+                estado,
+                data,
+                observacao
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/incidentes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(novoIncidente)
+                });
+                
+                if (response.ok) {
+                    alert('Incidente registrado com sucesso!');
+                    form.reset();
+                } else {
+                    alert('Erro ao registrar o incidente.');
+                }
+            } catch (error) {
+                console.error('Erro ao conectar com o servidor:', error);
+                alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+            }
+        });
+    </script>
+</body>
+</html>

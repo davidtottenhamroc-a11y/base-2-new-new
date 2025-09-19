@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Incidentes</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        h2 {
+            color: #dc3545;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+
+        p.details {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+        
+        .incident-card {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .incident-card .agente {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .incident-card .data {
+            font-size: 14px;
+            color: #6c757d;
+            float: right;
+        }
+        
+        .incident-card .observacao {
+            margin-top: 10px;
+            font-size: 16px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .delete-button:hover {
+            background: #c82333;
+        }
+
+        .no-incidents {
+            text-align: center;
+            color: #6c757d;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button.back-button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            text-align: center;
+        }
+        button.back-button:hover {
+            background: linear-gradient(135deg, #0069d9, #004da3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Relatório de Incidentes</h1>
+            <p class="details">Incidentes registrados por estado.</p>
+        </header>
+        
+        <div class="main-content" id="relatorio-incidentes">
+            </div>
+
+        <a href="index.html"><button class="back-button">Voltar para a Página Inicial</button></a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIncidentes();
+        });
+
+        async function fetchIncidentes() {
+            try {
+                const response = await fetch('http://localhost:3000/api/incidentes');
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                } else {
+                    console.error('Erro ao buscar incidentes do servidor.');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+                return [];
+            }
+        }
+
+        async function renderIncidentes() {
+            const incidentes = await fetchIncidentes();
+            const relatorioDiv = document.getElementById('relatorio-incidentes');
+            relatorioDiv.innerHTML = '';
+            
+            if (incidentes.length === 0) {
+                relatorioDiv.innerHTML = '<div class="no-incidents">Nenhum incidente registrado até o momento.</div>';
+                return;
+            }
+            
+            const incidentesPorEstado = incidentes.reduce((acc, incidente) => {
+                if (!acc[incidente.estado]) {
+                    acc[incidente.estado] = [];
+                }
+                acc[incidente.estado].push(incidente);
+                return acc;
+            }, {});
+
+            for (const estado in incidentesPorEstado) {
+                const estadoDiv = document.createElement('div');
+                estadoDiv.innerHTML = `<h2>Incidentes em ${estado}</h2>`;
+                
+                incidentesPorEstado[estado].forEach(incidente => {
+                    const incidenteCard = document.createElement('div');
+                    incidenteCard.className = 'incident-card';
+                    incidenteCard.innerHTML = `
+                        <p class="agente">Registrado por: <strong>${incidente.agente}</strong></p>
+                        <p class="data">Data: ${incidente.data}</p>
+                        <p class="observacao">${incidente.observacao}</p>
+                    `;
+                    
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.innerHTML = '&times;';
+                    deleteButton.onclick = () => {
+                         const agenteExclusao = prompt("Por favor, digite seu nome de agente para confirmar a exclusão:");
+                         if (agenteExclusao) {
+                            excluirIncidente(incidente._id, agenteExclusao); // _id é gerado pelo MongoDB
+                         }
+                    };
+                    incidenteCard.appendChild(deleteButton);
+                    
+                    estadoDiv.appendChild(incidenteCard);
+                });
+                
+                relatorioDiv.appendChild(estadoDiv);
+            }
+        }
+        
+        async function excluirIncidente(idIncidente, agenteExclusao) {
+            if (confirm(`Tem certeza que deseja excluir este incidente?`)) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/incidentes/${idIncidente}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        alert('Incidente excluído com sucesso!');
+                        renderIncidentes(); // Atualiza a tela
+                    } else {
+                        alert('Erro ao excluir o incidente.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao conectar com o servidor:', error);
+                    alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

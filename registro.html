@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Diário - Dashboard de Aulas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin: -20px -20px 20px -20px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .panel-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #0069d9, #004da3);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .button-group a, .button-group button {
+            flex: 1;
+        }
+        #observacao-group {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 id="agente-estado-header">Registro Diário</h1>
+            <p class="description">Insira os dados de monitoramento de aulas para o dia.</p>
+        </header>
+
+        <div>
+            <form id="daily-data-form">
+                <div class="form-group">
+                    <label for="tipo-registro">Tipo de Registro:</label>
+                    <select id="tipo-registro" required>
+                        <option value="checking">Checking do dia</option>
+                        <option value="checkout">Checkout do dia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="data-input">Data:</label>
+                    <input type="date" id="data-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="total-aulas">Total de Aulas:</label>
+                    <input type="number" id="total-aulas" placeholder="Ex: 50" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="aulas-execucao">Aulas em Execução:</label>
+                    <input type="number" id="aulas-execucao" placeholder="Ex: 5" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="aulas-nao-enviadas">Aulas Não Enviadas:</label>
+                    <input type="number" id="aulas-nao-enviadas" placeholder="Ex: 2" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="aulas-recusadas">Aulas Recusadas:</label>
+                    <input type="number" id="aulas-recusadas" placeholder="Ex: 1" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="aulas-processamento">Aulas em Processamento:</label>
+                    <input type="number" id="aulas-processamento" placeholder="Ex: 2" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="status-operacao">Status da Operação:</label>
+                    <select id="status-operacao" required>
+                        <option value="estavel">Estável</option>
+                        <option value="potencial">Potencial Incidente</option>
+                        <option value="incidente">Incidente Identificado</option>
+                        <option value="critico">Crítico</option>
+                    </select>
+                </div>
+                <div class="form-group" id="observacao-group">
+                    <label for="observacao-input">Observação:</label>
+                    <textarea id="observacao-input" rows="3" placeholder="Descreva o incidente aqui..."></textarea>
+                </div>
+                <button type="submit">Salvar Dados do Dia</button>
+                <div class="button-group">
+                    <a href="index.html" style="text-decoration: none;"><button type="button" style="margin-top: 10px;">Voltar</button></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const agente = localStorage.getItem('agenteSelecionado');
+            const estado = localStorage.getItem('estadoSelecionado');
+            
+            if (!agente) {
+                alert('Agente não selecionado. Por favor, volte para a página inicial.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const headerText = agente === 'Wesley' 
+                ? `Registro Diário de Wesley (Todos os Estados)`
+                : `Registro Diário de ${agente} (${estado})`;
+
+            document.getElementById('agente-estado-header').textContent = headerText;
+
+            const today = new Date().toISOString().slice(0, 10);
+            document.getElementById('data-input').value = today;
+        });
+
+        document.getElementById('status-operacao').addEventListener('change', (e) => {
+            const status = e.target.value;
+            const observacaoGroup = document.getElementById('observacao-group');
+            if (status === 'incidente' || status === 'critico') {
+                observacaoGroup.style.display = 'block';
+            } else {
+                observacaoGroup.style.display = 'none';
+            }
+        });
+
+        const form = document.getElementById('daily-data-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const date = document.getElementById('data-input').value;
+            const tipoRegistro = document.getElementById('tipo-registro').value;
+            const agente = localStorage.getItem('agenteSelecionado');
+            const estado = localStorage.getItem('estadoSelecionado');
+            const status = document.getElementById('status-operacao').value;
+            const observacao = document.getElementById('observacao-input').value;
+
+            if (!date) {
+                alert('Por favor, selecione uma data.');
+                return;
+            }
+             if ((status === 'incidente' || status === 'critico') && !observacao) {
+                alert('Por favor, descreva o incidente na caixa de observação.');
+                return;
+            }
+            
+            const dailyData = {
+                agente: agente,
+                estado: estado,
+                data: date,
+                tipoRegistro: tipoRegistro,
+                total: parseInt(document.getElementById('total-aulas').value),
+                execucao: parseInt(document.getElementById('aulas-execucao').value),
+                naoEnviadas: parseInt(document.getElementById('aulas-nao-enviadas').value),
+                recusadas: parseInt(document.getElementById('aulas-recusadas').value),
+                processamento: parseInt(document.getElementById('aulas-processamento').value),
+                status: status,
+                observacao: observacao
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/aulas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dailyData)
+                });
+
+                if (response.ok) {
+                    alert('Dados salvos com sucesso!');
+                    form.reset();
+                } else {
+                    alert('Erro ao salvar os dados.');
+                }
+            } catch (error) {
+                console.error('Erro ao conectar com o servidor:', error);
+                alert('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+            }
+        });
+    </script>
+</body>
+</html>

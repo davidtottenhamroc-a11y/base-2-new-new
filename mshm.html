@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processos e Integrações DETRAN-MS / Valid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #0d1a2a; /* Fundo azul escuro */
+            color: #f4f4f4; /* Cor do texto para contraste */
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            color: #f4f4f4;
+        }
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            background: rgba(255, 255, 255, 0.2);
+            color: #3498db;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .info-box {
+            background: rgba(52, 152, 219, 0.2);
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .info-box.danger {
+            background: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+        }
+        .info-box.success {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+        }
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+        }
+        .info-content {
+            line-height: 1.5;
+        }
+        .endpoint-url {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .documentation {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6f42c1;
+        }
+        .doc-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #f4f4f4;
+            font-size: 18px;
+        }
+        .doc-section {
+            margin-bottom: 20px;
+        }
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f4f4f4;
+            font-size: 16px;
+        }
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .param-table th, .param-table td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            text-align: left;
+        }
+        .param-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            color: #f4f4f4;
+        }
+        .param-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .code-block {
+            background: #2c3e50;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Processos e Integrações DETRAN-MS / Valid</h1>
+            <p class="description">Documentação técnica sobre fluxos, processamentos e sincronizações entre Valid e DETRAN-MS.</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="fluxo-backoffice">1. Fluxo BackOffice</div>
+            <div class="tab" data-tab="processamento-envio">2. Processamento e Envio</div>
+            <div class="tab" data-tab="sincronizacao-agendamentos">3. Sincronização de Agendamentos</div>
+            <div class="tab" data-tab="info-gerais">4. Info. Consulta e Token</div>
+            <div class="tab" data-tab="aulas-praticas">5. Aulas Práticas Monitoradas</div>
+        </div>
+        
+        <div class="tab-content active" id="fluxo-backoffice">
+            <h2>1. Fluxo BackOffice Exames Clínicos e Teórico</h2>
+            <div class="info-box">
+                <div class="info-title">Visão Geral</div>
+                <div class="info-content">
+                    O fluxo inicia com a validação biométrica na clínica e, em seguida, passa por auditoria manual e do Detran.
+                </div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">Etapas do Fluxo</div>
+                    <ol>
+                        <li>**Análise de Vivacidade**: O sistema verifica a vivacidade das biometrias para identificar fraudes.</li>
+                        <li>**Verificação de Fraude**:
+                            <ul>
+                                <li>**Caso sim**: O processo vai para a auditoria IH.</li>
+                                <li>**Caso não**: É feito o envio para o SGI (Sistema de Gestão Integrada) no endpoint ValidBio com o código `1` (Biometria Validada) para o Detran.</li>
+                            </ul>
+                        </li>
+                        <li>**Classificação e Auditoria**: O analista de IH e, posteriormente, o Detran, fazem a auditoria do processo.</li>
+                        <li>**Verificação de Aprovação do Detran**:
+                            <ul>
+                                <li>**Aprovado**: Envio para o SGI com o código `1` (Biometria Validada).</li>
+                                <li>**Reprovado**: Envio para o SGI com o código `3` (Biometria Reprovada pelo backoffice).</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="processamento-envio">
+            <h2>2. Processamento e Envio de Resultados ao Detran</h2>
+            <div class="info-box">
+                <div class="info-title">Visão Geral</div>
+                <div class="info-content">
+                    Este fluxo é composto por jobs agendados que processam e enviam os resultados dos exames (Médico, Psicólogo e Teórico) em intervalos regulares.
+                </div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">2.1 Processamento Médico</div>
+                    <ul>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExameMedicoAlertaFraude` - Executa a cada **30 minutos**.</li>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExameMedicoAlertaValidacao` - Executa a cada **30 minutos**.</li>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExameMedicoAnalise` - Executa a cada **20 minutos** para alterar status do alerta.</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">2.2 Processamento Psicólogo</div>
+                    <ul>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExamePsicologicoAlertaFraude` - Executa a cada **30 minutos**.</li>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExamePsicologicoAlertaValidacao` - Executa a cada **30 minutos**.</li>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExamePsicologicoAnalise` - Executa a cada **20 minutos** para alterar status do alerta.</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">2.3 Processamento Exame Teórico</div>
+                    <ul>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExameTeoricoAlertaFraude` - Executa a cada **30 minutos**.</li>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExameTeoricoAlertaValidacao` - Executa a cada **30 minutos**.</li>
+                        <li>**Job:** `Detran.DetranMS.ProcessingFrequenciaExameTeoricoAnalise` - Executa a cada **20 minutos** para alterar status do alerta.</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">2.4 Envio de Frequência</div>
+                    <div class="info-box">
+                        <div class="info-title">Jobs de Envio</div>
+                        <div class="info-content">
+                            Os jobs a seguir executam a cada **30 minutos** para enviar a frequência dos respectivos exames ao Detran.
+                        </div>
+                    </div>
+                    <ul>
+                        <li>`Detran.DetranMS.EnviarFrequenciaExameMedico`</li>
+                        <li>`Detran.DetranMS.EnviarFrequenciaExamePsicologico`</li>
+                        <li>`Detran.DetranMS.EnviarFrequenciaExameTeorico`</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="sincronizacao-agendamentos">
+            <h2>3. Sincronização de Agendamentos</h2>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">3.1 Sincronização Agendamentos Psicológico</div>
+                    <p>A sincronização é feita a cada **30 minutos** por um job que consulta o endpoint do Detran para obter os candidatos agendados e os dados biográficos. Em seguida, o CPF é enviado a uma fila do Rabbit para recuperar as informações biométricas.</p>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">3.2 Sincronização Agendamentos Médicos</div>
+                    <p>Similar ao fluxo de exames psicológicos, um job executa a cada **30 minutos** consultando endpoints do Detran para obter agendamentos e dados biográficos. As informações biométricas são recuperadas do ABIS via fila do Rabbit.</p>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">3.3 Sincronização Agendamento Exame Teórico</div>
+                    <p>A sincronização é realizada através de arquivos **.txt** em um servidor **FTP** do Detran. O job `SyncExameTeorico.SincronizarAgendamentosExameTeorico` executa a cada 30 minutos para sincronizar agendamentos de até **5 dias** para frente.</p>
+                    <div class="info-box">
+                        <div class="info-title">Dados FTP</div>
+                        <div class="info-content">
+                            **Usuário:** `valid_ftp` <br>
+                            **Host:** `ftp.detran.ms.gov.br` <br>
+                            **Porta:** `21` <br>
+                            **Diretório:** `\inter1`
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="info-gerais">
+            <h2>4. Informações de Consulta e Geração de Token</h2>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">4.1 Endpoints da Valid (Exames Psicológicos e Médicos)</div>
+                    <p>Endpoints utilizados para recuperar informações biométricas.</p>
+                    <div class="info-box">
+                        <div class="info-title">URL Login</div>
+                        <div class="endpoint-url">https://sitecnhms.si.valid.com.br:4443/WebAPIConsultaImagensVsoft/api/Integracao/Login</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-title">URL Consulta Dados</div>
+                        <div class="endpoint-url">https://sitecnhms.si.valid.com.br:4443/WebAPIConsultaImagensVsoft/api/Integracao/ObterColeta</div>
+                    </div>
+                    <div class="doc-section-title">Body de Requisição para Consulta</div>
+                    <div class="code-block">
+{
+  "id": 0,
+  "renach": "",
+  "cpf": "02260943160",
+  "tipoPessoa": "Condutor"
+}
+                    </div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">4.2 Geração de Token DETRAN-MS</div>
+                    <p>O token é gerado com base na senha (`zEpUrUPriChofL74xvalid`) e na data atual no formato `AAAAMMDD`, e é calculado usando o algoritmo **SHA1**.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="aulas-praticas">
+            <h2>5. Aulas Práticas Monitoradas (API DETRAN-MS SuperPrático)</h2>
+            <div class="info-box">
+                <div class="info-title">Endpoint Base</div>
+                <div class="endpoint-url">https://detranms-superpratico-admin.azurewebsites.net/api/</div>
+            </div>
+            <div class="documentation">
+                <div class="doc-section">
+                    <div class="doc-section-title">5.1. Início Aula Prática</div>
+                    <div class="info-box success">
+                        <div class="info-title">Endpoint</div>
+                        <div class="endpoint-url">POST api/pratico/auditoria/aula/inicio</div>
+                        <div class="info-content">
+                            Função: Cria e marca a aula como em execução.
+                        </div>
+                    </div>
+                    <div class="doc-section-title">Parâmetros do Body</div>
+                    <div class="code-block">
+{
+  "GuidIdentificacaoAula": "string",
+  "CredencialCfc": 123456,
+  "CpfCandidato": 30390832014,
+  "CpfInstrutor": 2593431024,
+  "Renach": 123456789,
+  "DataInicio": "2023-11-14T11:30:35Z",
+  "CategoriaPretendidaCandidato": 2,
+  "PlacaVeiculo": "QAZ-9A63",
+  "KmInicio": 15
+}
+                    </div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">5.2. Biometria Aulas Práticas</div>
+                    <div class="info-box success">
+                        <div class="info-title">Endpoint</div>
+                        <div class="endpoint-url">POST api/pratico/auditoria/aula/biometria</div>
+                        <div class="info-content">
+                            Função: Recebe e cadastra as biometrias de candidato ou instrutor.
+                        </div>
+                    </div>
+                    <div class="doc-section-title">Parâmetros do Body</div>
+                    <div class="code-block">
+{
+  "GuidIdentificacaoAula": "a3f5b8c9-7d6e-4f2a-9f9d-8c7f6a7d8e12",
+  "CpfPessoa": 30390832014,
+  "TipoPessoa": 0,
+  "DataColetaBiometria": "2023-11-14T12:25:26Z",
+  "OrigemBiometria": 2,
+  "TipoBiometria": 1,
+  "Imagem": "imagem em base64",
+  "Latitude": -10.912189,
+  "Longitude": -37.050541
+}
+                    </div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">5.3. Fim Aula</div>
+                    <div class="info-box success">
+                        <div class="info-title">Endpoint</div>
+                        <div class="endpoint-url">POST api/pratico/auditoria/aula/fim</div>
+                        <div class="info-content">
+                            Função: Marca a aula como finalizada.
+                        </div>
+                    </div>
+                    <div class="doc-section-title">Parâmetros do Body</div>
+                    <div class="code-block">
+{
+  "GuidIdentificacaoAulaCandidato": "a3f5b8c9-7d6e-4f2a-9f9d-8c7f6a7d8e12",
+  "DataFim": "2023-11-14T12:20:35Z",
+  "KmFim": 100,
+  "GeolocalizacoesPercurso": [ /* ... array de geolocalizações ... */ ],
+  "FiscalizacoesAluno": [ /* ... array de imagens do aluno ... */ ],
+  "FiscalizacoesInstrutor": [ /* ... array de imagens do instrutor ... */ ]
+}
+                    </div>
+                </div>
+                <div class="doc-section">
+                    <div class="doc-section-title">5.4. Consulta Situação Aula</div>
+                    <div class="info-box success">
+                        <div class="info-title">Endpoint</div>
+                        <div class="endpoint-url">GET api/pratico/auditoria/aula/status/{oidAulaCandidato}</div>
+                        <div class="info-content">
+                            Função: Consulta o status atual de uma aula.
+                        </div>
+                    </div>
+                    <div class="doc-section-title">Exemplo de Resposta</div>
+                    <div class="code-block">
+[
+  "SituacaoAula" : 0,
+  "Erros" : [
+    {
+      "Codigo": 47,
+      "Descricao": "Pendência de coleta CAV para o aluno."
+    }
+  ]
+]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-button-container">
+            <a href="Menu.html" class="back-button">Voltar para o Menu</a>
+        </div>
+        
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Inicializa a primeira aba como ativa ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+</html>
