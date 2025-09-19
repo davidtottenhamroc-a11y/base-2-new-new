@@ -9,8 +9,8 @@
       "destination": "/api/index.js"
     },
     {
-      "source": "/(?!login.html)(.*)",
-      "destination": "/login.html"
+      "source": "/(.*)",
+      "destination": "/$1"
     }
   ]
 }
