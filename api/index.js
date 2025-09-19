@@ -4,20 +4,15 @@ const cors = require('cors');
 
 const app = express();
 
-// Configurações
 app.use(cors());
 app.use(express.json());
 
-// String de Conexão do MongoDB
-// IMPORTANTE: A Vercel lerá esta variável de ambiente que você configurou.
-const MONGODB_URI = process.env.MONGODB_URI; 
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('Conectado ao MongoDB!'))
     .catch(err => console.error('Erro de conexão com o MongoDB:', err));
 
-// --- Schemas (Modelos de Dados) ---
 const aulaSchema = new mongoose.Schema({
     agente: String,
     estado: String,
@@ -42,10 +37,7 @@ const incidenteSchema = new mongoose.Schema({
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
 
-// --- Rotas da API ---
-
-// Rota para autenticação
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     const users = {
         'Wesley': '1234',
         'David': '456'
@@ -58,7 +50,6 @@ app.post('/login', (req, res) => {
     }
 });
 
-// Rota para salvar um registro de aula
 app.post('/api/aulas', async (req, res) => {
     try {
         const novaAula = new Aula(req.body);
@@ -69,7 +60,6 @@ app.post('/api/aulas', async (req, res) => {
     }
 });
 
-// Rota para buscar todos os registros de aulas
 app.get('/api/aulas', async (req, res) => {
     try {
         const aulas = await Aula.find({});
@@ -79,7 +69,6 @@ app.get('/api/aulas', async (req, res) => {
     }
 });
 
-// Rota para salvar um incidente
 app.post('/api/incidentes', async (req, res) => {
     try {
         const novoIncidente = new Incidente(req.body);
@@ -90,7 +79,6 @@ app.post('/api/incidentes', async (req, res) => {
     }
 });
 
-// Rota para buscar todos os incidentes
 app.get('/api/incidentes', async (req, res) => {
     try {
         const incidentes = await Incidente.find({});
@@ -100,7 +88,6 @@ app.get('/api/incidentes', async (req, res) => {
     }
 });
 
-// Rota para deletar um incidente
 app.delete('/api/incidentes/:id', async (req, res) => {
     try {
         const incidente = await Incidente.findByIdAndDelete(req.params.id);
