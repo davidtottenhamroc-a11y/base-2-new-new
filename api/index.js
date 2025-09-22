@@ -45,7 +45,7 @@ const Incidente = mongoose.model('Incidente', incidenteSchema);
 // --- Rotas da API ---
 
 // Rota para autenticação
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     const users = {
         'Wesley': '1234',
         'David': '456'
@@ -112,5 +112,6 @@ app.delete('/api/incidentes/:id', async (req, res) => {
 });
 
 module.exports = app;
+
 
 
