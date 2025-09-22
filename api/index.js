@@ -50,6 +50,7 @@ const incidenteSchema = new mongoose.Schema({
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
 
+// Rota para login (autenticação)
 app.post('/api/login', (req, res) => {
     const users = {
         'Wesley': '1234',
@@ -57,12 +58,16 @@ app.post('/api/login', (req, res) => {
     };
     const { username, password } = req.body;
     if (users[username] && users[username] === password) {
+        // Gera e define um token de segurança (em um ambiente real, seria um JWT)
+        const token = 'seu-token-de-seguranca'; // Token simples para demonstração
+        res.setHeader('Set-Cookie', `authToken=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=3600`);
         res.json({ authenticated: true });
     } else {
         res.status(401).json({ authenticated: false, message: 'Invalid credentials' });
     }
 });
 
+// Rotas da API
 app.post('/api/aulas', async (req, res) => {
     try {
         await connectToDatabase();
@@ -70,11 +75,10 @@ app.post('/api/aulas', async (req, res) => {
         await novaAula.save();
         res.status(201).send(novaAula);
     } catch (error) {
-        // Envia o erro do Mongoose para o frontend
         res.status(400).send(`Erro de validação: ${error.message}` || 'Erro desconhecido ao salvar os dados.');
     }
 });
-
+// ... (rotas get e delete permanecem as mesmas)
 app.get('/api/aulas', async (req, res) => {
     try {
         await connectToDatabase();
@@ -116,5 +120,4 @@ app.delete('/api/incidentes/:id', async (req, res) => {
         res.status(500).send(`Erro de conexão com o banco: ${error.message}` || 'Erro desconhecido ao deletar o incidente.');
     }
 });
-
 module.exports = app;
