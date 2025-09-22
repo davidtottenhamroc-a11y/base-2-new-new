@@ -110,6 +110,22 @@
                 grid-template-columns: 1fr;
             }
         }
+        .logout-button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #dc3545, #b42a35);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .logout-button:hover {
+            background: linear-gradient(135deg, #c82333, #a71d24);
+        }
     </style>
 </head>
 <body>
@@ -165,9 +181,19 @@
 
             </div>
         </main>
+        <button class="logout-button" onclick="logout()">Sair</button>
     </div>
-
+    <script>
+        function logout() {
+            // Limpa o estado de login
+            localStorage.removeItem('agenteSelecionado');
+            localStorage.removeItem('estadoSelecionado');
+            // Redireciona para a tela de login
+            window.location.href = 'login.html';
+        }
+    </script>
 </body>
 
 </html>
+
 
