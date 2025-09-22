@@ -9,7 +9,7 @@
       "destination": "/api/index.js"
     },
     {
-      "source": "/(?!login.html)(.*)",
+      "source": "/(.*)",
       "destination": "/login.html"
     }
   ]
