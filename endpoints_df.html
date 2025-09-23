@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação APIs Detran-DF (Valid/VSoft)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #001f3f;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #1f3747;
+            border-bottom: 1px solid #0056b3;
+            flex-wrap: wrap;
+            padding-left: 20px;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #152d3d;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            background: #0d1a2a;
+            color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #0d1a2a;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #1a2f40;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .info-box.danger {
+            background: #3e262a;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .info-box.success {
+            background: #2a3a2d;
+            border-left: 4px solid #28a745;
+        }
+        
+        .info-box.warning {
+            background: #3e3221;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        
+        .info-content {
+            line-height: 1.5;
+            color: #c0c0c0;
+        }
+
+        .endpoint-url {
+            background: #000;
+            color: #3498db;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .documentation {
+            background: #1f3747;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6f42c1;
+        }
+
+        .doc-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .doc-section {
+            margin-bottom: 20px;
+        }
+
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .param-table th, .param-table td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .param-table th {
+            background: #1a2f40;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        .param-table tr:nth-child(even) {
+            background: #11202c;
+        }
+
+        .code-block {
+            background: #11202c;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #f4f4f4;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        table.status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table.status-table th, table.status-table td {
+            border: 1px solid #555;
+            padding: 8px;
+            text-align: left;
+        }
+        table.status-table th {
+            background: #1a2f40;
+            color: #ffc107;
+        }
+        
+        .interactive-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #1f3747;
+            border-radius: 8px;
+        }
+        
+        .interactive-section h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .interactive-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .interactive-controls button {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .interactive-controls button:hover {
+            background: #2980b9;
+        }
+        
+        .interactive-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #0d1a2a;
+            border-left: 4px solid #3498db;
+        }
+
+        .interactive-result.success {
+            border-left-color: #28a745;
+        }
+        .interactive-result.error {
+            border-left-color: #dc3545;
+        }
+        .interactive-result.warning {
+            border-left-color: #ffc107;
+        }
+        
+        .interactive-result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .interactive-result-content {
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            color: #f4f4f4;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Documentação APIs Detran-DF (Valid/VSoft)</h1>
+            <p class="description">Documento Técnico Unificado das APIs Detran-DF para consulta de processos e sincronização de dados.</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="introducao">1. Requisitos Comuns</div>
+            <div class="tab" data-tab="apis-processos">2. APIs de Processos e Candidatos</div>
+            <div class="tab" data-tab="apis-envio-aulas">3. APIs de Envio de Aulas</div>
+            <div class="tab" data-tab="apis-consulta-recursos">4. APIs de Consulta de Recursos</div>
+            <div class="tab" data-tab="apis-exames">5. APIs de Exames Práticos</div>
+            <div class="tab" data-tab="simulador">6. Simulador de Endpoints</div>
+            <div class="tab" data-tab="status-codes">7. Status HTTP Comuns</div>
+        </div>
+        
+        <div class="tab-content active" id="introducao">
+            <h2>I. Introdução e Requisitos Comuns</h2>
+            <div class="info-box">
+                <div class="info-title">1. URLs Base</div>
+                <div class="info-content">
+                    As URLs base variam dependendo do ambiente e do tipo de integração (Valid/Superprati ou Credenciadas/VSoft).
+                    <table class="param-table">
+                        <tr><th>Tipo de Integração</th><th>Ambiente</th><th>Base URL</th></tr>
+                        <tr><td>Consulta de Processo (Valid)</td><td>Produção</td><td>https://df.superprati.co/api/ </td></tr>
+                        <tr><td>Consulta de Processo (Valid)</td><td>Homologação</td><td>https://demo-df.superprati.co/api/ </td></tr>
+                        <tr><td>Consulta CFC/Instrutor/Veículo/Salas (Valid/Sincronização Externa)</td><td>Produção</td><td>https://df.superprati.co/api/ </td></tr>
+                        <tr><td>Consulta CFC/Instrutor/Veículo/Salas (Valid/Sincronização Externa)</td><td>Homologação</td><td>https://demo-df.si.valid.com.br/api/ ou https://hml-df.superprati.co/api/ </td></tr>
+                        <tr><td>Credenciadas/Exames Práticos (VSoft)</td><td>Desenvolvimento</td><td>https://abis.si.valid.com.br:10443/api-credenciadas-df ou https://abis.si.valid.com.br:10443/api-exames-praticos-df </td></tr>
+                        <tr><td>Notificação de Captura Biométrica</td><td>Homologação</td><td>https://hml-df.superprati.co/api/importacaodf </td></tr>
+                        <tr><td>Notificação de Captura Biométrica</td><td>Produção</td><td>https://df.superprati.co/api/importacaodf </td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-title">2. Cabeçalho Padrão (Header)</div>
+                <div class="info-content">
+                    Todas as requisições devem incluir o cabeçalho Authorization.
+                    <table class="param-table">
+                        <tr><th>Nome</th><th>Descrição</th><th>Tipo</th></tr>
+                        <tr><td>Authorization</td><td>Bearer token</td><td>string</td></tr>
+                        <tr><td>Content-Type</td><td>Tipo de conteúdo do corpo</td><td>string</td></tr>
+                    </table>
+                    <p><strong>Observação:</strong> O token deve ser solicitado ao suporte.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="apis-processos">
+            <h2>II. APIs de Processos e Candidatos</h2>
+            <div class="doc-section">
+                <div class="doc-section-title">1. Consulta de Processo (Endpoint Valid/Superprati)</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">POST /importacaodf/consultarprocesso </div>
+                    <div class="info-content">
+                        <p>Esta API consulta o processo de uma pessoa no ambiente Detran-DF.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">1.1. Parâmetros da Requisição (Body JSON)</div>
+                <table class="param-table">
+                    <tr><th>Nome</th><th>Descrição</th><th>Validação</th></tr>
+                    <tr><td>Cpf</td><td>CPF da pessoa cujo processo deve ser consultado.</td><td>Obrigatório, não pode ser vazio.</td></tr>
+                    <tr><td>Cnpj</td><td>CNPJ do centro de formação vinculado ao processo.</td><td>Obrigatório, não pode ser vazio.</td></tr>
+                    <tr><td>TipoProcesso</td><td>Tipo do processo a ser consultado.</td><td>Obrigatório. Valores: "T" (Teórico) e "P" (Prático).</td></tr>
+                </table>
+                <div class="doc-section-title">1.2. Padrão de Resposta (Status HTTP e Corpo JSON)</div>
+                <p>O Corpo de Resposta JSON inclui <code>Código</code>, <code>Mensagem</code> (resultado da consulta) e <code>Entity</code> (dados solicitados).</p>
+                <table class="status-table">
+                    <tr><th>Código</th><th>Mensagem (Possível Retorno)</th></tr>
+                    <tr><td>0</td><td>OK </td></tr>
+                    <tr><td>5</td><td>Detectada irregularidade cadastral na chave de acesso </td></tr>
+                    <tr><td>6</td><td>Campo 'Tipo de processo' está incorreto. </td></tr>
+                    <tr><td>8</td><td>Processo não encontrado no Detran </td></tr>
+                    <tr><td>99</td><td>Problema ao consumir API do Detran </td></tr>
+                </table>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title">2. Consultar Candidato (Endpoint Credenciadas/VSoft)</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">POST /api/cfc/buscar </div>
+                    <div class="info-content">
+                        <p>Consulta as informações dos candidatos que poderão fazer aulas teóricas/práticas nos CFCs, integrando-se com a VSoft e a base do Detran-DF.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">2.1. Parâmetros de Envio (Body JSON)</div>
+                <table class="param-table">
+                    <tr><th>Nome</th><th>Descrição</th><th>Validação</th></tr>
+                    <tr><td>cpf</td><td>CPF do Candidato.</td><td>É obrigatório.</td></tr>
+                    <tr><td>tipoPesquisa</td><td>Define o Tipo de Curso a ser consultado.</td><td>Valores aceitos: T (Teórico), P (Prático), S (Simulador).</td></tr>
+                </table>
+                <div class="doc-section-title">2.2. Campos de Retorno Comuns na Data</div>
+                <p>Os dados de retorno são influenciados pelo tipoPesquisa.</p>
+                <ul>
+                    <li><code>renach</code> , <code>nomeCandidato</code> , <code>dataNascimento</code> , <code>motivoRequerimento</code>.</li>
+                    <li><code>pne</code>: Indica se o candidato é Portador de Necessidades Especiais (PNE).</li>
+                    <li><code>dataValidadeExameMedico</code>.</li>
+                    <li>Retorno Específico (Tipo Pesquisa T - Teórico): Retorna a lista <code>dadosAulasTeoricas</code>.</li>
+                    <li>Retorno Específico (Tipo Pesquisa P - Prático): Inclui <code>dataEmissaoLADV</code> e <code>dataValidadeLicencaLADV</code>.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">3. Notificação de Captura Biométrica</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">POST /biometria </div>
+                    <div class="info-content">
+                        <p>Dispara a sincronização com a Valid das informações biométricas da pessoa com o CPF informado.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">3.1. Parâmetros da Requisição (Body JSON)</div>
+                <table class="param-table">
+                    <tr><th>Nome</th><th>Obrigatoriedade</th></tr>
+                    <tr><td>Cpf</td><td>Obrigatório, não pode ser vazio.</td></tr>
+                    <tr><td>Renach</td><td>Opcional.</td></tr>
+                </table>
+                <div class="doc-section-title">3.2. Possíveis Retornos HTTP</div>
+                <table class="status-table">
+                    <tr><th>Código</th><th>Descrição</th></tr>
+                    <tr><td>200 OK</td><td>O processo de sincronização foi iniciado com sucesso (corpo vazio).</td></tr>
+                    <tr><td>400 Bad Request</td><td>Alguma regra de negócio violada.</td></tr>
+                    <tr><td>401 Unauthorized</td><td>Token de autenticação não informado ou inválido.</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="apis-envio-aulas">
+            <h2>III. APIs de Envio de Aulas (Credenciadas/VSoft)</h2>
+            <div class="doc-section">
+                <div class="doc-section-title">1. Enviar Aula Teórica</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">POST /api/aula/envio-aula-teorica </div>
+                    <div class="info-content">
+                        <p>Envio de aula teórica para validação e inclusão.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">1.1. Parâmetros de Envio (Body JSON)</div>
+                <p>Todos os campos são obrigatórios.</p>
+                <table class="param-table">
+                    <tr><th>Nome</th><th>Descrição</th><th>Formato / Valores Possíveis</th></tr>
+                    <tr><td>cpfAluno</td><td>CPF do aluno.</td><td>Somente números.</td></tr>
+                    <tr><td>resultado</td><td>Resultado da aula.</td><td>"1" (Validar), "0" (Cancelar).</td></tr>
+                    <tr><td>codigoDisciplina</td><td>Código da disciplina.</td><td>01 a 05 (Direção defensiva, Primeiros socorros, etc.).</td></tr>
+                    <tr><td>dataInicio</td><td>Data de início da aula.</td><td>yyyyMMddHHmmss (Ex: 20250131080000).</td></tr>
+                    <tr><td>dataFinal</td><td>Data final da aula.</td><td>yyyyMMddHHmmss (Ex: 20250131085000).</td></tr>
+                </table>
+                <div class="doc-section-title">1.2. Observações sobre o Retorno</div>
+                <p>O retorno fornece um <code>codigoRetorno</code> sobre a operação.</p>
+                <table class="status-table">
+                    <tr><th>Código Retorno</th><th>Mensagem</th></tr>
+                    <tr><td>00</td><td>Dados gravados com sucesso.</td></tr>
+                    <tr><td>35</td><td>Dados gravados com sucesso e carga horária concluída.</td></tr>
+                    <tr><td>01</td><td>Número de RENACH Inválido.</td></tr>
+                    <tr><td>99</td><td>Aplicação fora do ar/falha de conexão.</td></tr>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">2. Enviar Aula Prática</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">POST /api/aula/envio-aula-pratica </div>
+                    <div class="info-content">
+                        <p>Envia a aula prática para inclusão direta na base do Detran-DF.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">2.1. Parâmetros de Envio (Body JSON)</div>
+                <p>Todos os campos são obrigatórios.</p>
+                <table class="param-table">
+                    <tr><th>Nome</th><th>Descrição</th><th>Formato / Valores Possíveis</th></tr>
+                    <tr><td>cpfAluno</td><td>CPF do aluno.</td><td>Somente números.</td></tr>
+                    <tr><td>placaAula</td><td>Placa do veículo.</td><td>- </td></tr>
+                    <tr><td>dataAula</td><td>Data da aula.</td><td>Formato yyyyMMdd.</td></tr>
+                    <tr><td>horaInicio</td><td>Horário do início da aula.</td><td>Formato hhmm (Ex: 0800).</td></tr>
+                </table>
+                <div class="doc-section-title">2.2. Observações sobre o Retorno</div>
+                <p>O retorno fornece um <code>codigoRetorno</code> (e mensagem vazia no exemplo de sucesso).</p>
+                <table class="status-table">
+                    <tr><th>Código Retorno</th><th>Descrição</th></tr>
+                    <tr><td>996</td><td>SERVIDOR FORA DO AR. </td></tr>
+                    <tr><td>997</td><td>ERRO NO PROCESSAMENTO. </td></tr>
+                    <tr><td>998</td><td>AULA JA CADASTRADA, CANDIDATO NAO CADASTRADO, etc. </td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="apis-consulta-recursos">
+            <h2>IV. APIs de Consulta de Recursos (Valid/Sincronização Externa)</h2>
+            <div class="doc-section">
+                <div class="doc-section-title">1. Consulta Dados do CFC</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao </div>
+                    <div class="info-content">
+                        <p>Este método lista todos os CFCs.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">2. Consulta Dados de Instrutor</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao/{codigoCfc}/instrutores </div>
+                    <div class="info-content">
+                        <p>Este método lista todos os instrutores de um CFC.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">3. Consulta Salas Teóricas</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">GET /teorico/aulaexterna/salateorica?codigoCfcDetran={codigoCfcDetran} </div>
+                    <div class="info-content">
+                        <p>Este método consulta as salas teóricas de um CFC pelo código.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">4. Consulta Dados de Veículo</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao/{codigoCfc}/veiculos </div>
+                    <div class="info-content">
+                        <p>Este método lista todos os veículos de um CFC.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="apis-exames">
+            <h2>V. APIs de Exames Práticos (VSoft)</h2>
+            <div class="doc-section">
+                <div class="doc-section-title">1. Consultar Agendamentos de Exames Práticos</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">POST /api/exames-praticos/buscar </div>
+                    <div class="info-content">
+                        <p>Busca agendamentos de exames práticos na base do Detran para uma data informada.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">1.1. Parâmetros de Envio (Body JSON)</div>
+                <table class="param-table">
+                    <tr><th>Nome</th><th>Formato / Obrigatoriedade</th></tr>
+                    <tr><td>data</td><td>Padrão AAAA-MM-DD. Obrigatório.</td></tr>
+                    <tr><td>cpf</td><td>Opcional.</td></tr>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">2. Listar Veículos (Endpoint de Exames Práticos)</div>
+                <div class="info-box">
+                    <div class="info-title">Endpoint</div>
+                    <div class="endpoint-url">POST /api/veiculos/buscar </div>
+                    <div class="info-content">
+                        <p>Lista os veículos disponíveis para a realização do exame prático.</p>
+                    </div>
+                </div>
+                <div class="doc-section-title">2.1. Parâmetros de Envio (Body JSON)</div>
+                <table class="param-table">
+                    <tr><th>Nome</th><th>Obrigatoriedade</th></tr>
+                    <tr><td>companyCnpj</td><td>Não é obrigatório.</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="simulador">
+            <h2>6. Simulador de Endpoints</h2>
+            <div class="info-box warning">
+                <div class="info-title">Atenção</div>
+                <div class="info-content">
+                    Este é um simulador. As consultas não são reais e os retornos são apenas para demonstração do comportamento das APIs.
+                </div>
+            </div>
+            
+            <div class="interactive-section">
+                <h3>Simular Consulta de Processo</h3>
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros</div>
+                    <table class="param-table">
+                        <tr><th>Nome</th><th>Descrição</th><th>Validação</th></tr>
+                        <tr><td>Cpf</td><td>CPF da pessoa.</td><td>Obrigatório.</td></tr>
+                        <tr><td>Cnpj</td><td>CNPJ do CFC.</td><td>Obrigatório.</td></tr>
+                        <tr><td>TipoProcesso</td><td>Tipo de processo.</td><td>Valores: "T" ou "P".</td></tr>
+                    </table>
+                    <div class="interactive-controls">
+                        <input type="text" id="sim-cpf" placeholder="CPF (ex: 12345678900)">
+                        <input type="text" id="sim-cnpj" placeholder="CNPJ (ex: 12345678000190)">
+                        <select id="sim-tipo-processo">
+                            <option value="P">Prático</option>
+                            <option value="T">Teórico</option>
+                        </select>
+                        <button onclick="simularConsultaProcesso()">Simular Consulta</button>
+                    </div>
+                </div>
+                <div class="interactive-result" id="sim-processo-result"></div>
+            </div>
+
+            <div class="interactive-section">
+                <h3>Simular Envio de Aula Teórica</h3>
+                <div class="doc-section">
+                    <div class="doc-section-title">Parâmetros</div>
+                     <table class="param-table">
+                        <tr><th>Nome</th><th>Descrição</th><th>Formato / Valores</th></tr>
+                        <tr><td>cpfAluno</td><td>CPF do aluno.</td><td>Somente números.</td></tr>
+                        <tr><td>resultado</td><td>Resultado da aula.</td><td>"1" (Validar), "0" (Cancelar).</td></tr>
+                        <tr><td>codigoDisciplina</td><td>Código da disciplina.</td><td>01 a 05.</td></tr>
+                        <tr><td>dataInicio</td><td>Data/Hora de início.</td><td>yyyyMMddHHmmss.</td></tr>
+                    </table>
+                    <div class="interactive-controls">
+                        <input type="text" id="sim-cpf-aluno-teorica" placeholder="CPF Aluno">
+                        <input type="text" id="sim-cod-disciplina" placeholder="Cod. Disciplina (ex: 01)">
+                        <select id="sim-resultado-teorica">
+                            <option value="1">Validar</option>
+                            <option value="0">Cancelar</option>
+                        </select>
+                        <button onclick="simularEnvioAulaTeorica()">Simular Envio</button>
+                    </div>
+                </div>
+                 <div class="interactive-result" id="sim-teorica-result"></div>
+            </div>
+
+        </div>
+
+        <div class="tab-content" id="status-codes">
+            <h2>VII. Status Codes HTTP Comuns</h2>
+            <p>Os seguintes códigos de status HTTP são utilizados consistentemente nas diversas APIs Credenciadas (VSoft) e de Sincronização/Consulta (Valid):</p>
+            <table class="status-table">
+                <tr><th>Código</th><th>Descrição</th><th>Objetivo/Uso</th></tr>
+                <tr><td>200</td><td>OK</td><td>Endpoint executado com sucesso e possui dados de retorno.</td></tr>
+                <tr><td>204</td><td>NoContent</td><td>Endpoint executado com sucesso, mas não possui dados de retorno.</td></tr>
+                <tr><td>400</td><td>BadRequest</td><td>Parâmetros de entrada inválidos.</td></tr>
+                <tr><td>401</td><td>Unauthorized</td><td>Dados de autenticação (token) inválidos.</td></tr>
+                <tr><td>403</td><td>Forbidden</td><td>Dados de autenticação válidos, mas sem permissão.</td></tr>
+                <tr><td>404</td><td>NotFound</td><td>A URL/Endpoint não é encontrado.</td></tr>
+                <tr><td>422</td><td>UnprocessableEntity</td><td>Parâmetros de entrada válidos, mas ocorreu um erro esperado durante o processamento.</td></tr>
+                <tr><td>500</td><td>InternalServerError</td><td>Ocorre um erro inesperado e não mapeado.</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+
+        function simularConsultaProcesso() {
+            const cpf = document.getElementById('sim-cpf').value;
+            const cnpj = document.getElementById('sim-cnpj').value;
+            const tipoProcesso = document.getElementById('sim-tipo-processo').value;
+            const resultDiv = document.getElementById('sim-processo-result');
+            
+            if (!cpf || !cnpj || !tipoProcesso) {
+                resultDiv.className = 'interactive-result error';
+                resultDiv.innerHTML = `<div class="interactive-result-title">Erro 400 Bad Request</div><div class="interactive-result-content">Erro: Parâmetros obrigatórios ausentes. CPF, CNPJ e TipoProcesso são necessários para a consulta.</div>`;
+                return;
+            }
+
+            const response = {
+                Codigo: 0,
+                Mensagem: "OK",
+                Entity: {
+                    Renach: "123456789",
+                    NomeCandidato: "Candidato de Teste",
+                    TipoProcesso: tipoProcesso === "P" ? "Primeira habilitação" : "Teórico",
+                    CodigoCfc: parseInt(cnpj.replace(/\D/g, '')),
+                    DataAberturaProcesso: "2023-01-01",
+                    PNE: false,
+                    CnhSocial: false
+                }
+            };
+
+            resultDiv.className = 'interactive-result success';
+            resultDiv.innerHTML = `<div class="interactive-result-title">Simulação de Resposta: 200 OK</div><div class="interactive-result-content">${JSON.stringify(response, null, 2)}</div>`;
+        }
+
+        function simularEnvioAulaTeorica() {
+             const cpfAluno = document.getElementById('sim-cpf-aluno-teorica').value;
+             const codDisciplina = document.getElementById('sim-cod-disciplina').value;
+             const resultado = document.getElementById('sim-resultado-teorica').value;
+             const resultDiv = document.getElementById('sim-teorica-result');
+
+             if (!cpfAluno || !codDisciplina || !resultado) {
+                 resultDiv.className = 'interactive-result error';
+                 resultDiv.innerHTML = `<div class="interactive-result-title">Erro 400 Bad Request</div><div class="interactive-result-content">Erro: Parâmetros obrigatórios ausentes. CPF, Código da Disciplina e Resultado são necessários para a simulação.</div>`;
+                 return;
+             }
+
+             const response = {
+                codigoRetorno: "00",
+                mensagem: "Dados gravados com sucesso."
+            };
+            
+            resultDiv.className = 'interactive-result success';
+            resultDiv.innerHTML = `<div class="interactive-result-title">Simulação de Resposta: 200 OK</div><div class="interactive-result-content">${JSON.stringify(response, null, 2)}</div>`;
+        }
+    </script>
+</body>
+</html>
