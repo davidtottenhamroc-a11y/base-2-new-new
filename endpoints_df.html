@@ -221,6 +221,12 @@
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .interactive-controls input, .interactive-controls select {
+            flex: 1;
+            min-width: 150px;
         }
         
         .interactive-controls button {
@@ -268,6 +274,29 @@
             font-size: 14px;
             color: #f4f4f4;
         }
+        
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
 
         @media (max-width: 768px) {
             .tabs {
@@ -305,13 +334,13 @@
                     As URLs base variam dependendo do ambiente e do tipo de integração (Valid/Superprati ou Credenciadas/VSoft).
                     <table class="param-table">
                         <tr><th>Tipo de Integração</th><th>Ambiente</th><th>Base URL</th></tr>
-                        <tr><td>Consulta de Processo (Valid)</td><td>Produção</td><td>https://df.superprati.co/api/ </td></tr>
-                        <tr><td>Consulta de Processo (Valid)</td><td>Homologação</td><td>https://demo-df.superprati.co/api/ </td></tr>
-                        <tr><td>Consulta CFC/Instrutor/Veículo/Salas (Valid/Sincronização Externa)</td><td>Produção</td><td>https://df.superprati.co/api/ </td></tr>
-                        <tr><td>Consulta CFC/Instrutor/Veículo/Salas (Valid/Sincronização Externa)</td><td>Homologação</td><td>https://demo-df.si.valid.com.br/api/ ou https://hml-df.superprati.co/api/ </td></tr>
-                        <tr><td>Credenciadas/Exames Práticos (VSoft)</td><td>Desenvolvimento</td><td>https://abis.si.valid.com.br:10443/api-credenciadas-df ou https://abis.si.valid.com.br:10443/api-exames-praticos-df </td></tr>
-                        <tr><td>Notificação de Captura Biométrica</td><td>Homologação</td><td>https://hml-df.superprati.co/api/importacaodf </td></tr>
-                        <tr><td>Notificação de Captura Biométrica</td><td>Produção</td><td>https://df.superprati.co/api/importacaodf </td></tr>
+                        <tr><td>Consulta de Processo (Valid)</td><td>Produção</td><td>https://df.superprati.co/api/</td></tr>
+                        <tr><td>Consulta de Processo (Valid)</td><td>Homologação</td><td>https://demo-df.superprati.co/api/</td></tr>
+                        <tr><td>Consulta CFC/Instrutor/Veículo/Salas (Valid/Sincronização Externa)</td><td>Produção</td><td>https://df.superprati.co/api/</td></tr>
+                        <tr><td>Consulta CFC/Instrutor/Veículo/Salas (Valid/Sincronização Externa)</td><td>Homologação</td><td>https://demo-df.si.valid.com.br/api/ ou https://hml-df.superprati.co/api/</td></tr>
+                        <tr><td>Credenciadas/Exames Práticos (VSoft)</td><td>Desenvolvimento</td><td>https://abis.si.valid.com.br:10443/api-credenciadas-df ou https://abis.si.valid.com.br:10443/api-exames-praticos-df</td></tr>
+                        <tr><td>Notificação de Captura Biométrica</td><td>Homologação</td><td>https://hml-df.superprati.co/api/importacaodf</td></tr>
+                        <tr><td>Notificação de Captura Biométrica</td><td>Produção</td><td>https://df.superprati.co/api/importacaodf</td></tr>
                     </table>
                 </div>
             </div>
@@ -335,7 +364,7 @@
                 <div class="doc-section-title">1. Consulta de Processo (Endpoint Valid/Superprati)</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">POST /importacaodf/consultarprocesso </div>
+                    <div class="endpoint-url">POST /importacaodf/consultarprocesso</div>
                     <div class="info-content">
                         <p>Esta API consulta o processo de uma pessoa no ambiente Detran-DF.</p>
                     </div>
@@ -351,11 +380,11 @@
                 <p>O Corpo de Resposta JSON inclui <code>Código</code>, <code>Mensagem</code> (resultado da consulta) e <code>Entity</code> (dados solicitados).</p>
                 <table class="status-table">
                     <tr><th>Código</th><th>Mensagem (Possível Retorno)</th></tr>
-                    <tr><td>0</td><td>OK </td></tr>
-                    <tr><td>5</td><td>Detectada irregularidade cadastral na chave de acesso </td></tr>
-                    <tr><td>6</td><td>Campo 'Tipo de processo' está incorreto. </td></tr>
-                    <tr><td>8</td><td>Processo não encontrado no Detran </td></tr>
-                    <tr><td>99</td><td>Problema ao consumir API do Detran </td></tr>
+                    <tr><td>0</td><td>OK</td></tr>
+                    <tr><td>5</td><td>Detectada irregularidade cadastral na chave de acesso</td></tr>
+                    <tr><td>6</td><td>Campo 'Tipo de processo' está incorreto.</td></tr>
+                    <tr><td>8</td><td>Processo não encontrado no Detran</td></tr>
+                    <tr><td>99</td><td>Problema ao consumir API do Detran</td></tr>
                 </table>
             </div>
             
@@ -363,7 +392,7 @@
                 <div class="doc-section-title">2. Consultar Candidato (Endpoint Credenciadas/VSoft)</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">POST /api/cfc/buscar </div>
+                    <div class="endpoint-url">POST /api/cfc/buscar</div>
                     <div class="info-content">
                         <p>Consulta as informações dos candidatos que poderão fazer aulas teóricas/práticas nos CFCs, integrando-se com a VSoft e a base do Detran-DF.</p>
                     </div>
@@ -377,7 +406,7 @@
                 <div class="doc-section-title">2.2. Campos de Retorno Comuns na Data</div>
                 <p>Os dados de retorno são influenciados pelo tipoPesquisa.</p>
                 <ul>
-                    <li><code>renach</code> , <code>nomeCandidato</code> , <code>dataNascimento</code> , <code>motivoRequerimento</code>.</li>
+                    <li><code>renach</code>, <code>nomeCandidato</code>, <code>dataNascimento</code>, <code>motivoRequerimento</code>.</li>
                     <li><code>pne</code>: Indica se o candidato é Portador de Necessidades Especiais (PNE).</li>
                     <li><code>dataValidadeExameMedico</code>.</li>
                     <li>Retorno Específico (Tipo Pesquisa T - Teórico): Retorna a lista <code>dadosAulasTeoricas</code>.</li>
@@ -389,7 +418,7 @@
                 <div class="doc-section-title">3. Notificação de Captura Biométrica</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">POST /biometria </div>
+                    <div class="endpoint-url">POST /biometria</div>
                     <div class="info-content">
                         <p>Dispara a sincronização com a Valid das informações biométricas da pessoa com o CPF informado.</p>
                     </div>
@@ -416,7 +445,7 @@
                 <div class="doc-section-title">1. Enviar Aula Teórica</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">POST /api/aula/envio-aula-teorica </div>
+                    <div class="endpoint-url">POST /api/aula/envio-aula-teorica</div>
                     <div class="info-content">
                         <p>Envio de aula teórica para validação e inclusão.</p>
                     </div>
@@ -446,7 +475,7 @@
                 <div class="doc-section-title">2. Enviar Aula Prática</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">POST /api/aula/envio-aula-pratica </div>
+                    <div class="endpoint-url">POST /api/aula/envio-aula-pratica</div>
                     <div class="info-content">
                         <p>Envia a aula prática para inclusão direta na base do Detran-DF.</p>
                     </div>
@@ -456,7 +485,7 @@
                 <table class="param-table">
                     <tr><th>Nome</th><th>Descrição</th><th>Formato / Valores Possíveis</th></tr>
                     <tr><td>cpfAluno</td><td>CPF do aluno.</td><td>Somente números.</td></tr>
-                    <tr><td>placaAula</td><td>Placa do veículo.</td><td>- </td></tr>
+                    <tr><td>placaAula</td><td>Placa do veículo.</td><td>-</td></tr>
                     <tr><td>dataAula</td><td>Data da aula.</td><td>Formato yyyyMMdd.</td></tr>
                     <tr><td>horaInicio</td><td>Horário do início da aula.</td><td>Formato hhmm (Ex: 0800).</td></tr>
                 </table>
@@ -464,9 +493,9 @@
                 <p>O retorno fornece um <code>codigoRetorno</code> (e mensagem vazia no exemplo de sucesso).</p>
                 <table class="status-table">
                     <tr><th>Código Retorno</th><th>Descrição</th></tr>
-                    <tr><td>996</td><td>SERVIDOR FORA DO AR. </td></tr>
-                    <tr><td>997</td><td>ERRO NO PROCESSAMENTO. </td></tr>
-                    <tr><td>998</td><td>AULA JA CADASTRADA, CANDIDATO NAO CADASTRADO, etc. </td></tr>
+                    <tr><td>996</td><td>SERVIDOR FORA DO AR.</td></tr>
+                    <tr><td>997</td><td>ERRO NO PROCESSAMENTO.</td></tr>
+                    <tr><td>998</td><td>AULA JA CADASTRADA, CANDIDATO NAO CADASTRADO, etc.</td></tr>
                 </table>
             </div>
         </div>
@@ -477,7 +506,7 @@
                 <div class="doc-section-title">1. Consulta Dados do CFC</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao </div>
+                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao</div>
                     <div class="info-content">
                         <p>Este método lista todos os CFCs.</p>
                     </div>
@@ -485,7 +514,7 @@
                 <div class="doc-section-title">2. Consulta Dados de Instrutor</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao/{codigoCfc}/instrutores </div>
+                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao/{codigoCfc}/instrutores</div>
                     <div class="info-content">
                         <p>Este método lista todos os instrutores de um CFC.</p>
                     </div>
@@ -493,7 +522,7 @@
                 <div class="doc-section-title">3. Consulta Salas Teóricas</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">GET /teorico/aulaexterna/salateorica?codigoCfcDetran={codigoCfcDetran} </div>
+                    <div class="endpoint-url">GET /teorico/aulaexterna/salateorica?codigoCfcDetran={codigoCfcDetran}</div>
                     <div class="info-content">
                         <p>Este método consulta as salas teóricas de um CFC pelo código.</p>
                     </div>
@@ -501,7 +530,7 @@
                 <div class="doc-section-title">4. Consulta Dados de Veículo</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao/{codigoCfc}/veiculos </div>
+                    <div class="endpoint-url">GET sincronizacaoExterna/centroFormacao/{codigoCfc}/veiculos</div>
                     <div class="info-content">
                         <p>Este método lista todos os veículos de um CFC.</p>
                     </div>
@@ -515,7 +544,7 @@
                 <div class="doc-section-title">1. Consultar Agendamentos de Exames Práticos</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">POST /api/exames-praticos/buscar </div>
+                    <div class="endpoint-url">POST /api/exames-praticos/buscar</div>
                     <div class="info-content">
                         <p>Busca agendamentos de exames práticos na base do Detran para uma data informada.</p>
                     </div>
@@ -532,7 +561,7 @@
                 <div class="doc-section-title">2. Listar Veículos (Endpoint de Exames Práticos)</div>
                 <div class="info-box">
                     <div class="info-title">Endpoint</div>
-                    <div class="endpoint-url">POST /api/veiculos/buscar </div>
+                    <div class="endpoint-url">POST /api/veiculos/buscar</div>
                     <div class="info-content">
                         <p>Lista os veículos disponíveis para a realização do exame prático.</p>
                     </div>
@@ -618,6 +647,10 @@
                 <tr><td>500</td><td>InternalServerError</td><td>Ocorre um erro inesperado e não mapeado.</td></tr>
             </table>
         </div>
+    </div>
+    
+    <div class="back-button-container">
+        <a href="menu.html" class="back-button">Voltar para o Menu</a>
     </div>
 
     <script>
