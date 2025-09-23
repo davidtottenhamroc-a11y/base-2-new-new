@@ -6,92 +6,325 @@
     <title>Política para Gerenciamento de Incidentes e Problemas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9;
-            color: #333;
-            line-height: 1.6;
-            margin: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            min-height: 100vh;
             padding: 20px;
+            color: #f4f4f4;
         }
+
         .container {
-            max-width: 900px;
+            max-width: 1400px;
             margin: 0 auto;
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
+
         header {
+            background: #001f3f;
+            color: white;
+            padding: 20px;
             text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #0056b3;
-            padding-bottom: 15px;
         }
-        header h1 {
-            color: #0056b3;
-            margin: 0;
+
+        h1 {
             font-size: 28px;
-        }
-        header p {
-            margin: 5px 0 0;
-            color: #555;
-            font-size: 16px;
-        }
-        .content {
-            padding: 10px 0;
-        }
-        .section {
-            margin-bottom: 30px;
-        }
-        .section h2 {
-            color: #0056b3;
-            font-size: 22px;
             margin-bottom: 10px;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 5px;
         }
-        .section h3 {
-            color: #495057;
-            font-size: 18px;
+
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #1f3747;
+            border-bottom: 1px solid #0056b3;
+            flex-wrap: wrap;
+            padding-left: 20px;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #152d3d;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            background: #0d1a2a;
+            color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #0d1a2a;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .info-box {
+            background: #1a2f40;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-box.danger {
+            background: #3e262a;
+            border-left: 4px solid #dc3545;
+        }
+
+        .info-box.success {
+            background: #2a3a2d;
+            border-left: 4px solid #28a745;
+        }
+
+        .info-box.warning {
+            background: #3e3221;
+            border-left: 4px solid #ffc107;
+        }
+
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .info-content {
+            line-height: 1.5;
+            color: #c0c0c0;
+        }
+
+        .doc-section {
+            margin-bottom: 20px;
+        }
+
+        .doc-section h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a2f40;
+        }
+
+        .doc-section h3 {
+            color: #ffc107;
             margin-top: 20px;
             margin-bottom: 10px;
         }
-        p, ul, ol {
-            margin-bottom: 15px;
-            padding-left: 20px;
-            color: #495057;
-        }
-        table {
+
+        .param-table, .status-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
         }
-        th, td {
-            border: 1px solid #dee2e6;
+
+        .param-table th, .param-table td, .status-table th, .status-table td {
+            border: 1px solid #555;
             padding: 10px;
             text-align: left;
-            font-size: 14px;
         }
-        th {
-            background-color: #f1f3f5;
+
+        .param-table th, .status-table th {
+            background: #1a2f40;
             font-weight: 600;
+            color: #3498db;
         }
+
+        .param-table tr:nth-child(even), .status-table tr:nth-child(even) {
+            background: #11202c;
+        }
+
         .highlight-box {
-            background-color: #f7f9fc;
-            border-left: 4px solid #0056b3;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #3498db;
             padding: 15px;
             margin: 15px 0;
             border-radius: 5px;
         }
-        .sub-section-list {
-            list-style-type: none;
-            padding-left: 0;
+        
+        ul, ol {
+            padding-left: 20px;
+            color: #c0c0c0;
         }
-        .sub-section-list li {
-            margin-bottom: 10px;
-            border-left: 3px solid #ced4da;
-            padding-left: 10px;
+        
+        li {
+            margin-bottom: 5px;
+        }
+        
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .form-section {
+            padding: 20px;
+            background: #1f3747;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .form-section h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            font-size: 16px;
+            background: #3a506b;
+            color: white;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+        
+        #copy-button {
+            background: #28a745;
+            margin-top: 10px;
+        }
+        
+        #copy-button:hover {
+            background: #218838;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: #0d1a2a;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .result-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #c0c0c0;
+        }
+
+        .result-box .img-container {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .result-box .img-container img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+        
+        .estado-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .estado-checkboxes label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .estado-checkboxes input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+        }
+        
+        #imagem-previews {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        #imagem-previews img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
@@ -99,13 +332,25 @@
 
     <div class="container">
         <header>
-            <p>Código: PL.SC.04.00</p>
             <h1>Política para Gerenciamento de Incidentes e Problemas</h1>
+            <p class="description">Código: PL.SC.04.00</p>
         </header>
 
-        <div class="content">
+        <div class="tabs">
+            <div class="tab active" data-tab="introducao">1. Introdução</div>
+            <div class="tab" data-tab="diretrizes">2. Diretrizes Principais</div>
+            <div class="tab" data-tab="categorizacao">3. Categorização</div>
+            <div class="tab" data-tab="ciclo">4. Ciclo de Tratamento</div>
+            <div class="tab" data-tab="metricas">5. Métricas e Níveis de Serviço (SLA)</div>
+            <div class="tab" data-tab="monitoramento">6. Monitoramento e Relatórios</div>
+            <div class="tab" data-tab="riscos">7. Riscos</div>
+            <div class="tab" data-tab="responsabilidades">8. Responsabilidades</div>
+            <div class="tab" data-tab="conclusao">9. Conclusão</div>
+            <div class="tab" data-tab="gerador">10. Gerador de Acionamento</div>
+        </div>
 
-            <div class="section">
+        <div class="tab-content active" id="introducao">
+            <div class="doc-section">
                 <h2>1. Introdução e Objetivos</h2>
                 <p>A Política de Gerenciamento de Incidentes e Problemas (PL.SC.04.00) define diretrizes, responsabilidades e procedimentos para garantir a gestão estruturada, eficiente e padronizada de incidentes e problemas relacionados aos produtos e serviços da Vsoft.</p>
                 <p><strong>Objetivos centrais:</strong></p>
@@ -117,8 +362,10 @@
                 </ul>
                 <p><strong>Abrangência:</strong> Aplica-se a todos os incidentes, falhas e solicitações de suporte oriundos dos produtos Vsoft.</p>
             </div>
+        </div>
 
-            <div class="section">
+        <div class="tab-content" id="diretrizes">
+            <div class="doc-section">
                 <h2>2. Diretrizes Principais</h2>
                 <h3>2.1. Gestão de Incidentes</h3>
                 <p><strong>Definição:</strong> Qualquer interrupção parcial ou total de serviços que impactem diretamente os fluxos operacionais.</p>
@@ -143,13 +390,16 @@
                     <li>Registro e classificação.</li>
                     <li>Comunicação via canais oficiais.</li>
                     <li>Investigação e análise da causa raiz.</li>
-                    <li>Definição de plano de ação.</li>
+                    <li>Priorização em reuniões semanais do time de Produto.</li>
+                    <li>Elaboração de plano de ação.</li>
                     <li>Implementação e monitoramento.</li>
                     <li>Encerramento após validação da eficácia.</li>
                 </ul>
             </div>
+        </div>
 
-            <div class="section">
+        <div class="tab-content" id="categorizacao">
+            <div class="doc-section">
                 <h2>3. Categorização de Incidentes e Problemas</h2>
                 <h3>3.1. Severidade de Incidentes (Impacto Real)</h3>
                 <ul class="sub-section-list">
@@ -166,8 +416,10 @@
                     <li><strong>Baixo:</strong> Potencial para impacto mínimo.</li>
                 </ul>
             </div>
-            
-            <div class="section">
+        </div>
+
+        <div class="tab-content" id="ciclo">
+            <div class="doc-section">
                 <h2>4. Ciclo de Tratamento</h2>
                 <h3>4.1. Ciclo do Incidente</h3>
                 <ol>
@@ -212,11 +464,13 @@
                     </ul>
                 </div>
             </div>
-            
-            <div class="section">
+        </div>
+        
+        <div class="tab-content" id="metricas">
+            <div class="doc-section">
                 <h2>5. Métricas e Níveis de Serviço (SLA)</h2>
                 <h3>5.1. SLA de Incidentes</h3>
-                <table>
+                <table class="status-table">
                     <thead>
                         <tr>
                             <th>Severidade</th>
@@ -253,7 +507,7 @@
                     </tbody>
                 </table>
                 <h3>5.2. SLA de Problemas</h3>
-                <table>
+                <table class="status-table">
                     <thead>
                         <tr>
                             <th>Severidade</th>
@@ -285,8 +539,10 @@
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            <div class="section">
+        <div class="tab-content" id="monitoramento">
+            <div class="doc-section">
                 <h2>6. Monitoramento e Relatórios</h2>
                 <ul>
                     <li>Monitoramento conduzido pelo time de operações (Suporte N2 e Supervisor Técnico).</li>
@@ -294,8 +550,10 @@
                     <li>Uso de relatórios periódicos, dashboards e reuniões de revisão para análise das métricas.</li>
                 </ul>
             </div>
-
-            <div class="section">
+        </div>
+        
+        <div class="tab-content" id="riscos">
+            <div class="doc-section">
                 <h2>7. Riscos</h2>
                 <p>Principais riscos identificados:</p>
                 <ul>
@@ -306,8 +564,10 @@
                     <li>Falha na resolução da causa raiz.</li>
                 </ul>
             </div>
+        </div>
 
-            <div class="section">
+        <div class="tab-content" id="responsabilidades">
+            <div class="doc-section">
                 <h2>8. Responsabilidades</h2>
                 <ul class="sub-section-list">
                     <li><strong>Analista de Suporte/NOC:</strong> Identificação, registro, triagem, comunicação com usuários, documentação.</li>
@@ -317,8 +577,10 @@
                     <li><strong>Gerente de Operações:</strong> Direção estratégica, avaliação da eficácia do processo, análise de relatórios.</li>
                 </ul>
             </div>
-
-            <div class="section">
+        </div>
+        
+        <div class="tab-content" id="conclusao">
+            <div class="doc-section">
                 <h2>9. Definições e Siglas</h2>
                 <ul class="sub-section-list">
                     <li><strong>RI:</strong> Registro de Incidente</li>
@@ -329,14 +591,221 @@
                     <li><strong>BI (Business Intelligence):</strong> Inteligência de negócios aplicada à análise de dados</li>
                 </ul>
             </div>
-
-            <div class="section">
+            <div class="doc-section">
                 <h2>10. Conclusão</h2>
                 <p>A Política PL.SC.04.00 consolida um framework robusto de governança para gerenciamento de incidentes e problemas na Vsoft. Ao definir papéis claros, processos padronizados, SLAs rígidos e monitoramento contínuo, a Vsoft fortalece a resiliência de seus serviços, melhora a satisfação dos clientes e reduz a recorrência de falhas, adotando uma postura proativa na eliminação de causas raiz. O Comitê de Gestão e os Relatórios Post-Mortem garantem aprendizado contínuo e evolução organizacional.</p>
             </div>
-
         </div>
+        
+        <div class="tab-content" id="gerador">
+            <h2>Gerador de Acionamento</h2>
+            <div class="form-section">
+                <h2>🚨 Classificação e Dados</h2>
+                <div class="form-group">
+                    <label for="sistema">Sistema/Serviço:</label>
+                    <select id="sistema">
+                        <option value="">Selecione um sistema...</option>
+                        <option value="Exame Teórico">Exame Teórico</option>
+                        <option value="Exame Prático">Exame Prático</option>
+                        <option value="Super Aula">Super Aula</option>
+                        <option value="Super Prático">Super Prático</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estados Impactados:</label>
+                    <div class="estado-checkboxes">
+                        <label><input type="checkbox" name="estados" value="PE"> Pernambuco</label>
+                        <label><input type="checkbox" name="estados" value="RN"> Rio Grande do Norte</label>
+                        <label><input type="checkbox" name="estados" value="PB"> Paraíba</label>
+                        <label><input type="checkbox" name="estados" value="BA"> Bahia</label>
+                        <label><input type="checkbox" name="estados" value="MG"> Minas Gerais</label>
+                        <label><input type="checkbox" name="estados" value="SE"> Sergipe</label>
+                        <label><input type="checkbox" name="estados" value="GO"> Goiás</label>
+                        <label><input type="checkbox" name="estados" value="MA"> Maranhão</label>
+                        <label><input type="checkbox" name="estados" value="AL"> Alagoas</label>
+                        <label><input type="checkbox" name="estados" value="CE"> Ceará</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição:</label>
+                    <textarea id="descricao" rows="4" placeholder="Descrição breve do que está acontecendo..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="impacto">Impacto (Criticidade):</label>
+                    <select id="impacto">
+                        <option value="">Selecione o nível de impacto</option>
+                        <option value="Crítico">Crítico</option>
+                        <option value="Alto">Alto</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Baixo">Baixo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="analise">Análise/Ações:</label>
+                    <textarea id="analise" rows="4" placeholder="Detalhes técnicos, o que foi feito até agora..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="id-registro">ID do registro do incidente:</label>
+                    <input type="text" id="id-registro" placeholder="Ex: ZEN-12345">
+                </div>
+                <div class="form-group">
+                    <label for="imagem-upload">Adicionar Imagem (upload):</label>
+                    <input type="file" id="imagem-upload" accept="image/*" multiple>
+                    <div id="imagem-previews"></div>
+                </div>
+                <div class="form-group">
+                    <label for="imagem-paste">Colar Imagem (Ctrl+V):</label>
+                    <textarea id="imagem-paste" rows="1" placeholder="Cole a imagem aqui..."></textarea>
+                </div>
+                <button onclick="gerarAcionamento()">Gerar Acionamento</button>
+                <button id="copy-button" onclick="copiarAcionamento()" style="display:none;">Copiar Acionamento</button>
+            </div>
+            
+            <div class="result-box" id="result-box" style="display:none;">
+                <div id="result-content-text"></div>
+                <div id="result-content-images" class="img-container"></div>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="back-button-container">
+        <a href="menu.html" class="back-button">Voltar para o Menu</a>
     </div>
 
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+        
+        function gerarAcionamento() {
+            const sistema = document.getElementById('sistema').value || 'Não informado';
+            const estados = Array.from(document.querySelectorAll('input[name="estados"]:checked')).map(el => el.value).join(', ') || 'Não informado';
+            const descricao = document.getElementById('descricao').value || 'Não informado';
+            const impacto = document.getElementById('impacto').value || 'Não informado';
+            const analise = document.getElementById('analise').value || 'Não informado';
+            const idRegistro = document.getElementById('id-registro').value || 'Não informado';
+            
+            const imagens = [];
+            document.querySelectorAll('#imagem-previews img').forEach(img => {
+                imagens.push(img.src);
+            });
+
+            const acionamentoTexto = `
+🚨 Classificação: ${impacto}
+Sistema/Serviço: ${sistema}
+Estados Impactados: ${estados}
+Descrição: ${descricao}
+Análise/Ações: ${analise}
+ID do registro do incidente: ${idRegistro}
+            `.trim();
+            
+            const resultTextDiv = document.getElementById('result-content-text');
+            resultTextDiv.innerHTML = `<pre>${acionamentoTexto}</pre>`;
+
+            const resultImagesDiv = document.getElementById('result-content-images');
+            resultImagesDiv.innerHTML = '';
+            
+            imagens.forEach(imgSrc => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                resultImagesDiv.appendChild(img);
+            });
+
+            document.getElementById('result-box').style.display = 'block';
+            document.getElementById('copy-button').style.display = 'block';
+
+            window.generatedData = {
+                text: acionamentoTexto,
+                images: imagens
+            };
+        }
+        
+        async function copiarAcionamento() {
+            const data = window.generatedData;
+            if (!data || !data.text) {
+                alert('Nenhum acionamento gerado para copiar.');
+                return;
+            }
+
+            try {
+                // Combine text and images into a single HTML-like block for richer pasting
+                let htmlContent = `<pre>${data.text}</pre>`;
+                if (data.images.length > 0) {
+                    htmlContent += '<br>Imagens:<br>';
+                    data.images.forEach(imgSrc => {
+                        htmlContent += `<img src="${imgSrc}" style="max-width:300px; display:block; margin-bottom: 10px;">`;
+                    });
+                }
+                
+                const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+                const textBlob = new Blob([data.text], { type: 'text/plain' });
+                
+                const items = [
+                    new ClipboardItem({ 
+                        'text/plain': textBlob,
+                        'text/html': htmlBlob 
+                    })
+                ];
+                
+                await navigator.clipboard.write(items);
+                alert('Acionamento copiado para a área de transferência!');
+            } catch (err) {
+                console.error('Erro ao copiar:', err);
+                alert('Falha ao copiar. O navegador pode não suportar a cópia de imagens e texto juntos. Tente copiar o texto manualmente.');
+            }
+        }
+        
+        // Lógica para carregar imagem do arquivo
+        document.getElementById('imagem-upload').addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                const previewContainer = document.getElementById('imagem-previews');
+                previewContainer.innerHTML = '';
+                
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+
+        // Lógica para colar imagem
+        document.getElementById('imagem-paste').addEventListener('paste', (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            const previewContainer = document.getElementById('imagem-previews');
+            
+            for (let item of items) {
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
