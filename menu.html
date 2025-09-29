@@ -308,18 +308,20 @@
                         <p class="card-description">Documentação completa do gerenciamento de incidente.</p>
                     </div>
                 </a>
-                <a href="menu2.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-table"></i></div>
-                    <div>
-                        <h2 class="card-title">Registro Diários</h2>
-                        <p class="card-description">Base de registro diário do N2</p>
-                    </div>
-                </a>
+                
                 <a href="knowledge_manager.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-database"></i></div>
                     <div>
                         <h2 class="card-title">Gerenciar Base de Conhecimento</h2>
                         <p class="card-description">Interface para adicionar e atualizar informações do chatbot por estado (MongoDB).</p>
+                    </div>
+                </a>
+                
+                <a href="menu2.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-table"></i></div>
+                    <div>
+                        <h2 class="card-title">Registro Diários</h2>
+                        <p class="card-description">Base de registro diário do N2</p>
                     </div>
                 </a>
 
@@ -334,13 +336,13 @@
         <div id="chat-body">
             <div id="chat-messages">
                 <div class="message bot-message">
-                    Olá! Sou seu assistente de suporte N2. Posso te dar endpoints por estado (RN, DF, SE, MS) ou detalhes sobre a **Política de Incidentes**.
+                    Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
                     <br><br>
-                    **Dica de Memória:** Use o comando `/lembrar [SIGLA] [sua informação]` para guardar informações por estado. Ex: `/lembrar RN A API de consulta de CFC é lenta.`.
+                    **Dica:** Use o comando `/lembrar [SIGLA] [sua informação]` ou a página 'Gerenciar Base de Conhecimento' para me ensinar algo.
                 </div>
             </div>
             <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Ex: 'endpoints RN', 'MTTR crítico' ou '/lembrar...'">
+                <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou '/lembrar...'">
                 <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -356,7 +358,7 @@
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
         // ⚠️ ATENÇÃO: SUBSTITUA PELA URL PÚBLICA DA SUA API NA VERCEL
-        // Ex: 'https://base-2-new-new-9xow.vercel.app'
+        // Use a URL real do seu deployment Vercel.
         const BACKEND_URL = 'https://sua-api-aqui.vercel.app'; 
         
         function logout() {
@@ -506,7 +508,7 @@
                 if (memoryResponse) {
                     botResponse = memoryResponse;
                 } else {
-                    // Se não for um comando de memória, usa a base de conhecimento (RN/Política/Outros)
+                    // Se não for um comando de memória, usa a base de conhecimento (AGORA APENAS O BANCO)
                     botResponse = getBotResponse(messageText);
                 }
 
@@ -543,7 +545,7 @@
             }
         }
 
-        // --- Lógica de Resposta do Chatbot (Baseado nas suas docs + MongoDB) ---
+        // --- Lógica de Resposta do Chatbot (AGORA TUDO VEM DO BANCO) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
             const keywords = lowerCaseMessage.split(/\s+/).filter(w => w.length > 2);
@@ -560,6 +562,9 @@
             if (siglaQuery && siglaQuery !== 'todos') {
                 // Filtra as memórias para o estado específico OU para TODAS
                 filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
+            } else {
+                 // Se não houver sigla, busca em todas as memórias.
+                 filteredMemories = chatMemories;
             }
             
             // 1.2. Filtro por Palavras-chave
@@ -570,7 +575,7 @@
                 
                 if (textKeywords.length === 0) return false; 
 
-                // Verifica se a memória contém pelo menos uma das palavras-chave
+                // Verifica se a memória contém pelo menos 1 palavra-chave da pergunta
                 return textKeywords.some(keyword => memoryTextLower.includes(keyword));
             });
 
@@ -587,74 +592,22 @@
             }
 
             // --------------------------------------------------------
-            // --- 3. ORIENTAÇÃO POR SIGLA DO ESTADO (BASE DE CONHECIMENTO FIXA) ---
+            // --- 2. RESPOSTA PADRÃO (CONHECIMENTO INEXISTENTE) ---
             // --------------------------------------------------------
             
-            if (lowerCaseMessage.includes("rn") || lowerCaseMessage.includes("rio grande do norte")) {
-                return "Para o **Detran-RN**, você pode consultar:\n" +
-                       "* **Endpoints de Consulta:** (CFC, Instrutor, Veículo, Agendamento)\n" +
-                       "* **Endpoints de Confirmação:** (ConfirmacaoAulaPratica/Teorica)\n" +
-                       "* **Regras de Alerta e Fraude**\n" +
-                       "* **Fluxo e Erros** (Ex: Erro 060)\n\n" +
-                       "Tente: `erro 060 rn` ou `consulta agendamento rn`.";
+            let initialMessage = "Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para essa pesquisa.";
+
+            if (lowerCaseMessage.includes('sla') || lowerCaseMessage.includes('endpoint') || lowerCaseMessage.includes('fluxo')) {
+                 initialMessage += "\n\n**Parece que o conhecimento sobre este tópico ainda não foi inserido na base.** Use a página de gerenciamento para adicionar o SLA, Endpoints ou Fluxos.";
+            } else if (siglaQuery) {
+                 initialMessage += `\n\n**Verifique:** Não há informações salvas para a palavra-chave que você usou no estado **${siglaQuery.toUpperCase()}**.`;
             }
+
+            initialMessage += "\n\nUse o comando `/lembrar [SIGLA] [sua informação]` para me ensinar.";
             
-            if (lowerCaseMessage.includes("df") || lowerCaseMessage.includes("distrito federal")) {
-                return "Para o **Detran-DF**, você pode consultar:\n" +
-                       "* **Endpoints de Processo:** (Consultar Processo)\n" +
-                       "* **Endpoints de Aulas:** (Envio Aula Teórica/Prática)\n" +
-                       "* **Endpoints de Sincronização:** (Consulta CFC, Instrutor, Notificação Biometria)\n\n" +
-                       "Tente: `consulta processo df` ou `enviar aula teorica df`.";
-            }
-            
-            if (lowerCaseMessage.includes("se") || lowerCaseMessage.includes("sergipe")) {
-                return "Para o **Detran-SE**, você pode consultar:\n" +
-                       "* **Endpoints de Veículos e CFCs**\n" +
-                       "* **Endpoints de Pessoas:** (Instrutor e Candidato - inclui biometria)\n" +
-                       "* **Endpoint de Envio de Aulas**\n\n" +
-                       "Tente: `consulta veiculo se` ou `consulta candidato se`.";
-            }
-
-            if (lowerCaseMessage.includes("ms") || lowerCaseMessage.includes("mato grosso do sul")) {
-                return "Para o **Detran-MS**, você pode consultar:\n" +
-                       "* **Endpoints de Aulas Práticas** (Início, Fim, Status)\n" +
-                       "* **Fluxos de Processamento:** (Exames Médico/Psicológico/Teórico)\n" +
-                       "* **Sincronização de Agendamento** (inclui FTP Teórico)\n\n" +
-                       "Tente: `fluxo exame medico ms` ou `inicio aula pratica ms`.";
-            }
-
-            // --------------------------------------------------------
-            // --- 4. POLÍTICA DE INCIDENTES (PL.SC.04.00) ---
-            // --------------------------------------------------------
-            const isPolicyRequest = lowerCaseMessage.includes("política") || lowerCaseMessage.includes("incidente") || lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("problema") || lowerCaseMessage.includes("mttr") || lowerCaseMessage.includes("responsabilidade") || lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("categorização");
-
-            if (isPolicyRequest) {
-                if (lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("mttr") || lowerCaseMessage.includes("tempo de resposta")) {
-                    if (lowerCaseMessage.includes("crítico")) {
-                        return "SLA Incidente **Crítico**:\n- Resp. Inicial: **5 minutos**\n- MTTR: **2 a 4 horas**\n\nSLA Problema **Crítico**:\n- MTTR: **5 a 10 dias úteis**";
-                    }
-                    if (lowerCaseMessage.includes("alto")) {
-                        return "SLA Incidente **Alto**:\n- Resp. Inicial: **10 minutos**\n- MTTR: **Até 6h úteis**\n\nSLA Problema **Alto**:\n- MTTR: **11 a 15 dias úteis**";
-                    }
-                    return "A Política de Incidentes detalha o SLA por severidade (Crítico, Alto, Médio). Qual nível você gostaria de verificar?";
-                }
-                if (lowerCaseMessage.includes("responsabilidades")) {
-                    return "As principais responsabilidades são:\n" +
-                           "* **Analista de Suporte/NOC:** Identificação, registro, triagem. \n" +
-                           "* **Equipe Técnica:** Diagnóstico e implementação de soluções.\n" +
-                           "* **Product Owner:** Priorização de problemas.\n" + 
-                           "Consulte o documento para ver as demais funções.";
-                }
-                return "A Política de Incidentes (PL.SC.04.00) está totalmente coberta. Qual aspecto você deseja detalhar (SLA, Ciclo, Responsabilidades, Categorização)?";
-            }
-
-            // --------------------------------------------------------
-            // --- 5. RESPOSTA PADRÃO ---
-            // --------------------------------------------------------
-            return "Desculpe, não encontrei uma resposta na base de conhecimento. Tente digitar a **sigla do estado (RN, DF, SE, MS)** para ver as opções ou use `/lembrar` para me ensinar algo.";
+            return initialMessage;
         }
     </script>
 </body>
 
 </html>
-
