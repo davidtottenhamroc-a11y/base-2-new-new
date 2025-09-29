@@ -5,13 +5,12 @@ const cors = require('cors');
 const app = express();
 
 // Configurações
-// Permite requisições de origens diferentes (necessário para o frontend rodando no navegador)
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 
 // --- Variáveis de Ambiente ---
-// IMPORTANTE: A Vercel ou seu ambiente de execução lerá esta variável.
 const MONGODB_URI = process.env.MONGODB_URI; 
+const PORT = process.env.PORT || 3000; // Define a porta
 
 // Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
@@ -40,9 +39,9 @@ const incidenteSchema = new mongoose.Schema({
     observacao: String
 });
 
-// NOVO SCHEMA PARA O CHATBOT
+// SCHEMA PARA MEMÓRIA DO CHATBOT
 const memorySchema = new mongoose.Schema({
-    agente: String, // Quem salvou a memória
+    agente: String,
     dataHora: { type: Date, default: Date.now },
     texto: String
 });
@@ -53,10 +52,10 @@ const Memory = mongoose.model('Memory', memorySchema); // NOVO MODEL
 
 // --- Rotas da API ---
 
-// Rota para autenticação
+// Rota para autenticação (Corrigida para usar /api/login)
 app.post('/api/login', (req, res) => {
     const users = {
-        'Weslley': 'wqtm1234',
+        'Wesley': '1234',
         'David': '456'
     };
     const { username, password } = req.body;
@@ -67,7 +66,7 @@ app.post('/api/login', (req, res) => {
     }
 });
 
-// --- Rotas de Aulas ---
+// Rota para salvar um registro de aula
 app.post('/api/aulas', async (req, res) => {
     try {
         const novaAula = new Aula(req.body);
@@ -78,6 +77,7 @@ app.post('/api/aulas', async (req, res) => {
     }
 });
 
+// Rota para buscar todos os registros de aulas
 app.get('/api/aulas', async (req, res) => {
     try {
         const aulas = await Aula.find({});
@@ -87,7 +87,7 @@ app.get('/api/aulas', async (req, res) => {
     }
 });
 
-// --- Rotas de Incidentes ---
+// Rota para salvar um incidente
 app.post('/api/incidentes', async (req, res) => {
     try {
         const novoIncidente = new Incidente(req.body);
@@ -98,6 +98,7 @@ app.post('/api/incidentes', async (req, res) => {
     }
 });
 
+// Rota para buscar todos os incidentes
 app.get('/api/incidentes', async (req, res) => {
     try {
         const incidentes = await Incidente.find({});
@@ -107,6 +108,7 @@ app.get('/api/incidentes', async (req, res) => {
     }
 });
 
+// Rota para deletar um incidente
 app.delete('/api/incidentes/:id', async (req, res) => {
     try {
         const incidente = await Incidente.findByIdAndDelete(req.params.id);
@@ -119,7 +121,6 @@ app.delete('/api/incidentes/:id', async (req, res) => {
 
 // --- NOVAS ROTAS PARA MEMÓRIA DO CHATBOT ---
 
-// Rota para salvar uma nova memória
 app.post('/api/memories', async (req, res) => {
     try {
         const novaMemoria = new Memory(req.body);
@@ -130,15 +131,23 @@ app.post('/api/memories', async (req, res) => {
     }
 });
 
-// Rota para buscar todas as memórias
 app.get('/api/memories', async (req, res) => {
     try {
-        // Ordena pela data mais recente (os mais novos aparecem primeiro)
         const memories = await Memory.find({}).sort({ dataHora: -1 });
         res.send(memories);
     } catch (error) {
         res.status(500).send(error);
     }
+});
+
+// Adiciona uma rota base para testar
+app.get('/', (req, res) => {
+    res.send('API VSoft N2 está rodando!');
+});
+
+// Inicia o servidor, essencial para o funcionamento
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 module.exports = app;
