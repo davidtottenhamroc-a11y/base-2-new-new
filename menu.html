@@ -328,7 +328,9 @@
             </div>
         </main>
         <button class="logout-button" onclick="logout()">Sair</button>
-    </div> <div id="chat-widget-container">
+    </div> 
+    
+    <div id="chat-widget-container">
         <div id="chat-header">
             Assistente VSoft N2 <i class="fas fa-robot"></i>
             <button id="chat-close-btn" onclick="toggleChat()">X</button>
@@ -354,11 +356,12 @@
     
     <script>
         // Variável global para armazenar as memórias carregadas do MongoDB
-        let chatMemories = []; 
+        let chatMemories = []; 
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
         // ⚠️ ATENÇÃO: SUBSTITUA PELA URL PÚBLICA DA SUA API NA VERCEL
-        const BACKEND_URL = 'https://sua-api-aqui.vercel.app'; 
+        // Use a mesma URL da sua implantação
+        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app'; 
         
         function logout() {
             localStorage.removeItem('agenteSelecionado');
@@ -383,6 +386,7 @@
         // Função para carregar todas as memórias do MongoDB
         async function loadMemoriesFromDatabase() {
             try {
+                // Certifique-se de que a URL está correta
                 const response = await fetch(`${BACKEND_URL}/api/memories`);
                 if (response.ok) {
                     const data = await response.json();
@@ -390,14 +394,15 @@
                     console.log(`[MongoDB] ${data.length} memórias carregadas.`);
                 } else {
                     console.error('Erro ao carregar memórias:', response.status);
+                    appendMessage(`[ERRO] Não foi possível carregar as memórias. Status: ${response.status}. Verifique o backend em ${BACKEND_URL}`, 'bot-message');
                 }
             } catch (error) {
                 console.error('Erro de rede ao carregar memórias:', error);
+                appendMessage(`[ERRO] Falha de conexão com o servidor de memórias: ${BACKEND_URL}`, 'bot-message');
             }
         }
 
-        // Inicialmente, mostra o botão flutuante e oculta o widget completo
-        document.addEventListener('DOMContentLoaded', async () => { 
+        document.addEventListener('DOMContentLoaded', async () => { 
             document.getElementById('chat-open-btn').style.display = 'block';
             await loadMemoriesFromDatabase(); // Carrega as memórias do banco ao iniciar
         });
@@ -409,35 +414,8 @@
             }
         });
 
-        // Função para salvar a memória no MongoDB (Deixada aqui apenas para caso o botão seja reativado)
-        async function saveMemoryToDatabase(stateSigla, memoryText) {
-            const agenteLogado = localStorage.getItem('agenteSelecionado') || 'SuporteN2'; 
-            
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/memories`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        agente: agenteLogado,
-                        estado: stateSigla, // Adicionando o estado
-                        texto: memoryText
-                    })
-                });
-
-                if (response.ok) {
-                    await loadMemoriesFromDatabase(); 
-                    return `**MEMÓRIA SALVA PERMANENTEMENTE!** [Estado: ${stateSigla}]. Seu lembrete foi registrado no MongoDB e está disponível.`;
-                } else {
-                    return `Erro ao salvar no banco. Status: ${response.status}.`;
-                }
-            } catch (error) {
-                console.error('Erro de rede ao salvar memória:', error);
-                return `Erro de conexão com o servidor. Verifique se o backend está rodando em ${BACKEND_URL}.`;
-            }
-        }
-
         // Função principal de envio e resposta
-        async function sendMessage() { 
+        async function sendMessage() { 
             const input = document.getElementById('chat-input');
             const messageText = input.value.trim();
             
@@ -449,6 +427,7 @@
             
             showTypingIndicator();
 
+            // Usamos setTimeout para simular o tempo de processamento e dar tempo do indicador aparecer
             setTimeout(() => {
                 hideTypeningIndicator();
                 
@@ -475,7 +454,7 @@
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message bot-message typing-indicator';
             typingDiv.id = 'typing-indicator';
-            typingDiv.innerHTML = 'Digitando...'; 
+            typingDiv.innerHTML = 'Digitando...'; 
             messagesContainer.appendChild(typingDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -487,55 +466,50 @@
             }
         }
 
-        // --- Lógica de Resposta do Chatbot (AGORA TUDO VEM DO BANCO) ---
+        // --- Lógica de Resposta do Chatbot (CORRIGIDA) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
-            // Pegamos todas as palavras com mais de 2 letras
             const keywords = lowerCaseMessage.split(/\s+/).filter(w => w.length > 2);
             
             // Tenta identificar a sigla na pergunta
             const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
 
-            // --------------------------------------------------------
-            // --- 1. CONSULTA AO BANCO DE DADOS (MEMÓRIA PERMANENTE) ---
-            // --------------------------------------------------------
-            
+            // 1. Filtro Inicial por Estado
             let filteredMemories = chatMemories;
             
-            // 1.1. Filtro por Estado
             if (siglaQuery && siglaQuery !== 'todos') {
-                // Filtra as memórias para o estado específico OU para TODAS
+                // Filtra memórias para o estado específico OU para TODOS os estados
                 filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
-            } else {
-                 // Se não houver sigla, busca em todas as memórias.
-                 filteredMemories = chatMemories;
-            }
-            
-            // 1.2. Filtro por Palavras-chave
-            const matchingMemories = filteredMemories.filter(m => {
-                const memoryTextLower = m.texto.toLowerCase();
-                // Remove a sigla da busca para que 'N2 de RN' procure 'N2' e 'RN' filtre por estado.
-                const textKeywords = keywords.filter(w => w !== siglaQuery);
+            } 
+            // Se siglaQuery for 'todos' ou não for encontrada, filteredMemories = chatMemories (TODAS)
+
+            // 2. Filtro por Palavras-chave
+            const textKeywords = keywords.filter(w => w !== siglaQuery && w.length > 2); // Palavras-chave sem a sigla
+
+            let matchingMemories = [];
+
+            if (textKeywords.length === 0 && siglaQuery) {
+                // CASO 1: Usuário digitou APENAS a sigla (Ex: "DF")
+                // Se a sigla foi encontrada, listamos TUDO que foi filtrado por ela.
+                matchingMemories = filteredMemories;
+            } else if (textKeywords.length > 0) {
+                // CASO 2: Usuário digitou sigla + palavras-chave (Ex: "DF Processo") ou apenas palavras-chave (Ex: "Processo")
                 
-                // --- CORREÇÃO DE LÓGICA DE BUSCA: Se o usuário digitou apenas a sigla (Ex: "DF"), 
-                // --- retorna TRUE para listar o conteúdo do estado.
-                if (textKeywords.length === 0 && siglaQuery) {
-                    return true; 
-                }
-
-                // Verifica se a memória contém pelo menos 1 palavra-chave da pergunta
-                return textKeywords.some(keyword => memoryTextLower.includes(keyword));
-            });
+                // Filtra as memórias (já filtradas por estado em 1) que contenham pelo menos 1 palavra-chave
+                matchingMemories = filteredMemories.filter(m => {
+                    const memoryTextLower = m.texto.toLowerCase();
+                    return textKeywords.some(keyword => memoryTextLower.includes(keyword));
+                });
+            }
 
 
+            // 3. Gerar Resposta
             if (matchingMemories.length > 0) {
                 
-                // 1.3. Se o usuário só digitou a sigla (Ex: "DF"), lista os TÍTULOS para orientação.
-                if (keywords.length === 1 && siglaQuery) {
+                // Se for a busca apenas por sigla, retorna o índice de títulos
+                if (keywords.length === 1 && siglaQuery && textKeywords.length === 0) {
                     const titles = matchingMemories.map(m => {
-                        // Tenta extrair o título se houver um ': ' no texto
                         const titleMatch = m.texto.split(':')[0].trim();
-                        // Trunca se for muito longo
                         const cleanTitle = titleMatch.length > 50 ? titleMatch.substring(0, 47) + '...' : titleMatch;
                         return `* **${cleanTitle}**`;
                     }).join('\n');
@@ -543,31 +517,29 @@
                     return `Para **${siglaQuery.toUpperCase()}**, as informações disponíveis na base são:\n\n${titles}\n\n**Dica:** Digite o título ou palavras-chave (Ex: 'N2 de RN') para ver o conteúdo completo.`;
                 }
 
-                // 1.4. Retorno padrão para busca detalhada (Ex: 'N2 de RN')
+                // Retorno padrão para busca detalhada (Ex: 'N2 de RN' ou 'Processo')
                 const topMemories = matchingMemories.slice(0, 3).map(m => {
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
                     const estado = m.estado ? `[${m.estado}] ` : '';
                     return `* ${estado}**${m.texto}** (Agente: ${m.agente}, ${date})`;
                 }).join('\n\n');
 
-                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n${topMemories}\n\nPara ver tudo, use a página de gerenciamento ou /minhas memorias.`;
+                const totalMsg = matchingMemories.length > 3 ? `e mais ${matchingMemories.length - 3}` : '';
+
+                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n${topMemories}\n\n${totalMsg}`;
             }
 
-            // --------------------------------------------------------
-            // --- 2. RESPOSTA PADRÃO (CONHECIMENTO INEXISTENTE) ---
-            // --------------------------------------------------------
-            
-            let initialMessage = "Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para essa pesquisa.";
+            // 4. Resposta Padrão: Conhecimento Inexistente
+            let initialMessage = "Desculpe, não encontrei uma resposta na base de conhecimento (**MongoDB**) para essa pesquisa.";
 
             if (siglaQuery) {
                  initialMessage += `\n\n**Verifique:** Não há informações salvas para a palavra-chave que você usou no estado **${siglaQuery.toUpperCase()}**.`;
             }
 
-            initialMessage += "\n\nUse a página 'Gerenciar Base de Conhecimento' para inserir o conhecimento necessário.";
+            initialMessage += "\n\nUse a página **'Gerenciar Base de Conhecimento'** para inserir o conhecimento necessário.";
             
             return initialMessage;
         }
     </script>
 </body>
-
 </html>
