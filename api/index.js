@@ -6,13 +6,13 @@ const app = express();
 
 // Configurações
 // Permite requisições de origens diferentes (CORS)
-app.use(cors()); 
+app.use(cors()); 
 app.use(express.json());
 
 // --- Variáveis de Ambiente ---
 // A string de conexão do seu Atlas que deve estar configurada na Vercel
-const MONGODB_URI = process.env.MONGODB_URI; 
-const PORT = process.env.PORT || 3000; 
+const MONGODB_URI = process.env.MONGODB_URI; 
+const PORT = process.env.PORT || 3000; 
 
 // Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
@@ -43,19 +43,19 @@ const incidenteSchema = new mongoose.Schema({
 
 // SCHEMA PARA MEMÓRIA DO CHATBOT
 const memorySchema = new mongoose.Schema({
-    agente: String,
-    dataHora: { type: Date, default: Date.now },
-    texto: String, // Usado para armazenar o conteúdo (conteudo)
-    estado: String // Usado para o filtro do estado
+    agente: String,
+    dataHora: { type: Date, default: Date.now },
+    texto: String, // Usado para armazenar o conteúdo (conteudo)
+    estado: String // Usado para o filtro do estado
 });
 
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
-const Memory = mongoose.model('Memory', memorySchema); 
+const Memory = mongoose.model('Memory', memorySchema); 
 
 // --- Rotas da API ---
 
-// Rota para autenticação (Corrigida para usar /api/login)
+// Rota para autenticação
 app.post('/api/login', (req, res) => {
     const users = {
         'Wesley': '1234',
@@ -69,7 +69,7 @@ app.post('/api/login', (req, res) => {
     }
 });
 
-// --- Rotas de Aulas, Incidentes, e Memória (Conforme a estrutura anterior) ---
+// --- Rotas de Aulas ---
 
 app.post('/api/aulas', async (req, res) => {
     try {
@@ -89,6 +89,8 @@ app.get('/api/aulas', async (req, res) => {
         res.status(500).send(error);
     }
 });
+
+// --- Rotas de Incidentes ---
 
 app.post('/api/incidentes', async (req, res) => {
     try {
@@ -119,31 +121,30 @@ app.delete('/api/incidentes/:id', async (req, res) => {
     }
 });
 
-// --- NOVAS ROTAS PARA MEMÓRIA DO CHATBOT ---
+// --- ROTAS PARA MEMÓRIA DO CHATBOT (MongoDB) ---
 
 app.post('/api/memories', async (req, res) => {
-    try {
-        const novaMemoria = new Memory(req.body);
-        await novaMemoria.save();
-        res.status(201).send(novaMemoria);
-    } catch (error) {
-        res.status(400).send(error);
-    }
+    try {
+        const novaMemoria = new Memory(req.body);
+        await novaMemoria.save();
+        res.status(201).send(novaMemoria);
+    } catch (error) {
+        res.status(400).send(error);
+    }
 });
 
 app.get('/api/memories', async (req, res) => {
-    try {
-        const memories = await Memory.find({}).sort({ dataHora: -1 });
-        res.send(memories);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+    try {
+        const memories = await Memory.find({}).sort({ dataHora: -1 });
+        res.send(memories);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 });
 
-// Inicia o servidor, essencial para o funcionamento
+// Inicia o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 module.exports = app;
-
