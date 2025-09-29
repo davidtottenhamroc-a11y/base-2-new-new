@@ -329,7 +329,7 @@
                 <div class="message bot-message">
                     Olá! Sou seu assistente de suporte N2. Posso te dar endpoints por estado (RN, DF, SE, MS) ou detalhes sobre a **Política de Incidentes**.
                     <br><br>
-                    **Dica de Memória:** Use o comando `/lembrar [sua informação]` para me ensinar algo que vou guardar **permanentemente** no banco.
+                    **Dica de Memória:** Use o comando `/lembrar [SIGLA] [sua informação]` para guardar informações por estado. Ex: `/lembrar RN A API de consulta de CFC é lenta.`
                 </div>
             </div>
             <div id="chat-input-container">
@@ -346,10 +346,11 @@
     <script>
         // Variável global para armazenar as memórias carregadas do MongoDB
         let chatMemories = []; 
+        const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
         // ⚠️ ATENÇÃO: SUBSTITUA PELA URL PÚBLICA DA SUA API NA VERCEL
-        // Use http://localhost:3000 SOMENTE para testes locais.
-        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app'; 
+        // Use o domínio Vercel correto, como 'https://base-2-new-new-9xow.vercel.app'
+        const BACKEND_URL = 'https://sua-api-aqui.vercel.app'; 
         
         function logout() {
             // Limpa o estado de login
@@ -404,7 +405,7 @@
         });
 
         // Função para salvar a memória no MongoDB
-        async function saveMemoryToDatabase(memoryText) {
+        async function saveMemoryToDatabase(stateSigla, memoryText) {
             const agenteLogado = localStorage.getItem('agenteSelecionado') || 'SuporteN2'; 
             
             try {
@@ -413,13 +414,14 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         agente: agenteLogado,
+                        estado: stateSigla, // Adicionando o estado
                         texto: memoryText
                     })
                 });
 
                 if (response.ok) {
                     await loadMemoriesFromDatabase(); 
-                    return `**MEMÓRIA SALVA PERMANENTEMENTE!** Seu lembrete foi registrado no MongoDB e está disponível.`;
+                    return `**MEMÓRIA SALVA PERMANENTEMENTE!** [Estado: ${stateSigla}]. Seu lembrete foi registrado no MongoDB e está disponível.`;
                 } else {
                     return `Erro ao salvar no banco. Status: ${response.status}.`;
                 }
@@ -433,13 +435,25 @@
         async function handleMemoryCommands(message) {
             const lowerCaseMessage = message.toLowerCase();
 
-            // 1. Comando explícito para "lembrar" (/lembrar)
+            // 1. Comando explícito para "lembrar" (/lembrar [SIGLA] [TEXTO])
             if (lowerCaseMessage.startsWith("/lembrar ")) {
-                const memory = message.substring("/lembrar ".length).trim();
-                if (memory) {
-                    return await saveMemoryToDatabase(memory); 
+                const parts = message.trim().split(' ').slice(1); // Remove '/lembrar'
+                
+                if (parts.length < 2) {
+                     return "Formato inválido. Use: `/lembrar [SIGLA do Estado] [sua informação]`. Ex: `/lembrar RN API consulta lenta`.";
                 }
-                return "Por favor, use o formato: `/lembrar [informação que você quer que eu guarde]`.";
+                
+                const siglaInput = parts[0].toUpperCase();
+                const memoryText = parts.slice(1).join(' ');
+
+                // Mapeia siglas válidas e nomes completos para simplificar a validação
+                const validSiglas = VALID_STATES.map(s => s.toUpperCase().substring(0, 2) === 'RI' ? 'RN' : s.toUpperCase().substring(0, 2));
+                
+                if (VALID_STATES.includes(siglaInput) || validSiglas.includes(siglaInput) || siglaInput === 'TODOS') {
+                    // Chama a função assíncrona para salvar
+                    return await saveMemoryToDatabase(siglaInput, memoryText); 
+                }
+                return `SIGLA INVÁLIDA. Use uma sigla válida como RN, DF, SE, MS ou TODOS.`;
             }
 
             // 2. Comando explícito para "ver memórias" (/minhas memorias)
@@ -447,13 +461,14 @@
                 await loadMemoriesFromDatabase(); 
 
                 if (chatMemories.length === 0) {
-                    return "Eu não tenho nenhuma informação armazenada no banco de dados para esta sessão. Use `/lembrar [informação]` para me ensinar algo.";
+                    return "Eu não tenho nenhuma informação armazenada no banco de dados para esta sessão. Use `/lembrar [SIGLA] [informação]` para me ensinar algo.";
                 }
 
                 // Formata e exibe as 5 memórias mais recentes
                 const latestMemories = chatMemories.slice(0, 5).map(m => {
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
-                    return `* [${date}] ${m.texto} (Agente: ${m.agente})`;
+                    const estado = m.estado ? `[${m.estado}] ` : '';
+                    return `* ${estado}${m.texto} (Agente: ${m.agente})`;
                 }).join('\n');
                 
                 return `As **${chatMemories.length}** informações salvas permanentemente (últimas 5):\n\n` + latestMemories;
@@ -524,56 +539,87 @@
             }
         }
 
-        // --- Lógica de Resposta do Chatbot (Baseado nas suas docs) ---
+        // --- Lógica de Resposta do Chatbot (Baseado nas suas docs + MongoDB) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
+            const keywords = lowerCaseMessage.split(/\s+/).filter(w => w.length > 2);
+            
+            const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
 
             // --------------------------------------------------------
-            // --- RN (Rio Grande do Norte) - FOCO PRINCIPAL ---
+            // --- 1. CONSULTA AO BANCO DE DADOS (MEMÓRIA PERMANENTE) ---
             // --------------------------------------------------------
-            if (lowerCaseMessage.includes("rio grande do norte") || lowerCaseMessage.includes("rn") || lowerCaseMessage.includes("detran-rn")) {
-                if (lowerCaseMessage.includes("endpoints") || lowerCaseMessage.includes("consulta") || lowerCaseMessage.includes("webservice")) {
-                    let response = "Os WebServices do DetranNet-RN disponibilizam os seguintes métodos:\n\n";
-                    response += "**Consultas Cadastrais e Agendamento:**\n";
-                    response += "ConsultaCFC (opcional CNPJ)\n";
-                    response += "ConsultaInstrutor (requer CNPJ)\n";
-                    response += "ConsultaVeiculo (requer CNPJ)\n";
-                    response += "ConsultaCandidato (requer CPF e CNPJ)\n";
-                    response += "ConsultaAgendamentoPratico (requer CNPJ, Data)\n\n";
-                    response += "**Confirmação de Aulas (Envio):**\n";
-                    response += "ConfirmacaoAulaPratica\n";
-                    response += "ConfirmacaoAulaTeorica";
-                    return response;
-                }
-                if (lowerCaseMessage.includes("fluxo") || lowerCaseMessage.includes("processo") || lowerCaseMessage.includes("aula")) {
-                    return "O fluxo para aulas monitoradas segue 4 etapas principais: 1. CFC realiza a **matrícula** no DetranNet. 2. Sistema de Monitoramento **sincroniza** os dados. 3. Instrutor/Aluno iniciam e finalizam a aula com **biometria**. 4. Sistema de Monitoramento **envia o resumo** para o DetranNet, que contabiliza o curso.";
-                }
-                if (lowerCaseMessage.includes("erro") && (lowerCaseMessage.includes("abertura") || lowerCaseMessage.includes("060"))) {
-                    return "O **Erro 060** refere-se a **Erros de Identificação** (Instrutor/Aluno).\n" +
-                           "Causas comuns de erros de abertura:\n" +
-                           "* **Identificação:** CPFs inválidos/inativos, matrícula expirada, categoria incompatível.\n" +
-                           "* **Agendamento:** Aula fora do horário permitido (Regra: Agendamento deve ser no intervalo de 15 minutos do início da telemetria).";
-                }
-                if (lowerCaseMessage.includes("alerta") || lowerCaseMessage.includes("regra") || lowerCaseMessage.includes("fraude")) {
-                    let response = "**AULA COM ALERTA (Prática)** é considerada quando (Exemplos):\n";
-                    response += "* Veículo parado por mais de **10 minutos** (exceto aulas de PARADA E ESTACIONAMENTO).\n";
-                    response += "* Não houve detecção de pelo menos **uma face humana** nas imagens capturadas.\n";
-                    response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**.";
-                    return response;
-                }
-                if (lowerCaseMessage.includes("confirmacao") && lowerCaseMessage.includes("pratica")) {
-                     return "O método **ConfirmacaoAulaPratica** envia biometrias de Entrada/Saída do Aluno e Instrutor, Placa, CNPJCFC, etc..\n\n" +
-                            "**Regra Crítica:** A aula não será aceita se a digital não for validada e não houver foto no envio. O **CodigoRetorno 0** indica Sucesso.";
-                }
-                 if (lowerCaseMessage.includes("agendamento") && lowerCaseMessage.includes("teorico")) {
-                     return "O agendamento teórico (atualização e formação) é realizado **dentro do sistema SuperPrático**.\n\n" +
-                            "O fluxo é: **Importar Candidato** > **Criar Turma** > **Agendamento** (repetir para todos os dias e manter 'É virtual' selecionada) > **Inserir Alunos na Turma**.";
-                }
-                return "Temos informações detalhadas sobre o **Fluxo de Aulas**, **WebServices** (Consulta e Confirmação), regras de **Alerta** e erros de **Abertura de Aula** (Erro 060) para o RN. Qual tópico você precisa?";
+            
+            let filteredMemories = chatMemories;
+            
+            if (siglaQuery && siglaQuery !== 'todos') {
+                // Filtra pelo estado se a sigla for fornecida na pergunta
+                filteredMemories = filteredMemories.filter(m => m.estado && m.estado.toLowerCase().includes(siglaQuery));
+            }
+            
+            // Filtra o texto da memória pelas palavras-chave da pergunta
+            const matchingMemories = filteredMemories.filter(m => {
+                const memoryTextLower = m.texto.toLowerCase();
+                // Requer que pelo menos 2 palavras-chave da pergunta (excluindo a sigla) estejam na memória
+                const textKeywords = keywords.filter(w => w !== siglaQuery);
+                
+                if (textKeywords.length === 0) return false; // Evita retornar tudo se só digitou a sigla
+
+                return textKeywords.some(keyword => memoryTextLower.includes(keyword));
+            });
+
+
+            if (matchingMemories.length > 0) {
+                // Se houver correspondência, retorna as 3 mais recentes do banco
+                const topMemories = matchingMemories.slice(0, 3).map(m => {
+                    const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
+                    const estado = m.estado ? `[${m.estado}] ` : '';
+                    // Retorna o texto original da memória salva
+                    return `* ${estado}**${m.texto}** (Agente: ${m.agente}, ${date})`;
+                }).join('\n\n');
+
+                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n${topMemories}\n\nPara ver tudo, use /minhas memorias.`;
             }
 
             // --------------------------------------------------------
-            // --- POLÍTICA DE INCIDENTES (PL.SC.04.00) ---
+            // --- 2. ORIENTAÇÃO POR SIGLA DO ESTADO (BASE DE CONHECIMENTO FIXA) ---
+            // --------------------------------------------------------
+            
+            if (lowerCaseMessage.includes("rn") || lowerCaseMessage.includes("rio grande do norte")) {
+                return "Para o **Detran-RN**, você pode consultar:\n" +
+                       "* **Endpoints de Consulta:** (CFC, Instrutor, Veículo, Agendamento)\n" +
+                       "* **Endpoints de Confirmação:** (ConfirmacaoAulaPratica/Teorica)\n" +
+                       "* **Regras de Alerta e Fraude**\n" +
+                       "* **Fluxo e Erros** (Ex: Erro 060)\n\n" +
+                       "Tente: `erro 060 rn` ou `consulta agendamento rn`.";
+            }
+            
+            if (lowerCaseMessage.includes("df") || lowerCaseMessage.includes("distrito federal")) {
+                return "Para o **Detran-DF**, você pode consultar:\n" +
+                       "* **Endpoints de Processo:** (Consultar Processo)\n" +
+                       "* **Endpoints de Aulas:** (Envio Aula Teórica/Prática)\n" +
+                       "* **Endpoints de Sincronização:** (Consulta CFC, Instrutor, Notificação Biometria)\n\n" +
+                       "Tente: `consulta processo df` ou `enviar aula teorica df`.";
+            }
+            
+            if (lowerCaseMessage.includes("se") || lowerCaseMessage.includes("sergipe")) {
+                return "Para o **Detran-SE**, você pode consultar:\n" +
+                       "* **Endpoints de Veículos e CFCs**\n" +
+                       "* **Endpoints de Pessoas:** (Instrutor e Candidato - inclui biometria)\n" +
+                       "* **Endpoint de Envio de Aulas**\n\n" +
+                       "Tente: `consulta veiculo se` ou `consulta candidato se`.";
+            }
+
+            if (lowerCaseMessage.includes("ms") || lowerCaseMessage.includes("mato grosso do sul")) {
+                return "Para o **Detran-MS**, você pode consultar:\n" +
+                       "* **Endpoints de Aulas Práticas** (Início, Fim, Status)\n" +
+                       "* **Fluxos de Processamento:** (Exames Médico/Psicológico/Teórico)\n" +
+                       "* **Sincronização de Agendamento** (inclui FTP Teórico)\n\n" +
+                       "Tente: `fluxo exame medico ms` ou `inicio aula pratica ms`.";
+            }
+
+            // --------------------------------------------------------
+            // --- 3. POLÍTICA DE INCIDENTES (PL.SC.04.00) ---
             // --------------------------------------------------------
             const isPolicyRequest = lowerCaseMessage.includes("política") || lowerCaseMessage.includes("incidente") || lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("problema") || lowerCaseMessage.includes("mttr") || lowerCaseMessage.includes("responsabilidade") || lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("categorização");
 
@@ -585,80 +631,23 @@
                     if (lowerCaseMessage.includes("alto")) {
                         return "SLA Incidente **Alto**:\n- Resp. Inicial: **10 minutos**\n- MTTR: **Até 6h úteis**\n\nSLA Problema **Alto**:\n- MTTR: **11 a 15 dias úteis**";
                     }
-                    if (lowerCaseMessage.includes("baixo")) {
-                         return "SLA Incidente **Baixo**:\n- Resp. Inicial: **2 horas**\n- MTTR: **Até 7 dias úteis**\n\nSLA Problema **Baixo**:\n- MTTR: **21 a 40 dias úteis/backlog**";
-                    }
-                    let response = "Tempos de Recuperação (MTTR) e Resposta Inicial da Política PL.SC.04.00:\n\n";
-                    response += "**Crítico** (Incidente): Resp. Inicial: 5 min, MTTR: 2-4h\n";
-                    response += "**Alto** (Incidente): Resp. Inicial: 10 min, MTTR: Até 6h úteis\n";
-                    response += "**Médio** (Problema): MTTR: 16 a 20 dias úteis";
-                    return response;
-                }
-                if (lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("etapas")) {
-                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas, começando com a **Identificação** e terminando com o **Encerramento**, após a **Resolução e restauração**.\n\n" +
-                           "O **Relatório Post-Mortem** é obrigatório em incidentes ou problemas críticos e deve conter Cronologia, Causa raiz e Ações corretivas.";
+                    return "A Política de Incidentes detalha o SLA por severidade (Crítico, Alto, Médio). Qual nível você gostaria de verificar?";
                 }
                 if (lowerCaseMessage.includes("responsabilidades")) {
                     return "As principais responsabilidades são:\n" +
-                           "* **Analista de Suporte/NOC:** Identificação, registro, triagem e comunicação.\n" +
-                           "* **Equipe Técnica:** Diagnóstico, investigação e implementação de soluções.\n" +
-                           "* **Product Owner:** Priorização de problemas e validação de soluções.\n" +
-                           "* **Comitê de Gestão:** Revisão de casos críticos e análise de relatórios post-mortem.";
-                }
-                if (lowerCaseMessage.includes("categorização") || lowerCaseMessage.includes("severidade")) {
-                    return "A severidade é classificada em **Crítico, Alto, Médio e Baixo**.\n\n" +
-                           "A severidade de **Incidentes** é baseada no **Impacto Real** (interrupção/degradação).\n" +
-                           "A severidade de **Problemas** é baseada no **Impacto Potencial** (causa raiz que pode gerar recorrência).";
+                           "* **Analista de Suporte/NOC:** Identificação, registro, triagem. \n" +
+                           "* **Equipe Técnica:** Diagnóstico e implementação de soluções.\n" +
+                           "* **Product Owner:** Priorização de problemas.";
                 }
                 return "A Política de Incidentes (PL.SC.04.00) está totalmente coberta. Qual aspecto você deseja detalhar (SLA, Ciclo, Responsabilidades, Categorização)?";
             }
 
             // --------------------------------------------------------
-            // --- DEMAIS ESTADOS E SISTEMAS ---
+            // --- 4. RESPOSTA PADRÃO ---
             // --------------------------------------------------------
-            
-            const isEndpointRequest = lowerCaseMessage.includes("endpoints") || lowerCaseMessage.includes("todos") || lowerCaseMessage.includes("api") || lowerCaseMessage.includes("rotas");
-
-            if (isEndpointRequest) {
-                if (lowerCaseMessage.includes("distrito federal") || lowerCaseMessage.includes("df")) {
-                    return "Endpoints Detran-DF:\n\n" +
-                           "**Consulta Processo (Valid):** POST /importacaodf/consultarprocesso\n" +
-                           "**Envio Aula Teórica:** POST /api/aula/envio-aula-teorica\n" +
-                           "**Notificação Biometria:** POST /biometria\n" +
-                           "**Consulta CFC/Instrutor:** GET sincronizacaoExterna/centroFormacao/{...}";
-                }
-                if (lowerCaseMessage.includes("sergipe") || lowerCaseMessage.includes("se")) {
-                    return "Endpoints Detran-SE:\n\n" +
-                           "**Consulta Veículos:** GET /Monitoramento/veiculo/{codigoCfc}\n" +
-                           "**Consulta Candidato:** GET /Monitoramento/Cpf/{cpf}/{tipoAula}/{categoria}/{codigoCfc}\n" +
-                           "**Envio de Aulas:** POST /Monitoramento/aula/cadastrar";
-                }
-                if (lowerCaseMessage.includes("mato grosso do sul") || lowerCaseMessage.includes("ms")) {
-                    return "Endpoints Detran-MS (Aulas Práticas):\n\n" +
-                           "**URL Base:** https://detranms-superpratico-admin.azurewebsites.net/api/\n" +
-                           "**Início Aula Prática:** POST api/pratico/auditoria/aula/inicio\n" +
-                           "**Fim Aula:** POST api/pratico/auditoria/aula/fim\n" +
-                           "*(Sincronização Teórica MS é via FTP)*";
-                }
-                if (lowerCaseMessage.includes("superprático") || lowerCaseMessage.includes("geral")) {
-                    return "Endpoints SuperPrático (Suporte/Geral):\n\n" +
-                           "**Movimentar Bônus:** GET /api/suportepratico/movimentacoes/movimentarBonus/{...}\n" +
-                           "**Reprocessar Aulas:** POST /api/suportepratico/reenvio/reprocessar\n" +
-                           "**Liberar Alerta:** POST https://hml-{UF}.superprati.co/api/pratico/alerta/Liberar";
-                }
-                if (isEndpointRequest) {
-                    return "Qual estado você deseja consultar? Temos endpoints para **RN**, **DF**, **SE** e **MS**, além dos endpoints de **SuperPrático** de suporte.";
-                }
-            }
-
-            // --------------------------------------------------------
-            // --- RESPOSTA PADRÃO ---
-            // --------------------------------------------------------
-            return "Desculpe, não consegui encontrar a informação específica. Tente perguntar de forma mais direta, usando o **estado** (RN, DF, SE, MS) e o **tópico** (ex: 'endpoints RN' ou 'MTTR crítico').";
+            return "Desculpe, não encontrei uma resposta na base de conhecimento. Tente digitar a **sigla do estado (RN, DF, SE, MS)** para ver as opções ou use `/lembrar` para me ensinar algo.";
         }
     </script>
 </body>
 
 </html>
-
-
