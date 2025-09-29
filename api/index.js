@@ -41,13 +41,13 @@ const incidenteSchema = new mongoose.Schema({
     observacao: String
 });
 
-// SCHEMA PARA MEMÓRIA DO CHATBOT
+// SCHEMA PARA MEMÓRIA DO CHATBOT - AGORA COM CAMPO PARA IMAGEM
 const memorySchema = new mongoose.Schema({
     agente: String,
     dataHora: { type: Date, default: Date.now },
-    texto: String, // Usado para armazenar o conteúdo (conteudo)
-    estado: String // Usado para o filtro do estado
-    imagemUrl: String // NOVIDADE: Campo para a URL da imagem
+    texto: String, // Usado para armazenar o conteúdo (conteudo) e título
+    estado: String, // Usado para o filtro do estado
+    imagemUrl: String // NOVIDADE: Campo para a URL da imagem
 });
 
 const Aula = mongoose.model('Aula', aulaSchema);
@@ -149,4 +149,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
-
