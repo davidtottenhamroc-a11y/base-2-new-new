@@ -351,7 +351,7 @@
 
         // *** ATENÇÃO: SUBSTITUA ESTA URL PELA URL REAL DO SEU BACKEND/VERCEL ***
         const BACKEND_URL = 'http://localhost:3000'; 
-        // Se você está usando HTTPS, use 'https://seubackend.vercel.app'
+        // Se você está usando HTTPS, use a URL pública da sua API
         
         function logout() {
             // Limpa o estado de login
@@ -542,42 +542,41 @@
                 if (lowerCaseMessage.includes("endpoints") || lowerCaseMessage.includes("consulta") || lowerCaseMessage.includes("webservice")) {
                     let response = "Os WebServices do DetranNet-RN disponibilizam os seguintes métodos:\n\n";
                     response += "**Consultas Cadastrais e Agendamento:**\n";
-                    response += "ConsultaCFC (opcional CNPJ)\n";
-                    response += "ConsultaInstrutor (requer CNPJ)\n";
-                    response += "ConsultaVeiculo (requer CNPJ)\n";
-                    response += "ConsultaCandidato (requer CPF e CNPJ)\n";
-                    response += "ConsultaAgendamentoPratico (requer CNPJ, Data)\n\n";
+                    [cite_start]response += "ConsultaCFC (opcional CNPJ) [cite: 138, 140]\n";
+                    [cite_start]response += "ConsultaInstrutor (requer CNPJ) [cite: 142, 144]\n";
+                    [cite_start]response += "ConsultaVeiculo (requer CNPJ) [cite: 146, 148]\n";
+                    [cite_start]response += "ConsultaCandidato (requer CPF e CNPJ) [cite: 154, 156]\n";
+                    [cite_start]response += "ConsultaAgendamentoPratico (requer CNPJ, Data) [cite: 158, 160]\n\n";
                     response += "**Confirmação de Aulas (Envio):**\n";
-                    response += "ConfirmacaoAulaPratica\n";
-                    response += "ConfirmacaoAulaTeorica";
+                    [cite_start]response += "ConfirmacaoAulaPratica [cite: 168]\n";
+                    [cite_start]response += "ConfirmacaoAulaTeorica [cite: 174]";
                     return response;
                 }
                 if (lowerCaseMessage.includes("fluxo") || lowerCaseMessage.includes("processo") || lowerCaseMessage.includes("aula")) {
-                    return "O fluxo para aulas monitoradas segue 4 etapas principais: 1. CFC realiza a **matrícula** no DetranNet. 2. Sistema de Monitoramento **sincroniza** os dados. 3. Instrutor/Aluno iniciam e finalizam a aula com **biometria**. 4. Sistema de Monitoramento **envia o resumo** para o DetranNet, que contabiliza o curso.";
+                    [cite_start]return "O fluxo para aulas monitoradas segue 4 etapas principais: 1. CFC realiza a **matrícula** no DetranNet[cite: 119]. 2. [cite_start]Sistema de Monitoramento **sincroniza** os dados[cite: 121, 123]. 3. [cite_start]Instrutor/Aluno iniciam e finalizam a aula com **biometria**[cite: 124, 126]. 4. [cite_start]Sistema de Monitoramento **envia o resumo** para o DetranNet, que contabiliza o curso[cite: 127, 128].";
                 }
                 if (lowerCaseMessage.includes("erro") && (lowerCaseMessage.includes("abertura") || lowerCaseMessage.includes("060"))) {
-                    return "O **Erro 060** refere-se a **Erros de Identificação** (Instrutor/Aluno).\n" +
+                    [cite_start]return "O **Erro 060** refere-se a **Erros de Identificação** (Instrutor/Aluno)[cite: 276].\n" +
                            "Causas comuns de erros de abertura:\n" +
-                           "* **Identificação:** CPFs inválidos/inativos, matrícula expirada, categoria incompatível.\n" +
-                           "* **Agendamento:** Aula fora do horário permitido (Regra: Agendamento deve ser no intervalo de 15 minutos do início da telemetria).";
-                    
+                           [cite_start]"* **Identificação:** CPFs inválidos/inativos, matrícula expirada, categoria incompatível[cite: 277].\n" +
+                           [cite_start]"* **Agendamento:** Aula fora do horário permitido (Regra: Agendamento deve ser no intervalo de 15 minutos do início da telemetria)[cite: 286, 299].";
                 }
                 if (lowerCaseMessage.includes("alerta") || lowerCaseMessage.includes("regra") || lowerCaseMessage.includes("fraude")) {
                     let response = "**AULA COM ALERTA (Prática)** é considerada quando (Exemplos):\n";
-                    response += "* Veículo parado por mais de **10 minutos** (exceto aulas de Parada e Estacionamento).\n";
-                    response += "* Não houve detecção de pelo menos **uma face humana** nas imagens capturadas.\n";
-                    response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**.";
+                    [cite_start]response += "* Veículo parado por mais de **10 minutos** (exceto aulas de PARADA E ESTACIONAMENTO)[cite: 215].\n";
+                    [cite_start]response += "* Não houve detecção de pelo menos **uma face humana** nas imagens capturadas[cite: 217].\n";
+                    [cite_start]response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**[cite: 219, 220].";
                     return response;
                 }
                 if (lowerCaseMessage.includes("confirmacao") && lowerCaseMessage.includes("pratica")) {
-                     return "O método **ConfirmacaoAulaPratica** envia biometrias de Entrada/Saída do Aluno e Instrutor, Placa, CNPJCFC, etc..\n\n" +
-                            "**Regra Crítica:** A aula não será aceita se a digital não for validada e não houver foto no envio. O **CodigoRetorno 0** indica Sucesso.";
+                     [cite_start]return "O método **ConfirmacaoAulaPratica** envia biometrias de Entrada/Saída do Aluno e Instrutor, Placa, CNPJCFC, etc.[cite: 170, 171].\n\n" +
+                            [cite_start]"**Regra Crítica:** A aula não será aceita se a digital não for validada e não houver foto no envio[cite: 173]. [cite_start]O **CodigoRetorno 0** indica Sucesso[cite: 172].";
                 }
                  if (lowerCaseMessage.includes("agendamento") && lowerCaseMessage.includes("teorico")) {
-                     return "O agendamento teórico (atualização e formação) é realizado **dentro do sistema SuperPrático**.\n\n" +
-                            "O fluxo é: **Importar Candidato** > **Criar Turma** > **Agendamento** (repetir para todos os dias e manter 'É virtual' selecionada) > **Inserir Alunos na Turma**.";
+                     [cite_start]return "O agendamento teórico (atualização e formação) é realizado **dentro do sistema SuperPrático**[cite: 321].\n\n" +
+                            [cite_start]"O fluxo é: **Importar Candidato** > **Criar Turma** > **Agendamento** (repetir para todos os dias e manter 'É virtual' selecionada) > **Inserir Alunos na Turma**[cite: 322, 323, 324, 327, 328].";
                 }
-                return "Temos informações detalhadas sobre o **Fluxo de Aulas**, **WebServices** (Consulta e Confirmação), regras de **Alerta** e erros de **Abertura de Aula** (Erro 060) para o RN. Qual tópico você precisa?";
+                [cite_start]return "Temos informações detalhadas sobre o **Fluxo de Aulas** [cite: 117][cite_start], **WebServices** (Consulta e Confirmação) [cite: 130][cite_start], regras de **Alerta** [cite: 214] [cite_start]e erros de **Abertura de Aula** (Erro 060) [cite: 276] para o RN. Qual tópico você precisa?";
             }
 
             // --------------------------------------------------------
@@ -588,37 +587,37 @@
             if (isPolicyRequest) {
                 if (lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("mttr") || lowerCaseMessage.includes("tempo de resposta")) {
                     if (lowerCaseMessage.includes("crítico")) {
-                        return "SLA Incidente **Crítico**:\n- Resp. Inicial: **5 minutos**\n- MTTR: **2 a 4 horas**\n\nSLA Problema **Crítico**:\n- MTTR: **5 a 10 dias úteis**";
+                        return "SLA Incidente **Crítico**:\n- Resp. [cite_start]Inicial: **5 minutos** [cite: 77][cite_start]\n- MTTR: **2 a 4 horas** [cite: 77][cite_start]\n\nSLA Problema **Crítico**:\n- MTTR: **5 a 10 dias úteis** [cite: 79]";
                     }
                     if (lowerCaseMessage.includes("alto")) {
-                        return "SLA Incidente **Alto**:\n- Resp. Inicial: **10 minutos**\n- MTTR: **Até 6h úteis**\n\nSLA Problema **Alto**:\n- MTTR: **11 a 15 dias úteis**";
+                        return "SLA Incidente **Alto**:\n- Resp. [cite_start]Inicial: **10 minutos** [cite: 77][cite_start]\n- MTTR: **Até 6h úteis** [cite: 77][cite_start]\n\nSLA Problema **Alto**:\n- MTTR: **11 a 15 dias úteis** [cite: 79]";
                     }
                     if (lowerCaseMessage.includes("baixo")) {
-                         return "SLA Incidente **Baixo**:\n- Resp. Inicial: **2 horas**\n- MTTR: **Até 7 dias úteis**\n\nSLA Problema **Baixo**:\n- MTTR: **21 a 40 dias úteis/backlog**";
+                         return "SLA Incidente **Baixo**:\n- Resp. [cite_start]Inicial: **2 horas** [cite: 77][cite_start]\n- MTTR: **Até 7 dias úteis** [cite: 77][cite_start]\n\nSLA Problema **Baixo**:\n- MTTR: **21 a 40 dias úteis/backlog** [cite: 79]";
                     }
-                    let response = "Tempos de Recuperação (MTTR) e Resposta Inicial da Política PL.SC.04.00:\n\n";
-                    response += "**Crítico** (Incidente): Resp. Inicial: 5 min, MTTR: 2-4h\n";
-                    response += "**Alto** (Incidente): Resp. Inicial: 10 min, MTTR: Até 6h úteis\n";
-                    response += "**Médio** (Problema): MTTR: 16 a 20 dias úteis";
+                    [cite_start]let response = "Tempos de Recuperação (MTTR) e Resposta Inicial da Política PL.SC.04.00[cite: 75]:\n\n";
+                    response += "**Crítico** (Incidente): Resp. [cite_start]Inicial: 5 min, MTTR: 2-4h [cite: 77]\n";
+                    response += "**Alto** (Incidente): Resp. [cite_start]Inicial: 10 min, MTTR: Até 6h úteis [cite: 77]\n";
+                    [cite_start]response += "**Médio** (Problema): MTTR: 16 a 20 dias úteis [cite: 79]";
                     return response;
                 }
                 if (lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("etapas")) {
-                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas, começando com a **Identificação** e terminando com o **Encerramento**, após a **Resolução e restauração**.\n\n" +
-                           "O **Relatório Post-Mortem** é obrigatório em casos críticos (Incidente ou Problema).";
+                    [cite_start]return "O **Ciclo de Tratamento do Incidente** possui 7 etapas, começando com a **Identificação** [cite: 46] [cite_start]e terminando com o **Encerramento** [cite: 52][cite_start], após a **Resolução e restauração**[cite: 50].\n\n" +
+                           [cite_start]"O **Relatório Post-Mortem** é obrigatório em incidentes ou problemas críticos [cite: 63] [cite_start]e deve conter Cronologia, Causa raiz e Ações corretivas[cite: 64, 65, 66].";
                 }
                 if (lowerCaseMessage.includes("responsabilidades")) {
                     return "As principais responsabilidades são:\n" +
-                           "* **Analista de Suporte/NOC:** Identificação, registro, triagem e comunicação.\n" +
-                           "* **Equipe Técnica:** Diagnóstico, investigação e implementação de soluções.\n" +
-                           "* **Product Owner:** Priorização de problemas e validação de soluções.\n" +
-                           "* **Comitê de Gestão:** Revisão de casos críticos e análise de relatórios post-mortem.";
+                           [cite_start]"* **Analista de Suporte/NOC:** Identificação, registro, triagem e comunicação[cite: 92].\n" +
+                           [cite_start]"* **Equipe Técnica:** Diagnóstico, investigação e implementação de soluções[cite: 94].\n" +
+                           [cite_start]"* **Product Owner:** Priorização de problemas e validação de soluções[cite: 93].\n" +
+                           [cite_start]"* **Comitê de Gestão:** Revisão de casos críticos e análise de relatórios post-mortem[cite: 71, 72].";
                 }
                 if (lowerCaseMessage.includes("categorização") || lowerCaseMessage.includes("severidade")) {
-                    return "A severidade é classificada em **Crítico, Alto, Médio e Baixo**.\n\n" +
-                           "A severidade de **Incidentes** é baseada no **Impacto Real** (interrupção/degradação).\n" +
-                           "A severidade de **Problemas** é baseada no **Impacto Potencial** (causa raiz que pode gerar recorrência).";
+                    [cite_start]return "A severidade é classificada em **Crítico, Alto, Médio e Baixo**[cite: 18].\n\n" +
+                           [cite_start]"A severidade de **Incidentes** é baseada no **Impacto Real** (interrupção/degradação)[cite: 34].\n" +
+                           [cite_start]"A severidade de **Problemas** é baseada no **Impacto Potencial** (causa raiz que pode gerar recorrência)[cite: 39, 21].";
                 }
-                return "A Política de Incidentes (PL.SC.04.00) está totalmente coberta. Qual aspecto você deseja detalhar (SLA, Ciclo, Responsabilidades, Categorização)?";
+                return "A Política de Incidentes (PL.SC.04.00) está totalmente coberta. [cite_start]Qual aspecto você deseja detalhar (SLA, Ciclo, Responsabilidades, Categorização)? [cite: 4, 3]";
             }
 
             // --------------------------------------------------------
