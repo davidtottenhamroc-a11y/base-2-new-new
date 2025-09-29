@@ -127,129 +127,166 @@
             background: linear-gradient(135deg, #c82333, #a71d24);
         }
 
-        /* --- Estilos do Chatbot --- */
+        /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
         #chat-widget-container {
+            /* Transformando em tela cheia */
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 350px;
-            height: 500px;
-            background: #f4f4f4;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            top: 0;
+            left: 0;
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(13, 26, 42, 0.95); /* Fundo escuro semitransparente */
+            border-radius: 0;
+            box-shadow: none;
+            display: none; /* Inicia oculto */
+            z-index: 9999;
+            align-items: center; /* Centraliza o conteúdo principal */
+            justify-content: center;
+        }
+
+        .chat-content {
+            width: 90%;
+            max-width: 800px; /* Limite o chat para melhor leitura */
+            height: 90%;
+            max-height: 800px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            z-index: 1000;
-            display: none; /* Inicia oculto */
         }
+        
         #chat-header {
             background: #3498db;
             color: white;
-            padding: 15px;
+            padding: 20px;
+            font-size: 20px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         #chat-header i {
-            margin-right: 5px;
+            margin-right: 10px;
         }
         #chat-close-btn {
             background: none;
-            border: none;
+            border: 1px solid white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background 0.2s;
         }
+        #chat-close-btn:hover {
+            background: #2980b9;
+        }
+
         #chat-body {
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 10px;
+            padding: 15px;
         }
         #chat-messages {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 5px;
-            background: #e9ecef;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa; /* Fundo mais claro para a conversa */
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
+        
+        /* Estilização das Mensagens Aprimorada */
         .message {
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 15px;
-            margin-bottom: 8px;
-            font-size: 14px;
-            line-height: 1.4;
+            max-width: 90%; /* Aumenta a largura máxima */
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.5;
             word-wrap: break-word;
+            animation: fadeIn 0.3s ease-out;
         }
         .user-message {
             background: #3498db;
             color: white;
             align-self: flex-end;
             margin-left: auto;
-            border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 5px; /* Detalhe moderno */
         }
         .bot-message {
-            background: #ffffff;
+            background: #e9ecef; /* Cor neutra para o bot */
             color: #333;
             align-self: flex-start;
             margin-right: auto;
-            border: 1px solid #ddd;
-            border-bottom-left-radius: 5px;
+            border: none;
+            border-bottom-left-radius: 5px; /* Detalhe moderno */
             white-space: pre-wrap;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
+        /* Foco em títulos e negritos dentro da resposta do bot */
+        .bot-message strong {
+            color: #c0392b; /* Destaque para palavras-chave */
+        }
+
         #chat-input-container {
             display: flex;
             padding: 5px 0;
+            border-top: 1px solid #ddd;
         }
         #chat-input {
             flex-grow: 1;
-            padding: 10px;
+            padding: 12px 20px;
             border: 1px solid #ccc;
-            border-radius: 20px;
+            border-radius: 25px;
             margin-right: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        #chat-input:focus {
+            border-color: #3498db;
+            outline: none;
         }
         #chat-send-btn {
             background: #28a745;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             cursor: pointer;
-            transition: background 0.3s;
+            font-size: 18px;
+            transition: background 0.3s, transform 0.1s;
         }
         #chat-send-btn:hover {
             background: #218838;
         }
-        #chat-open-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 15px 20px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 1000;
+        #chat-send-btn:active {
+            transform: scale(0.95);
         }
-        #chat-open-btn i {
-            margin-right: 8px;
-        }
+
         /* Indicador de Digitação */
         .typing-indicator {
             background: #e0e0e0;
             color: #555;
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
             font-style: italic;
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Esconder o botão flutuante, pois o chat abrirá ao clicar no menu */
+        #chat-open-btn {
+            display: none !important;
         }
     </style>
 </head>
@@ -309,6 +346,14 @@
                     </div>
                 </a>
                 
+                <a href="javascript:void(0)" onclick="toggleChat()" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-comment-dots"></i></div>
+                    <div>
+                        <h2 class="card-title">Assistente Chatbot N2</h2>
+                        <p class="card-description">Inicie o assistente virtual para consultar a base de conhecimento (MongoDB).</p>
+                    </div>
+                </a>
+                
                 <a href="knowledge_manager.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-database"></i></div>
                     <div>
@@ -331,36 +376,33 @@
     </div>
     
     <div id="chat-widget-container">
-        <div id="chat-header">
-            Assistente VSoft N2 <i class="fas fa-robot"></i>
-            <button id="chat-close-btn" onclick="toggleChat()">X</button>
-        </div>
-        <div id="chat-body">
-            <div id="chat-messages">
-                <div class="message bot-message">
-                    Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
-                    <br><br>
-                    Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
-                </div>
+        <div class="chat-content">
+            <div id="chat-header">
+                Assistente VSoft N2 <i class="fas fa-robot"></i>
+                <button id="chat-close-btn" onclick="toggleChat()">X</button>
             </div>
-            <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
-                <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            <div id="chat-body">
+                <div id="chat-messages">
+                    <div class="message bot-message">
+                        Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
+                        <br><br>
+                        Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
+                    </div>
+                </div>
+                <div id="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
+                    <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
     </div>
 
-    <button id="chat-open-btn" onclick="toggleChat()" style="display: none;">
-        <i class="fas fa-comment-dots"></i> Chat N2
-    </button>
-    
     <script>
         // Variável global para armazenar as memórias carregadas do MongoDB
         let chatMemories = [];
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
-        // ⚠️ ATENÇÃO: SUBSTITUA PELA URL PÚBLICA DA SUA API NA VERCEL
-        // Esta URL é a única que precisa ser definida manualmente.
+        // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
         const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
         
         function logout() {
@@ -369,44 +411,47 @@
             window.location.href = 'login.html';
         }
 
+        // Função corrigida para abrir/fechar o chat em tela cheia
         function toggleChat() {
             const chatWidget = document.getElementById('chat-widget-container');
-            const chatOpenBtn = document.getElementById('chat-open-btn');
 
             if (chatWidget.style.display === 'flex') {
                 chatWidget.style.display = 'none';
-                chatOpenBtn.style.display = 'block';
+                document.body.style.overflow = 'auto'; // Restaura o scroll
             } else {
                 chatWidget.style.display = 'flex';
-                chatOpenBtn.style.display = 'none';
+                document.body.style.overflow = 'hidden'; // Remove o scroll do corpo
                 document.getElementById('chat-input').focus();
             }
         }
 
         // Função para carregar todas as memórias do MongoDB
         async function loadMemoriesFromDatabase() {
+            console.log(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
             try {
-                // CORRIGIDO: Usando a variável BACKEND_URL corretamente
                 const response = await fetch(`${BACKEND_URL}/api/memories`);
+                
                 if (response.ok) {
                     const data = await response.json();
                     chatMemories = data;
-                    console.log(`[MongoDB] ${data.length} memórias carregadas.`);
+                    console.log(`[MongoDB] ${data.length} memórias carregadas com SUCESSO!`);
+                    
+                    if (data.length === 0) {
+                         appendMessage(`[AVISO] Conexão bem-sucedida, mas o banco **MongoDB** está **VAZIO** (0 memórias). Use a página Gerenciar Base de Conhecimento para adicionar dados.`, 'bot-message');
+                    }
                 } else {
-                    console.error('Erro ao carregar memórias:', response.status);
-                    // CORRIGIDO: Usando a variável BACKEND_URL corretamente
-                    appendMessage(`[ERRO] Não foi possível carregar as memórias. Status: ${response.status}. Verifique o backend em **${BACKEND_URL}**`, 'bot-message');
+                    console.error('Erro ao carregar memórias. Status:', response.status);
+                    appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
                 }
             } catch (error) {
-                console.error('Erro de rede ao carregar memórias:', error);
-                // CORRIGIDO: Usando a variável BACKEND_URL corretamente
-                appendMessage(`[ERRO] Falha de conexão com o servidor de memórias: **${BACKEND_URL}**`, 'bot-message');
+                console.error('Erro de rede/conexão:', error);
+                appendMessage(`[ERRO DE CONEXÃO] Não foi possível acessar o backend Vercel em **${BACKEND_URL}**. Verifique se a URL está correta e se o projeto está implantado e ativo.`, 'bot-message');
             }
         }
 
+        // Adiciona um novo Card ao menu para abrir o Chat
         document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('chat-open-btn').style.display = 'block';
-            await loadMemoriesFromDatabase(); // Carrega as memórias do banco ao iniciar
+            await loadMemoriesFromDatabase(); 
         });
 
         // Adicionar evento para enviar mensagem ao pressionar Enter
@@ -429,7 +474,6 @@
             
             showTypingIndicator();
 
-            // Usamos setTimeout para simular o tempo de processamento e dar tempo do indicador aparecer
             setTimeout(() => {
                 hideTypeningIndicator();
                 
@@ -509,7 +553,6 @@
                 // CASO 2: Usuário digitou palavras-chave (Ex: "DF Processo" ou "Endpoint")
                 
                 // Filtra as memórias (já pré-filtradas por estado) que contenham pelo menos 1 palavra-chave
-                // Usando 'some' (OU lógico) para maior flexibilidade na busca por palavras-chave
                 matchingMemories = filteredMemories.filter(m => {
                     const memoryTextLower = m.texto.toLowerCase();
                     // O item precisa ter pelo menos UMA das palavras-chave da busca
