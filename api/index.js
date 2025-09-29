@@ -47,6 +47,7 @@ const memorySchema = new mongoose.Schema({
     dataHora: { type: Date, default: Date.now },
     texto: String, // Usado para armazenar o conteúdo (conteudo)
     estado: String // Usado para o filtro do estado
+    imagemUrl: String // NOVIDADE: Campo para a URL da imagem
 });
 
 const Aula = mongoose.model('Aula', aulaSchema);
@@ -148,3 +149,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
