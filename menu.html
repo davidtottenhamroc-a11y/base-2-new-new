@@ -331,7 +331,7 @@
                 <div class="message bot-message">
                     Olá! Sou seu assistente de suporte N2. Posso te dar endpoints por estado (RN, DF, SE, MS) ou detalhes sobre a **Política de Incidentes**.
                     <br><br>
-                    **Dica de Memória:** Use o comando `/lembrar [sua informação]` para me ensinar algo que vou guardar nesta sessão. Ex: `/lembrar Meu nome é João.`
+                    **Dica de Memória:** Use o comando `/lembrar [sua informação]` para me ensinar algo que vou guardar **permanentemente** no banco.
                 </div>
             </div>
             <div id="chat-input-container">
@@ -346,9 +346,13 @@
     </button>
     
     <script>
-        // Variável global para simular o armazenamento de memória durante a sessão
-        let chatMemories = [];
+        // Variável global para armazenar as memórias carregadas do MongoDB
+        let chatMemories = []; 
 
+        // *** ATENÇÃO: SUBSTITUA ESTA URL PELA URL REAL DO SEU BACKEND/VERCEL ***
+        const BACKEND_URL = 'http://localhost:3000'; 
+        // Se você está usando HTTPS, use 'https://seubackend.vercel.app'
+        
         function logout() {
             // Limpa o estado de login
             localStorage.removeItem('agenteSelecionado');
@@ -372,9 +376,27 @@
             }
         }
 
+        // Função para carregar todas as memórias do MongoDB
+        async function loadMemoriesFromDatabase() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/memories`);
+                if (response.ok) {
+                    const data = await response.json();
+                    // Sobrescreve a memória global com os dados do banco
+                    chatMemories = data;
+                    console.log(`[MongoDB] ${data.length} memórias carregadas.`);
+                } else {
+                    console.error('Erro ao carregar memórias:', response.status);
+                }
+            } catch (error) {
+                console.error('Erro de rede ao carregar memórias:', error);
+            }
+        }
+
         // Inicialmente, mostra o botão flutuante e oculta o widget completo
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => { 
             document.getElementById('chat-open-btn').style.display = 'block';
+            await loadMemoriesFromDatabase(); // Carrega as memórias do banco ao iniciar
         });
 
         // Adicionar evento para enviar mensagem ao pressionar Enter
@@ -384,27 +406,64 @@
             }
         });
 
+        // Função para salvar a memória no MongoDB
+        async function saveMemoryToDatabase(memoryText) {
+            // Tenta obter o agente logado ou usa um padrão
+            const agenteLogado = localStorage.getItem('agenteSelecionado') || 'SuporteN2'; 
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/memories`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agente: agenteLogado,
+                        texto: memoryText
+                    })
+                });
+
+                if (response.ok) {
+                    // Recarrega as memórias globais após salvar com sucesso
+                    await loadMemoriesFromDatabase(); 
+                    return `**MEMÓRIA SALVA PERMANENTEMENTE!** Seu lembrete foi registrado no MongoDB e está disponível.`;
+                } else {
+                    return `Erro ao salvar no banco. Status: ${response.status}.`;
+                }
+            } catch (error) {
+                console.error('Erro de rede ao salvar memória:', error);
+                return `Erro de conexão com o servidor. Verifique se o backend está rodando em ${BACKEND_URL}.`;
+            }
+        }
+
         // Função para lidar com comandos de memória (simulação do memory tool)
-        function handleMemoryCommands(message) {
+        async function handleMemoryCommands(message) {
             const lowerCaseMessage = message.toLowerCase();
 
             // 1. Comando explícito para "lembrar" (/lembrar)
             if (lowerCaseMessage.startsWith("/lembrar ")) {
                 const memory = message.substring("/lembrar ".length).trim();
                 if (memory) {
-                    chatMemories.push(memory);
-                    // Simula a resposta do tool memory
-                    return `Eu anotei isso para você: "**${memory}**". Você pode verificar suas informações salvas [neste link](#).`;
+                    // Chama a função assíncrona para salvar
+                    return await saveMemoryToDatabase(memory); 
                 }
                 return "Por favor, use o formato: `/lembrar [informação que você quer que eu guarde]`.";
             }
 
             // 2. Comando explícito para "ver memórias" (/minhas memorias)
             if (lowerCaseMessage.includes("/minhas memorias") || lowerCaseMessage.includes("/minhasmemórias")) {
+                // Garante que as memórias mais recentes estão carregadas
+                await loadMemoriesFromDatabase(); 
+
                 if (chatMemories.length === 0) {
-                    return "Eu não tenho nenhuma informação armazenada explicitamente por você nesta sessão. Use `/lembrar [informação]` para me ensinar algo.";
+                    return "Eu não tenho nenhuma informação armazenada no banco de dados para esta sessão. Use `/lembrar [informação]` para me ensinar algo.";
                 }
-                return "As informações que você me pediu para lembrar nesta sessão são:\n" + chatMemories.map(m => `* ${m}`).join('\n');
+
+                // Formata e exibe as 5 memórias mais recentes
+                const latestMemories = chatMemories.slice(0, 5).map(m => {
+                    const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
+                    return `* [${date}] ${m.texto} (Agente: ${m.agente})`;
+                }).join('\n');
+                
+                return `As **${chatMemories.length}** informações salvas permanentemente (últimas 5):\n\n` + latestMemories;
             }
             
             return null; // Indica que não foi um comando de memória
@@ -412,7 +471,7 @@
 
 
         // Função principal de envio e resposta
-        function sendMessage() {
+        async function sendMessage() { 
             const input = document.getElementById('chat-input');
             const messageText = input.value.trim();
             
@@ -425,7 +484,7 @@
             showTypingIndicator();
 
             // 2. Processar a mensagem
-            const memoryResponse = handleMemoryCommands(messageText);
+            const memoryResponse = await handleMemoryCommands(messageText);
 
             setTimeout(() => {
                 hideTypingIndicator();
@@ -433,7 +492,6 @@
                 let botResponse;
 
                 if (memoryResponse) {
-                    // Responde com o resultado do comando de memória
                     botResponse = memoryResponse;
                 } else {
                     // Se não for um comando de memória, usa a base de conhecimento (RN/Política/Outros)
@@ -502,13 +560,13 @@
                            "Causas comuns de erros de abertura:\n" +
                            "* **Identificação:** CPFs inválidos/inativos, matrícula expirada, categoria incompatível.\n" +
                            "* **Agendamento:** Aula fora do horário permitido (Regra: Agendamento deve ser no intervalo de 15 minutos do início da telemetria).";
+                    
                 }
                 if (lowerCaseMessage.includes("alerta") || lowerCaseMessage.includes("regra") || lowerCaseMessage.includes("fraude")) {
                     let response = "**AULA COM ALERTA (Prática)** é considerada quando (Exemplos):\n";
                     response += "* Veículo parado por mais de **10 minutos** (exceto aulas de Parada e Estacionamento).\n";
                     response += "* Não houve detecção de pelo menos **uma face humana** nas imagens capturadas.\n";
-                    response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**.\n";
-                    response += "* Tentativa de validação biométrica sem sucesso por **cinco vezes consecutivas**.";
+                    response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**.";
                     return response;
                 }
                 if (lowerCaseMessage.includes("confirmacao") && lowerCaseMessage.includes("pratica")) {
@@ -545,13 +603,8 @@
                     return response;
                 }
                 if (lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("etapas")) {
-                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas:\n" +
-                           "1. Identificação\n" +
-                           "2. Registro e classificação\n" +
-                           "3. Triagem e direcionamento\n" +
-                           "4. Diagnóstico e investigação\n" +
-                           "5. Resolução e restauração\n" +
-                           "O **Relatório Post-Mortem** é obrigatório em casos críticos.";
+                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas, começando com a **Identificação** e terminando com o **Encerramento**, após a **Resolução e restauração**.\n\n" +
+                           "O **Relatório Post-Mortem** é obrigatório em casos críticos (Incidente ou Problema).";
                 }
                 if (lowerCaseMessage.includes("responsabilidades")) {
                     return "As principais responsabilidades são:\n" +
