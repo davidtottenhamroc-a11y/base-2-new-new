@@ -45,7 +45,8 @@ const incidenteSchema = new mongoose.Schema({
 const memorySchema = new mongoose.Schema({
     agente: String,
     dataHora: { type: Date, default: Date.now },
-    texto: String
+    texto: String, // Usado para armazenar o conteúdo (conteudo)
+    estado: String // Usado para o filtro do estado
 });
 
 const Aula = mongoose.model('Aula', aulaSchema);
@@ -145,3 +146,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
