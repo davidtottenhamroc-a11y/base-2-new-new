@@ -309,6 +309,7 @@
                     </div>
                 </a>
                 
+                <!-- LINK PARA GERENCIAMENTO DE CONHECIMENTO (Onde as informações são salvas) -->
                 <a href="knowledge_manager.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-database"></i></div>
                     <div>
@@ -328,13 +329,17 @@
             </div>
         </main>
         <button class="logout-button" onclick="logout()">Sair</button>
-    </div> <div id="chat-widget-container">
+    </div> <!-- FIM DO CONTAINER PRINCIPAL -->
+
+    <!-- Estrutura do Chatbot -->
+    <div id="chat-widget-container">
         <div id="chat-header">
             Assistente VSoft N2 <i class="fas fa-robot"></i>
             <button id="chat-close-btn" onclick="toggleChat()">X</button>
         </div>
         <div id="chat-body">
             <div id="chat-messages">
+                <!-- Mensagem inicial -->
                 <div class="message bot-message">
                     Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
                     <br><br>
@@ -348,6 +353,7 @@
         </div>
     </div>
 
+    <!-- Botão Flutuante para Abrir o Chat -->
     <button id="chat-open-btn" onclick="toggleChat()" style="display: none;">
         <i class="fas fa-comment-dots"></i> Chat N2
     </button>
@@ -451,7 +457,7 @@
             showTypingIndicator();
 
             setTimeout(() => {
-                hideTypingIndicator();
+                hideTypeningIndicator();
                 
                 let botResponse = getBotResponse(messageText);
 
@@ -481,7 +487,7 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function hideTypingIndicator() {
+        function hideTypeningIndicator() {
             const typingIndicator = document.getElementById('typing-indicator');
             if (typingIndicator) {
                 typingIndicator.remove();
@@ -518,8 +524,10 @@
                 // Remove a sigla da busca para que 'N2 de RN' procure 'N2' e 'RN' filtre por estado.
                 const textKeywords = keywords.filter(w => w !== siglaQuery);
                 
-                // Se o usuário só digitou a sigla (Ex: "DF"), permite a listagem total para orientação.
-                if (textKeywords.length === 0) {
+                // --- CORREÇÃO DE LÓGICA DE BUSCA: Se o usuário digitou apenas a sigla (Ex: "DF"), 
+                // --- o array textKeywords.length será 0, e a busca deve retornar TRUE.
+                if (textKeywords.length === 0 && siglaQuery) {
+                    // Retorna TRUE apenas se a sigla for identificada, permitindo a listagem completa.
                     return true; 
                 }
 
@@ -529,14 +537,15 @@
 
 
             if (matchingMemories.length > 0) {
-                // Se houver correspondência, retorna as 3 mais relevantes do banco
                 
                 // 1.3. Se o usuário só digitou a sigla (Ex: "DF"), lista os TÍTULOS para orientação.
                 if (keywords.length === 1 && siglaQuery) {
                     const titles = matchingMemories.map(m => {
                         // Tenta extrair o título se houver um ': ' no texto
                         const titleMatch = m.texto.split(':')[0].trim();
-                        return `* **${titleMatch.length < 50 ? titleMatch : 'Conteúdo Detalhado'}**`;
+                        // Trunca se for muito longo
+                        const cleanTitle = titleMatch.length > 50 ? titleMatch.substring(0, 47) + '...' : titleMatch;
+                        return `* **${cleanTitle}**`;
                     }).join('\n');
                     
                     return `Para **${siglaQuery.toUpperCase()}**, as informações disponíveis na base são:\n\n${titles}\n\n**Dica:** Digite o título ou palavras-chave (Ex: 'SLA crítico') para ver o conteúdo completo.`;
