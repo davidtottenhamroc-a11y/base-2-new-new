@@ -329,11 +329,11 @@
         <div id="chat-body">
             <div id="chat-messages">
                 <div class="message bot-message">
-                    Olá! Sou seu assistente de suporte N2. Posso te dar todos os endpoints por estado ou detalhes sobre a **Política de Incidentes**. Como posso ajudar?
+                    Olá! Sou seu assistente de suporte N2. Posso te dar endpoints por estado (RN, DF, SE, MS) ou detalhes sobre a **Política de Incidentes**. Como posso ajudar?
                 </div>
             </div>
             <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Ex: 'endpoints DF' ou 'SLA incidente crítico'">
+                <input type="text" id="chat-input" placeholder="Ex: 'endpoints RN' ou 'MTTR crítico'">
                 <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -433,134 +433,132 @@
             const lowerCaseMessage = message.toLowerCase();
 
             // --------------------------------------------------------
-            // --- NAVEGAÇÃO GERAL E LISTAGEM POR ESTADO ---
+            // --- RN (Rio Grande do Norte) - FOCO PRINCIPAL ---
             // --------------------------------------------------------
-            if (lowerCaseMessage.includes("endpoints") || lowerCaseMessage.includes("todos") || lowerCaseMessage.includes("api")) {
-                if (lowerCaseMessage.includes("sergipe") || lowerCaseMessage.includes("se")) {
-                    return "Endpoints Detran-SE:\n\n" +
-                           "**Consulta Veículos:** GET /Monitoramento/veiculo/{codigoCfc}\n" +
-                           "**Consulta CFCs:** GET /Monitoramento/Cfc\n" +
-                           "**Consulta Instrutores:** GET /Monitoramento/Instrutor/{codigoCfc}\n" +
-                           "**Consulta Candidato:** GET /Monitoramento/Cpf/{cpf}/{tipoAula}/{categoria}/{codigoCfc}\n" +
-                           "**Envio de Aulas:** POST /Monitoramento/aula/cadastrar";
+            if (lowerCaseMessage.includes("rio grande do norte") || lowerCaseMessage.includes("rn") || lowerCaseMessage.includes("detran-rn")) {
+                if (lowerCaseMessage.includes("endpoints") || lowerCaseMessage.includes("consulta") || lowerCaseMessage.includes("webservice")) {
+                    let response = "Os WebServices do DetranNet-RN disponibilizam os seguintes métodos:\n\n";
+                    response += "**Consultas Cadastrais e Agendamento:**\n";
+                    response += "ConsultaCFC (opcional CNPJ)\n";
+                    response += "ConsultaInstrutor (requer CNPJ)\n";
+                    response += "ConsultaVeiculo (requer CNPJ)\n";
+                    response += "ConsultaCandidato (requer CPF e CNPJ)\n";
+                    response += "ConsultaAgendamentoPratico (requer CNPJ, Data)\n\n";
+                    response += "**Confirmação de Aulas (Envio):**\n";
+                    response += "ConfirmacaoAulaPratica\n";
+                    response += "ConfirmacaoAulaTeorica";
+                    return response;
                 }
+                if (lowerCaseMessage.includes("fluxo") || lowerCaseMessage.includes("processo") || lowerCaseMessage.includes("aula")) {
+                    return "O fluxo para aulas monitoradas segue 4 etapas principais: 1. CFC realiza a **matrícula** no DetranNet. 2. Sistema de Monitoramento **sincroniza** os dados. 3. Instrutor/Aluno iniciam e finalizam a aula com **biometria**. 4. Sistema de Monitoramento **envia o resumo** para o DetranNet, que contabiliza o curso.";
+                }
+                if (lowerCaseMessage.includes("erro") && (lowerCaseMessage.includes("abertura") || lowerCaseMessage.includes("060"))) {
+                    return "O **Erro 060** refere-se a **Erros de Identificação** (Instrutor/Aluno).\n" +
+                           "Causas comuns de erros de abertura:\n" +
+                           "* **Identificação:** CPFs inválidos/inativos, matrícula expirada, categoria incompatível.\n" +
+                           "* **Agendamento:** Aula fora do horário permitido (Agendamento deve ser no intervalo de 15 minutos do início da telemetria).";
+                }
+                if (lowerCaseMessage.includes("alerta") || lowerCaseMessage.includes("regra") || lowerCaseMessage.includes("fraude")) {
+                    let response = "**AULA COM ALERTA (Prática)** é considerada quando (Exemplos):\n";
+                    response += "* Veículo parado por mais de **10 minutos** (exceto aulas de Parada e Estacionamento).\n";
+                    response += "* Não houve detecção de pelo menos **uma face humana** nas imagens capturadas.\n";
+                    response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**.";
+                    return response;
+                }
+                if (lowerCaseMessage.includes("confirmacao") && lowerCaseMessage.includes("pratica")) {
+                     return "O método **ConfirmacaoAulaPratica** envia biometrias de Entrada/Saída do Aluno e Instrutor, Placa, CNPJCFC, etc..\n\n" +
+                            "**Regra Crítica:** A aula não será aceita se a digital não for validada e não houver foto no envio. O **CodigoRetorno 0** indica Sucesso.";
+                }
+                if (lowerCaseMessage.includes("agendamento") && lowerCaseMessage.includes("teorico")) {
+                     return "O agendamento teórico (atualização e formação) é realizado **dentro do sistema SuperPrático**.\n\n" +
+                            "O fluxo é: **Importar Candidato** > **Criar Turma** > **Agendamento** (repetir para todos os dias e manter 'É virtual' selecionada) > **Inserir Alunos na Turma**.";
+                }
+                return "Temos informações detalhadas sobre o **Fluxo de Aulas**, **WebServices** (Consulta e Confirmação), regras de **Alerta** e erros de **Abertura de Aula** (Erro 060) para o RN. Qual tópico você precisa?";
+            }
+
+            // --------------------------------------------------------
+            // --- POLÍTICA DE INCIDENTES (PL.SC.04.00) ---
+            // --------------------------------------------------------
+            const isPolicyRequest = lowerCaseMessage.includes("política") || lowerCaseMessage.includes("incidente") || lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("problema") || lowerCaseMessage.includes("mttr") || lowerCaseMessage.includes("responsabilidade") || lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("categorização");
+
+            if (isPolicyRequest) {
+                if (lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("mttr") || lowerCaseMessage.includes("tempo de resposta")) {
+                    if (lowerCaseMessage.includes("crítico")) {
+                        return "SLA Incidente **Crítico**:\n- Resp. Inicial: **5 minutos**\n- MTTR: **2 a 4 horas**\n\nSLA Problema **Crítico**:\n- MTTR: **5 a 10 dias úteis**";
+                    }
+                    if (lowerCaseMessage.includes("alto")) {
+                        return "SLA Incidente **Alto**:\n- Resp. Inicial: **10 minutos**\n- MTTR: **Até 6h úteis**\n\nSLA Problema **Alto**:\n- MTTR: **11 a 15 dias úteis**";
+                    }
+                    if (lowerCaseMessage.includes("baixo")) {
+                         return "SLA Incidente **Baixo**:\n- Resp. Inicial: **2 horas**\n- MTTR: **Até 7 dias úteis**\n\nSLA Problema **Baixo**:\n- MTTR: **21 a 40 dias úteis/backlog**";
+                    }
+                    let response = "Tempos de Recuperação (MTTR) e Resposta Inicial da Política PL.SC.04.00:\n\n";
+                    response += "**Crítico** (Incidente): Resp. Inicial: 5 min, MTTR: 2-4h\n";
+                    response += "**Alto** (Incidente): Resp. Inicial: 10 min, MTTR: Até 6h úteis\n";
+                    response += "**Médio** (Problema): MTTR: 16 a 20 dias úteis";
+                    return response;
+                }
+                if (lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("etapas")) {
+                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas, começando com a **Identificação** e terminando com o **Encerramento**, após a **Resolução e restauração**.\n\n" +
+                           "O **Relatório Post-Mortem** é obrigatório em casos críticos (Incidente ou Problema).";
+                }
+                if (lowerCaseMessage.includes("responsabilidades")) {
+                    return "As principais responsabilidades são:\n" +
+                           "* **Analista de Suporte/NOC:** Identificação, registro, triagem e comunicação.\n" +
+                           "* **Equipe Técnica:** Diagnóstico, investigação e implementação de soluções.\n" +
+                           "* **Product Owner:** Priorização de problemas e validação de soluções.\n" +
+                           "* **Comitê de Gestão:** Revisão de casos críticos e análise de relatórios post-mortem.";
+                }
+                if (lowerCaseMessage.includes("categorização") || lowerCaseMessage.includes("severidade")) {
+                    return "A severidade é classificada em **Crítico, Alto, Médio e Baixo**.\n\n" +
+                           "A severidade de **Incidentes** é baseada no **Impacto Real** (interrupção/degradação).\n" +
+                           "A severidade de **Problemas** é baseada no **Impacto Potencial** (causa raiz que pode gerar recorrência).";
+                }
+                return "A Política de Incidentes (PL.SC.04.00) está totalmente coberta. Qual aspecto você deseja detalhar (SLA, Ciclo, Responsabilidades, Categorização)?";
+            }
+
+            // --------------------------------------------------------
+            // --- DEMAIS ESTADOS E SISTEMAS ---
+            // --------------------------------------------------------
+            
+            const isEndpointRequest = lowerCaseMessage.includes("endpoints") || lowerCaseMessage.includes("todos") || lowerCaseMessage.includes("api") || lowerCaseMessage.includes("rotas");
+
+            if (isEndpointRequest) {
                 if (lowerCaseMessage.includes("distrito federal") || lowerCaseMessage.includes("df")) {
                     return "Endpoints Detran-DF:\n\n" +
                            "**Consulta Processo (Valid):** POST /importacaodf/consultarprocesso\n" +
-                           "**Consulta Candidato (VSoft):** POST /api/cfc/buscar\n" +
                            "**Envio Aula Teórica:** POST /api/aula/envio-aula-teorica\n" +
-                           "**Envio Aula Prática:** POST /api/aula/envio-aula-pratica\n" +
-                           "**Consulta CFC:** GET sincronizacaoExterna/centroFormacao\n" +
-                           "**Notificação Biometria:** POST /biometria";
+                           "**Notificação Biometria:** POST /biometria\n" +
+                           "**Consulta CFC/Instrutor:** GET sincronizacaoExterna/centroFormacao/{...}";
+                }
+                if (lowerCaseMessage.includes("sergipe") || lowerCaseMessage.includes("se")) {
+                    return "Endpoints Detran-SE:\n\n" +
+                           "**Consulta Veículos:** GET /Monitoramento/veiculo/{codigoCfc}\n" +
+                           "**Consulta Candidato:** GET /Monitoramento/Cpf/{cpf}/{tipoAula}/{categoria}/{codigoCfc}\n" +
+                           "**Envio de Aulas:** POST /Monitoramento/aula/cadastrar";
                 }
                 if (lowerCaseMessage.includes("mato grosso do sul") || lowerCaseMessage.includes("ms")) {
                     return "Endpoints Detran-MS (Aulas Práticas):\n\n" +
                            "**URL Base:** https://detranms-superpratico-admin.azurewebsites.net/api/\n" +
                            "**Início Aula Prática:** POST api/pratico/auditoria/aula/inicio\n" +
-                           "**Biometria Aulas:** POST api/pratico/auditoria/aula/biometria\n" +
                            "**Fim Aula:** POST api/pratico/auditoria/aula/fim\n" +
-                           "**Consulta Situação Aula:** GET api/pratico/auditoria/aula/status/{oidAulaCandidato}";
+                           "*(Sincronização Teórica MS é via FTP: ftp.detran.ms.gov.br)*";
                 }
                 if (lowerCaseMessage.includes("superprático") || lowerCaseMessage.includes("geral")) {
                     return "Endpoints SuperPrático (Suporte/Geral):\n\n" +
                            "**Movimentar Bônus:** GET /api/suportepratico/movimentacoes/movimentarBonus/{...}\n" +
-                           "**Movimentar Créditos:** GET /api/suportepratico/movimentacoes/movimentarCreditos/{...}\n" +
                            "**Reprocessar Aulas:** POST /api/suportepratico/reenvio/reprocessar\n" +
-                           "**Obter Aulas:** GET /api/suportepratico/reenvio/aulas\n" +
                            "**Liberar Alerta:** POST https://hml-{UF}.superprati.co/api/pratico/alerta/Liberar";
                 }
+                if (isEndpointRequest) {
+                    return "Qual estado você deseja consultar? Temos endpoints para **RN**, **DF**, **SE** e **MS**, além dos endpoints de **SuperPrático** de suporte.";
+                }
             }
 
             // --------------------------------------------------------
-            // --- POLÍTICA DE INCIDENTES (SLA, CICLO, CATEGORIZAÇÃO) ---
+            // --- RESPOSTA PADRÃO ---
             // --------------------------------------------------------
-            if (lowerCaseMessage.includes("política") || lowerCaseMessage.includes("incidente") || lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("problema") || lowerCaseMessage.includes("mttr")) {
-                if (lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("recuperação") || lowerCaseMessage.includes("tempo de resposta")) {
-                    let response = "Tempos de Recuperação (MTTR) e Resposta Inicial da Política PL.SC.04.00:\n\n";
-                    response += "**Crítico**:\n- Resp. Inicial: 5 minutos\n- MTTR: 2 a 4 horas\n\n";
-                    response += "**Alto**:\n- Resp. Inicial: 10 minutos\n- MTTR: Até 6h úteis\n\n";
-                    response += "**Médio**:\n- Resp. Inicial: 1 hora\n- MTTR: Até 8h úteis\n\n";
-                    response += "MTTR de Problema Crítico: **5 a 10 dias úteis**.";
-                    return response;
-                }
-                if (lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("etapas")) {
-                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas:\n" +
-                           "1. Identificação\n" +
-                           "2. Registro e classificação\n" +
-                           "3. Triagem e direcionamento\n" +
-                           "4. Diagnóstico e investigação\n" +
-                           "5. Resolução e restauração\n" +
-                           "6. Documentação na base de conhecimento\n" +
-                           "7. Encerramento";
-                }
-                if (lowerCaseMessage.includes("categorização") || lowerCaseMessage.includes("severidade")) {
-                    return "A política categoriza a severidade em:\n" +
-                           "* **Crítico**: Interrupção total ou quase total de serviços críticos.\n" +
-                           "* **Alto**: Degradação significativa de serviços relevantes.\n" +
-                           "* **Médio**: Impacto limitado em funcionalidades específicas.\n" +
-                           "* **Baixo**: Impacto mínimo, com inconvenientes menores.\n" +
-                           "A severidade de **Problemas** avalia o impacto **potencial**.";
-                }
-                if (lowerCaseMessage.includes("responsabilidades")) {
-                    return "Principais Responsabilidades:\n" +
-                           "* **Analista de Suporte/NOC:** Identificação, registro, triagem e comunicação com usuários.\n" +
-                           "* **Equipe Técnica:** Diagnóstico, investigação e implementação de soluções.\n" +
-                           "* **Product Owner:** Priorização de problemas e validação de soluções.\n" +
-                           "* **Supervisão/Coordenação:** Gestão de incidentes, análise de tendências e comunicação com stakeholders.";
-                }
-                return "A **Política de Incidentes** (PL.SC.04.00) cobre SLAs, o ciclo de tratamento (Incidente e Problema), categorização por severidade e responsabilidades. Qual aspecto você deseja detalhar?";
-            }
-
-            // --------------------------------------------------------
-            // --- CONSULTAS ESPECÍFICAS (MANTIDAS) ---
-            // --------------------------------------------------------
-
-            // 1. DETRAN SE (Sergipe)
-            if (lowerCaseMessage.includes("consulta") && lowerCaseMessage.includes("veículo") && lowerCaseMessage.includes("se")) {
-                return "Endpoint: **GET /Monitoramento/veiculo/{codigoCfc}**\n\n" +
-                       "Parâmetros:\n" +
-                       "* **codigoCfc**: String, Sim (obrigatório).\n" +
-                       "* **placa**: String, Não (opcional).";
-            }
-            if (lowerCaseMessage.includes("consulta") && lowerCaseMessage.includes("instrutor") && lowerCaseMessage.includes("se")) {
-                return "Endpoint: **GET /Monitoramento/Instrutor/{codigoCfc}**\n\n" +
-                       "Resposta inclui: templates biométricos (digitais e foto) do instrutor, além de CPF, Registro e Situação.";
-            }
-            if (lowerCaseMessage.includes("envio") && lowerCaseMessage.includes("aula") && lowerCaseMessage.includes("se")) {
-                return "Endpoint: **POST /Monitoramento/aula/cadastrar**\n\n" +
-                       "Regra: **Placa** é obrigatória para aula prática ('P') e **codigoMateria** é obrigatório para aula teórica ('T', 'A', 'R').";
-            }
-
-            // 2. DETRAN DF (Distrito Federal)
-            if (lowerCaseMessage.includes("consulta") && lowerCaseMessage.includes("processo") && lowerCaseMessage.includes("df")) {
-                return "Endpoint: **POST /importacaodf/consultarprocesso**\n\n" +
-                       "Parâmetros Obrigatórios (Body JSON): **Cpf**, **Cnpj** e **TipoProcesso** ('T' ou 'P').";
-            }
-            if (lowerCaseMessage.includes("envio") && lowerCaseMessage.includes("aula") && lowerCaseMessage.includes("teórica") && lowerCaseMessage.includes("df")) {
-                return "Endpoint: **POST /api/aula/envio-aula-teorica**\n\n" +
-                       "Todos os campos (cpfAluno, resultado, codigoDisciplina, dataInicio, dataFinal) são obrigatórios.";
-            }
-
-            // 3. DETRAN MS (Mato Grosso do Sul)
-            if (lowerCaseMessage.includes("agendamento") && lowerCaseMessage.includes("teórico") && lowerCaseMessage.includes("ms")) {
-                return "A sincronização de Agendamento de Exame Teórico é feita via arquivos **.txt** em um servidor **FTP** do Detran. O job executa a cada 30 minutos.";
-            }
-            if (lowerCaseMessage.includes("token") && lowerCaseMessage.includes("ms")) {
-                 return "O token do DETRAN-MS é gerado com base na senha (`zEpUrUPriChofL74xvalid`) e na data atual no formato `AAAAMMDD`, usando o algoritmo **SHA1**.";
-            }
-
-            // 4. SUPERPRÁTICO GERAL / SUPORTE
-            if (lowerCaseMessage.includes("movimentar") && lowerCaseMessage.includes("bônus")) {
-                return "Endpoint: **GET /api/suportepratico/movimentacoes/movimentarBonus/{...}**\n\n" +
-                       "Regra: O parâmetro **diasExpirarBonus** é obrigatório para a ação **Credito**.";
-            }
-            if (lowerCaseMessage.includes("reprocessar") && lowerCaseMessage.includes("aula")) {
-                return "Endpoint: **POST /api/suportepratico/reenvio/reprocessar**\n\n" +
-                       "Limite de **200 aulas por requisição**. Permite alterar `Inicio` e `Fim` no Body JSON.";
-            }
-
-            // 5. RESPOSTA PADRÃO
-            return "Desculpe, não consegui encontrar a informação específica. Tente perguntar de forma mais direta, usando o **estado** (DF, SE, MS) e o **tópico** (ex: 'endpoints MS' ou 'SLA incidente crítico').";
+            return "Desculpe, não consegui encontrar a informação específica. Tente perguntar de forma mais direta, usando o **estado** (RN, DF, SE, MS) e o **tópico** (ex: 'endpoints RN' ou 'MTTR crítico').";
         }
     </script>
 </body>
