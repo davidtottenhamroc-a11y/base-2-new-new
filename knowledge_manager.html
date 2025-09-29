@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Base de Conhecimento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+        h1 {
+            color: #3498db;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #c0c0c0;
+        }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #3a506b;
+            font-size: 16px;
+            background: #1f3747;
+            color: white;
+            resize: vertical;
+        }
+        button {
+            padding: 12px 25px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+        .status-message.success {
+            background: #2a3a2d;
+            border-left: 4px solid #28a745;
+            color: #d4edda;
+        }
+        .status-message.error {
+            background: #3e262a;
+            border-left: 4px solid #dc3545;
+            color: #f8d7da;
+        }
+        .back-button-container {
+            margin-top: 30px;
+        }
+        .back-button {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+        .back-button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1><i class="fas fa-database"></i> Gerenciar Base de Conhecimento por Estado</h1>
+
+        <div class="form-group">
+            <label for="state-select">Estado Relacionado:</label>
+            <select id="state-select">
+                <option value="TODOS">TODOS os Estados (Geral)</option>
+                <option value="RN">Rio Grande do Norte (RN)</option>
+                <option value="DF">Distrito Federal (DF)</option>
+                <option value="SE">Sergipe (SE)</option>
+                <option value="MS">Mato Grosso do Sul (MS)</option>
+                <option value="PE">Pernambuco (PE)</option>
+                <option value="PB">Paraíba (PB)</option>
+                <option value="BA">Bahia (BA)</option>
+                <option value="MG">Minas Gerais (MG)</option>
+                <option value="GO">Goiás (GO)</option>
+                <option value="MA">Maranhão (MA)</option>
+                <option value="AL">Alagoas (AL)</option>
+                <option value="CE">Ceará (CE)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="content-title">Palavra-Chave / Título Resumido (Ex: N2 de RN, Erro 060, SLA Médio):</label>
+            <input type="text" id="content-title" placeholder="Digite um título para fácil busca..." required>
+        </div>
+
+        <div class="form-group">
+            <label for="content-text">Conteúdo Detalhado (A informação completa para o chatbot responder):</label>
+            <textarea id="content-text" rows="8" placeholder="Digite a solução, regra ou informação técnica completa..." required></textarea>
+        </div>
+
+        <button onclick="saveKnowledge()"><i class="fas fa-save"></i> Salvar Conteúdo na Base de Dados</button>
+
+        <div id="status-message" class="status-message"></div>
+    </div>
+
+    <div class="back-button-container">
+        <a href="Menu.html" class="back-button"><i class="fas fa-arrow-left"></i> Voltar ao Menu Principal</a>
+    </div>
+
+    <script>
+        // ⚠️ ATENÇÃO: SUBSTITUA PELA URL PÚBLICA DA SUA API NA VERCEL
+        const BACKEND_URL = 'https://sua-api-aqui.vercel.app'; 
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.innerText = message;
+            statusDiv.style.display = 'block';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+        }
+
+        async function saveKnowledge() {
+            const state = document.getElementById('state-select').value;
+            const title = document.getElementById('content-title').value.trim();
+            const content = document.getElementById('content-text').value.trim();
+            const agenteLogado = localStorage.getItem('agenteSelecionado') || 'Admin';
+
+            if (!title || !content || !state) {
+                showStatus('Por favor, preencha o Título/Palavra-Chave e o Conteúdo Detalhado.', 'error');
+                return;
+            }
+
+            const dataToSend = {
+                agente: agenteLogado,
+                estado: state,
+                // Usamos 'texto' aqui pois corresponde ao campo 'texto' no seu MemorySchema
+                texto: `${title}: ${content}` 
+            };
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/memories`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToSend)
+                });
+
+                if (response.ok) {
+                    showStatus(`Conteúdo salvo com sucesso para ${state}! O chatbot pode usá-lo agora.`, 'success');
+                    // Limpar formulário após o sucesso
+                    document.getElementById('content-title').value = '';
+                    document.getElementById('content-text').value = '';
+                } else {
+                    const errorData = await response.json();
+                    showStatus(`Falha ao salvar: ${errorData.message || 'Erro de Servidor.'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Erro de rede:', error);
+                showStatus(`Erro de rede. Verifique a URL do backend: ${BACKEND_URL}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
