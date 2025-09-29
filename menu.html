@@ -129,24 +129,23 @@
 
         /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
         #chat-widget-container {
-            /* Transformando em tela cheia */
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw; 
             height: 100vh;
-            background: rgba(13, 26, 42, 0.95); /* Fundo escuro semitransparente */
+            background: rgba(13, 26, 42, 0.95); 
             border-radius: 0;
             box-shadow: none;
-            display: none; /* Inicia oculto */
+            display: none; 
             z-index: 9999;
-            align-items: center; /* Centraliza o conteúdo principal */
+            align-items: center; 
             justify-content: center;
         }
 
         .chat-content {
             width: 90%;
-            max-width: 800px; /* Limite o chat para melhor leitura */
+            max-width: 800px; 
             height: 90%;
             max-height: 800px;
             background: #ffffff;
@@ -195,14 +194,14 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 10px;
-            background: #f8f9fa; /* Fundo mais claro para a conversa */
+            background: #f8f9fa; 
             border-radius: 8px;
             margin-bottom: 15px;
         }
         
         /* Estilização das Mensagens Aprimorada */
         .message {
-            max-width: 90%; /* Aumenta a largura máxima */
+            max-width: 90%; 
             padding: 12px 18px;
             border-radius: 20px;
             margin-bottom: 10px;
@@ -216,21 +215,20 @@
             color: white;
             align-self: flex-end;
             margin-left: auto;
-            border-bottom-right-radius: 5px; /* Detalhe moderno */
+            border-bottom-right-radius: 5px; 
         }
         .bot-message {
-            background: #e9ecef; /* Cor neutra para o bot */
+            background: #e9ecef; 
             color: #333;
             align-self: flex-start;
             margin-right: auto;
             border: none;
-            border-bottom-left-radius: 5px; /* Detalhe moderno */
+            border-bottom-left-radius: 5px; 
             white-space: pre-wrap;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
-        /* Foco em títulos e negritos dentro da resposta do bot */
         .bot-message strong {
-            color: #c0392b; /* Destaque para palavras-chave */
+            color: #c0392b; 
         }
 
         #chat-input-container {
@@ -502,13 +500,16 @@
             }, 1500);
         }
 
+        // Função para adicionar a mensagem (CORRIGIDA PARA ACEITAR HTML)
         function appendMessage(text, className) {
             const messagesContainer = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${className}`;
             
-            // Permite formatação markdown básica no texto da resposta
-            messageDiv.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Processa quebras de linha e negrito, permitindo que a tag <img> seja injetada
+            const processedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            messageDiv.innerHTML = processedText;
 
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -602,16 +603,17 @@
                     // LÓGICA PARA EXIBIR A IMAGEM
                     let imageTag = '';
                     if (m.imagemUrl && m.imagemUrl.trim().length > 0) {
-                        // Adiciona um estilo para limitar o tamanho da imagem no chat
-                        imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px;">`;
+                        // Adiciona a tag <img> com estilo para garantir que caiba no chat
+                        imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; display: block;">`;
                     }
 
-                    return `* ${estado}**${m.texto}** (Agente: ${m.agente}, ${date})${imageTag}`;
+                    // A resposta contém o texto formatado e a tag de imagem (HTML)
+                    return `${estado}**${m.texto}** (Agente: ${m.agente}, ${date})${imageTag}`;
                 }).join('\n\n');
 
                 const totalMsg = matchingMemories.length > 3 ? `e mais ${matchingMemories.length - 3} resultados semelhantes.` : 'Fim da lista.';
 
-                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n${topMemories}\n\n${totalMsg}`;
+                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n* ${topMemories}\n\n${totalMsg}`;
             }
 
             // 3. Resposta Padrão: Conhecimento Inexistente
