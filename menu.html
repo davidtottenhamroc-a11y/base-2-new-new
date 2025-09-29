@@ -126,6 +126,131 @@
         .logout-button:hover {
             background: linear-gradient(135deg, #c82333, #a71d24);
         }
+
+        /* --- Estilos do Chatbot --- */
+        #chat-widget-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background: #f4f4f4;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            display: none; /* Inicia oculto */
+        }
+        #chat-header {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-header i {
+            margin-right: 5px;
+        }
+        #chat-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #chat-body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 10px;
+        }
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 5px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background: #3498db;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        .bot-message {
+            background: #ffffff;
+            color: #333;
+            align-self: flex-start;
+            margin-right: auto;
+            border: 1px solid #ddd;
+            border-bottom-left-radius: 5px;
+            white-space: pre-wrap;
+        }
+        #chat-input-container {
+            display: flex;
+            padding: 5px 0;
+        }
+        #chat-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+        #chat-send-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #chat-send-btn:hover {
+            background: #218838;
+        }
+        #chat-open-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        #chat-open-btn i {
+            margin-right: 8px;
+        }
+        /* Indicador de Digitação */
+        .typing-indicator {
+            background: #e0e0e0;
+            color: #555;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -138,7 +263,6 @@
 
         <main>
             <div class="menu-grid">
-                
                 
                 <a href="endpoints.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-share-alt"></i></div>
@@ -196,6 +320,29 @@
         </main>
         <button class="logout-button" onclick="logout()">Sair</button>
     </div>
+
+    <div id="chat-widget-container">
+        <div id="chat-header">
+            Assistente VSoft N2 <i class="fas fa-robot"></i>
+            <button id="chat-close-btn" onclick="toggleChat()">X</button>
+        </div>
+        <div id="chat-body">
+            <div id="chat-messages">
+                <div class="message bot-message">
+                    Olá! Sou seu assistente de suporte N2, treinado com a documentação técnica da VSoft/Valid. Como posso te ajudar hoje?
+                </div>
+            </div>
+            <div id="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Pergunte sobre APIs, fluxos ou SLAs...">
+                <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <button id="chat-open-btn" onclick="toggleChat()" style="display: none;">
+        <i class="fas fa-comment-dots"></i> Chat N2
+    </button>
+    
     <script>
         function logout() {
             // Limpa o estado de login
@@ -204,12 +351,152 @@
             // Redireciona para a tela de login
             window.location.href = 'login.html';
         }
+
+        // Função para mostrar/ocultar o chat
+        function toggleChat() {
+            const chatWidget = document.getElementById('chat-widget-container');
+            const chatOpenBtn = document.getElementById('chat-open-btn');
+
+            if (chatWidget.style.display === 'flex') {
+                chatWidget.style.display = 'none';
+                chatOpenBtn.style.display = 'block';
+            } else {
+                chatWidget.style.display = 'flex';
+                chatOpenBtn.style.display = 'none';
+                document.getElementById('chat-input').focus();
+            }
+        }
+
+        // Inicialmente, mostra o botão flutuante e oculta o widget completo
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('chat-open-btn').style.display = 'block';
+        });
+
+        // Adicionar evento para enviar mensagem ao pressionar Enter
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Função principal de envio e resposta
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messageText = input.value.trim();
+            
+            if (messageText === "") return;
+
+            // 1. Adicionar a mensagem do usuário
+            appendMessage(messageText, 'user-message');
+            input.value = '';
+            
+            // 2. Simular a resposta do assistente 
+            showTypingIndicator();
+            setTimeout(() => {
+                const botResponse = getBotResponse(messageText);
+                hideTypingIndicator();
+                appendMessage(botResponse, 'bot-message');
+            }, 1500);
+        }
+
+        function appendMessage(text, className) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            
+            // Trata quebras de linha para formatação (opcional, mas bom para dados estruturados)
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = 'Digitando...'; 
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // --- Lógica de Resposta do Chatbot (Baseado nas suas docs) ---
+        function getBotResponse(message) {
+            const lowerCaseMessage = message.toLowerCase();
+
+            // 1. Respostas sobre SLAs e Política de Incidentes
+            if (lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("incidente") || lowerCaseMessage.includes("severidade")) {
+                if (lowerCaseMessage.includes("crítica")) {
+                    return "O SLA de Recuperação (MTTR) para um incidente de severidade **Crítica** é de **2 a 4 horas**, com um SLA de serviço de **≥ 98%**.\n\nO Tempo de Resposta Inicial é de **5 minutos**.";
+                }
+                if (lowerCaseMessage.includes("alta")) {
+                    return "Para incidentes de severidade **Alta**, o Tempo de Resposta Inicial é de **10 minutos** e o Tempo de Recuperação (MTTR) é de **até 6h úteis**.";
+                }
+                if (lowerCaseMessage.includes("problema")) {
+                    return "Para problemas de severidade **Crítica**, o Tempo de Recuperação (MTTR) é de **5 a 10 dias úteis**. Para severidade **Baixa**, pode ser de **21 a 40 dias úteis/backlog**.";
+                }
+                return "A política de incidentes classifica a severidade em Crítico, Alto, Médio e Baixo, com SLAs específicos para Tempo de Resposta e Recuperação (MTTR). Quer saber o MTTR para severidade Crítica?";
+            }
+
+            // 2. Respostas sobre Detran-DF
+            if (lowerCaseMessage.includes("detran-df") || lowerCaseMessage.includes("df") || lowerCaseMessage.includes("consultarprocesso")) {
+                if (lowerCaseMessage.includes("consultarprocesso")) {
+                    return "A API de **Consulta de Processo** do Detran-DF é `POST /importacaodf/consultarprocesso`.\n\nParâmetros Obrigatórios (Body JSON): \n- **Cpf**\n- **Cnpj**\n- **TipoProcesso** (Valores: 'T' para Teórico, 'P' para Prático).";
+                }
+                if (lowerCaseMessage.includes("aula teórica")) {
+                    return "O endpoint para **Enviar Aula Teórica** no Detran-DF (Credenciadas/VSoft) é `POST /api/aula/envio-aula-teorica`. Todos os campos, como `cpfAluno`, `resultado` e `codigoDisciplina`, são obrigatórios.";
+                }
+                return "Para o Detran-DF, você pode consultar o processo de um candidato (`/consultarprocesso`) ou enviar aulas (`/envio-aula-teorica`, `/envio-aula-pratica`). Qual API te interessa?";
+            }
+            
+            // 3. Respostas sobre Detran-MS
+            if (lowerCaseMessage.includes("detran-ms") || lowerCaseMessage.includes("ms") || lowerCaseMessage.includes("agendamento")) {
+                if (lowerCaseMessage.includes("aulas práticas")) {
+                    return "O **Endpoint Base** para Aulas Práticas Monitoradas no DETRAN-MS (SuperPrático) é `https://detranms-superpratico-admin.azurewebsites.net/api/`.\n\nO endpoint de Início de Aula é `POST api/pratico/auditoria/aula/inicio`.";
+                }
+                if (lowerCaseMessage.includes("sincronização") || lowerCaseMessage.includes("agendamento teorico")) {
+                    return "A sincronização de **Agendamento de Exame Teórico** no Detran-MS é feita via arquivos **.txt** em um servidor **FTP**.\n\nDetalhes do FTP: \n- **Host**: `ftp.detran.ms.gov.br`\n- **Porta**: `21`\n- **Diretório**: `\\inter1`.";
+                }
+                return "A integração Detran-MS/Valid inclui o Fluxo BackOffice, Processamento de Exames (Médico/Psicólogo/Teórico) e Aulas Práticas Monitoradas. Qual área você precisa de informação?";
+            }
+
+            // 4. Respostas sobre Detran-SE
+            if (lowerCaseMessage.includes("detran-se") || lowerCaseMessage.includes("se") || lowerCaseMessage.includes("veículos")) {
+                if (lowerCaseMessage.includes("instrutor")) {
+                    return "Para consultar instrutores no Detran-SE, use o endpoint `GET /Monitoramento/Instrutor/{codigoCfc}`. A resposta retorna dados profissionais, situação de credenciamento e os **templates biométricos** (digitais e foto) do instrutor.";
+                }
+                if (lowerCaseMessage.includes("candidato")) {
+                    return "Para consultar um candidato (verificar o processo), use `GET /Monitoramento/Cpf/{cpf}/{tipoAula}/{categoria}/{codigoCfc}`. O `tipoAula` aceita 'T' (Teórica) ou 'P' (Prática).";
+                }
+                return "As APIs do Detran-SE permitem consultas detalhadas de Veículos, CFCs, Candidatos e Instrutores, além do Envio de Aulas. A autenticação usa um **token JWT**.";
+            }
+
+            // 5. Respostas sobre SuperPrático (Geral)
+            if (lowerCaseMessage.includes("superprático") || lowerCaseMessage.includes("bônus") || lowerCaseMessage.includes("reenvio")) {
+                if (lowerCaseMessage.includes("bônus") || lowerCaseMessage.includes("credito")) {
+                    return "A rota para Movimentação de Aulas Bônus é `GET /api/suportepratico/movimentacoes/movimentarBonus/{renach}/{tipoMov}/{categoria}/{quantidade}/{diasExpirarBonus}`. O parâmetro `diasExpirarBonus` é obrigatório para a ação **Credito**.";
+                }
+                if (lowerCaseMessage.includes("reenvio")) {
+                    return "Para **Reprocessar Aulas Práticas** use `POST /api/suportepratico/reenvio/reprocessar`. O limite é de **200 aulas por requisição**. Você pode incluir a nova data/hora de Início e Fim no Body JSON.";
+                }
+                if (lowerCaseMessage.includes("abertura de aula")) {
+                    return "O Fluxo de Abertura de Aula é rigoroso: ele checa o ambiente, valida a biometria (Erro 060 para falhas de identificação) e confirma se a coordenada GPS está dentro da cerca geográfica.";
+                }
+                return "O SuperPrático tem endpoints para Movimentação de Créditos/Bônus, Reenvio de Aulas, Gerenciamento de Alertas e diversas APIs de Coletor/Online. O que você busca?";
+            }
+            
+            // 6. Resposta Padrão
+            return "Desculpe, não consegui encontrar a informação específica nas documentações. Tente refinar sua busca ou perguntar sobre um estado (DF, MS, SE) ou um tópico (SLA, SuperPrático, Aulas Práticas).";
+        }
     </script>
 </body>
 
 </html>
-
-
-
-
-
