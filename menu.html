@@ -284,9 +284,24 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Esconder o botão flutuante, pois o chat abrirá ao clicar no menu */
+        /* --- Estilo do Botão Flutuante (Retornado) --- */
         #chat-open-btn {
-            display: none !important;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        #chat-open-btn i {
+            margin-right: 8px;
         }
     </style>
 </head>
@@ -346,14 +361,6 @@
                     </div>
                 </a>
                 
-                <a href="javascript:void(0)" onclick="toggleChat()" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-comment-dots"></i></div>
-                    <div>
-                        <h2 class="card-title">Assistente Chatbot N2</h2>
-                        <p class="card-description">Inicie o assistente virtual para consultar a base de conhecimento (MongoDB).</p>
-                    </div>
-                </a>
-                
                 <a href="knowledge_manager.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-database"></i></div>
                     <div>
@@ -386,7 +393,7 @@
                     <div class="message bot-message">
                         Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
                         <br><br>
-                        Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
+                        Clique no **X** para fechar. Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
                     </div>
                 </div>
                 <div id="chat-input-container">
@@ -397,6 +404,10 @@
         </div>
     </div>
 
+    <button id="chat-open-btn" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i> Chat N2
+    </button>
+    
     <script>
         // Variável global para armazenar as memórias carregadas do MongoDB
         let chatMemories = [];
@@ -414,12 +425,17 @@
         // Função corrigida para abrir/fechar o chat em tela cheia
         function toggleChat() {
             const chatWidget = document.getElementById('chat-widget-container');
+            const openBtn = document.getElementById('chat-open-btn');
 
             if (chatWidget.style.display === 'flex') {
+                // Fechar
                 chatWidget.style.display = 'none';
+                openBtn.style.display = 'block'; // Mostra o botão flutuante
                 document.body.style.overflow = 'auto'; // Restaura o scroll
             } else {
+                // Abrir
                 chatWidget.style.display = 'flex';
+                openBtn.style.display = 'none'; // Esconde o botão flutuante
                 document.body.style.overflow = 'hidden'; // Remove o scroll do corpo
                 document.getElementById('chat-input').focus();
             }
@@ -437,7 +453,9 @@
                     console.log(`[MongoDB] ${data.length} memórias carregadas com SUCESSO!`);
                     
                     if (data.length === 0) {
-                         appendMessage(`[AVISO] Conexão bem-sucedida, mas o banco **MongoDB** está **VAZIO** (0 memórias). Use a página Gerenciar Base de Conhecimento para adicionar dados.`, 'bot-message');
+                         // Esta mensagem só aparece no primeiro carregamento, se o banco estiver vazio
+                         // Não vou usar appendMessage aqui para não poluir o histórico do chat
+                         console.warn("[AVISO CHATBOT] Conexão OK, mas o banco está vazio (0 memórias).");
                     }
                 } else {
                     console.error('Erro ao carregar memórias. Status:', response.status);
@@ -449,9 +467,10 @@
             }
         }
 
-        // Adiciona um novo Card ao menu para abrir o Chat
         document.addEventListener('DOMContentLoaded', async () => {
             await loadMemoriesFromDatabase(); 
+            // Garante que o botão flutuante esteja visível ao carregar
+            document.getElementById('chat-open-btn').style.display = 'block';
         });
 
         // Adicionar evento para enviar mensagem ao pressionar Enter
