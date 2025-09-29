@@ -338,11 +338,11 @@
                 <div class="message bot-message">
                     Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
                     <br><br>
-                    **Dica:** Use o comando `/lembrar [SIGLA] [sua informação]` ou a página 'Gerenciar Base de Conhecimento' para me ensinar algo.
+                    Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
                 </div>
             </div>
             <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou '/lembrar...'">
+                <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
                 <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -358,7 +358,6 @@
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
         // ⚠️ ATENÇÃO: SUBSTITUA PELA URL PÚBLICA DA SUA API NA VERCEL
-        // Use a URL real do seu deployment Vercel.
         const BACKEND_URL = 'https://sua-api-aqui.vercel.app'; 
         
         function logout() {
@@ -410,81 +409,7 @@
             }
         });
 
-        // Função para salvar a memória no MongoDB
-        async function saveMemoryToDatabase(stateSigla, memoryText) {
-            const agenteLogado = localStorage.getItem('agenteSelecionado') || 'SuporteN2'; 
-            
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/memories`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        agente: agenteLogado,
-                        estado: stateSigla, // Adicionando o estado
-                        texto: memoryText
-                    })
-                });
-
-                if (response.ok) {
-                    await loadMemoriesFromDatabase(); 
-                    return `**MEMÓRIA SALVA PERMANENTEMENTE!** [Estado: ${stateSigla}]. Seu lembrete foi registrado no MongoDB e está disponível.`;
-                } else {
-                    return `Erro ao salvar no banco. Status: ${response.status}.`;
-                }
-            } catch (error) {
-                console.error('Erro de rede ao salvar memória:', error);
-                return `Erro de conexão com o servidor. Verifique se o backend está rodando em ${BACKEND_URL}.`;
-            }
-        }
-
-        // Função para lidar com comandos de memória (simulação do memory tool)
-        async function handleMemoryCommands(message) {
-            const lowerCaseMessage = message.toLowerCase();
-
-            // 1. Comando explícito para "lembrar" (/lembrar [SIGLA] [TEXTO])
-            if (lowerCaseMessage.startsWith("/lembrar ")) {
-                const parts = message.trim().split(' ').slice(1); // Remove '/lembrar'
-                
-                if (parts.length < 2) {
-                     return "Formato inválido. Use: `/lembrar [SIGLA do Estado] [sua informação]`. Ex: `/lembrar RN API consulta lenta`.";
-                }
-                
-                const siglaInput = parts[0].toUpperCase();
-                const memoryText = parts.slice(1).join(' ');
-
-                // Mapeia siglas válidas e nomes completos para simplificar a validação
-                const validSiglas = VALID_STATES.map(s => s.toUpperCase().substring(0, 2) === 'RI' ? 'RN' : s.toUpperCase().substring(0, 2));
-                
-                if (VALID_STATES.includes(siglaInput) || validSiglas.includes(siglaInput) || siglaInput === 'TODOS') {
-                    // Chama a função assíncrona para salvar
-                    return await saveMemoryToDatabase(siglaInput, memoryText); 
-                }
-                return `SIGLA INVÁLIDA. Use uma sigla válida como RN, DF, SE, MS ou TODOS.`;
-            }
-
-            // 2. Comando explícito para "ver memórias" (/minhas memorias)
-            if (lowerCaseMessage.includes("/minhas memorias") || lowerCaseMessage.includes("/minhasmemórias")) {
-                await loadMemoriesFromDatabase(); 
-
-                if (chatMemories.length === 0) {
-                    return "Eu não tenho nenhuma informação armazenada no banco de dados para esta sessão. Use `/lembrar [SIGLA] [informação]` para me ensinar algo.";
-                }
-
-                // Formata e exibe as 5 memórias mais recentes
-                const latestMemories = chatMemories.slice(0, 5).map(m => {
-                    const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
-                    const estado = m.estado ? `[${m.estado}] ` : '';
-                    return `* ${estado}${m.texto} (Agente: ${m.agente})`;
-                }).join('\n');
-                
-                return `As **${chatMemories.length}** informações salvas permanentemente (últimas 5):\n\n` + latestMemories;
-            }
-            
-            return null; // Indica que não foi um comando de memória
-        }
-
-
-        // Função principal de envio e resposta
+        // Função principal de envio e resposta (AGORA ASSÍNCRONA)
         async function sendMessage() { 
             const input = document.getElementById('chat-input');
             const messageText = input.value.trim();
@@ -497,20 +422,13 @@
             
             showTypingIndicator();
 
-            // 2. Processar a mensagem
-            const memoryResponse = await handleMemoryCommands(messageText);
+            // 2. Processar a mensagem (sem o comando /lembrar)
+            // A busca de memória agora está totalmente dentro do getBotResponse
 
             setTimeout(() => {
                 hideTypingIndicator();
                 
-                let botResponse;
-
-                if (memoryResponse) {
-                    botResponse = memoryResponse;
-                } else {
-                    // Se não for um comando de memória, usa a base de conhecimento (AGORA APENAS O BANCO)
-                    botResponse = getBotResponse(messageText);
-                }
+                let botResponse = getBotResponse(messageText);
 
                 appendMessage(botResponse, 'bot-message');
             }, 1500);
@@ -548,8 +466,10 @@
         // --- Lógica de Resposta do Chatbot (AGORA TUDO VEM DO BANCO) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
+            // Pegamos todas as palavras com mais de 2 letras
             const keywords = lowerCaseMessage.split(/\s+/).filter(w => w.length > 2);
             
+            // Tenta identificar a sigla na pergunta
             const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
 
             // --------------------------------------------------------
@@ -603,7 +523,7 @@
                  initialMessage += `\n\n**Verifique:** Não há informações salvas para a palavra-chave que você usou no estado **${siglaQuery.toUpperCase()}**.`;
             }
 
-            initialMessage += "\n\nUse o comando `/lembrar [SIGLA] [sua informação]` para me ensinar.";
+            initialMessage += "\n\nUse a página 'Gerenciar Base de Conhecimento' para me ensinar.";
             
             return initialMessage;
         }
