@@ -5,12 +5,14 @@ const cors = require('cors');
 const app = express();
 
 // Configurações
-app.use(cors());
+// Permite requisições de origens diferentes (CORS)
+app.use(cors()); 
 app.use(express.json());
 
 // --- Variáveis de Ambiente ---
+// A string de conexão do seu Atlas que deve estar configurada na Vercel
 const MONGODB_URI = process.env.MONGODB_URI; 
-const PORT = process.env.PORT || 3000; // Define a porta
+const PORT = process.env.PORT || 3000; 
 
 // Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
@@ -48,7 +50,7 @@ const memorySchema = new mongoose.Schema({
 
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
-const Memory = mongoose.model('Memory', memorySchema); // NOVO MODEL
+const Memory = mongoose.model('Memory', memorySchema); 
 
 // --- Rotas da API ---
 
@@ -66,7 +68,8 @@ app.post('/api/login', (req, res) => {
     }
 });
 
-// Rota para salvar um registro de aula
+// --- Rotas de Aulas, Incidentes, e Memória (Conforme a estrutura anterior) ---
+
 app.post('/api/aulas', async (req, res) => {
     try {
         const novaAula = new Aula(req.body);
@@ -77,7 +80,6 @@ app.post('/api/aulas', async (req, res) => {
     }
 });
 
-// Rota para buscar todos os registros de aulas
 app.get('/api/aulas', async (req, res) => {
     try {
         const aulas = await Aula.find({});
@@ -87,7 +89,6 @@ app.get('/api/aulas', async (req, res) => {
     }
 });
 
-// Rota para salvar um incidente
 app.post('/api/incidentes', async (req, res) => {
     try {
         const novoIncidente = new Incidente(req.body);
@@ -98,7 +99,6 @@ app.post('/api/incidentes', async (req, res) => {
     }
 });
 
-// Rota para buscar todos os incidentes
 app.get('/api/incidentes', async (req, res) => {
     try {
         const incidentes = await Incidente.find({});
@@ -108,7 +108,6 @@ app.get('/api/incidentes', async (req, res) => {
     }
 });
 
-// Rota para deletar um incidente
 app.delete('/api/incidentes/:id', async (req, res) => {
     try {
         const incidente = await Incidente.findByIdAndDelete(req.params.id);
@@ -138,11 +137,6 @@ app.get('/api/memories', async (req, res) => {
     } catch (error) {
         res.status(500).send(error);
     }
-});
-
-// Adiciona uma rota base para testar
-app.get('/', (req, res) => {
-    res.send('API VSoft N2 está rodando!');
 });
 
 // Inicia o servidor, essencial para o funcionamento
