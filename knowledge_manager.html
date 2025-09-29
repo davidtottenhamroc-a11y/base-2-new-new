@@ -137,6 +137,11 @@
         </div>
 
         <div class="form-group">
+            <label for="image-url">URL da Imagem/Gráfico (Opcional):</label>
+            <input type="text" id="image-url" placeholder="Cole o link da imagem (Ex: de um diagrama ou print de erro)">
+        </div>
+
+        <div class="form-group">
             <label for="content-text">Conteúdo Detalhado (A informação completa para o chatbot responder):</label>
             <textarea id="content-text" rows="8" placeholder="Digite a solução, regra ou informação técnica completa..." required></textarea>
         </div>
@@ -151,7 +156,7 @@
     </div>
 
     <script>
-        // ⚠️ ATENÇÃO: Esta URL deve ser a mesma do seu projeto Vercel
+        // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
         const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';  
 
         function showStatus(message, type) {
@@ -166,6 +171,7 @@
             const state = document.getElementById('state-select').value;
             const title = document.getElementById('content-title').value.trim();
             const content = document.getElementById('content-text').value.trim();
+            const imageUrl = document.getElementById('image-url').value.trim(); // Novo campo
             const agenteLogado = localStorage.getItem('agenteSelecionado') || 'Admin';
 
             if (!title || !content || !state) {
@@ -176,12 +182,11 @@
             const dataToSend = {
                 agente: agenteLogado,
                 estado: state,
-                // Combina Título e Conteúdo como o valor 'texto'
-                texto: `${title}: ${content}` 
+                texto: `${title}: ${content}`,
+                imagemUrl: imageUrl || undefined // Envia apenas se não estiver vazio
             };
 
             try {
-                // CORRIGIDO: Usando a variável BACKEND_URL corretamente
                 const response = await fetch(`${BACKEND_URL}/api/memories`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -193,6 +198,7 @@
                     // Limpar formulário após o sucesso
                     document.getElementById('content-title').value = '';
                     document.getElementById('content-text').value = '';
+                    document.getElementById('image-url').value = ''; // Limpa o novo campo
                 } else {
                     const errorData = await response.json();
                     showStatus(`Falha ao salvar: ${errorData.message || 'Erro de Servidor.'}`, 'error');
