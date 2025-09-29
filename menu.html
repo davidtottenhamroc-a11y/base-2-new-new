@@ -600,10 +600,10 @@
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
                     const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
                     
-                    // LÓGICA PARA EXIBIR A IMAGEM
+                    // LÓGICA PARA EXIBIR A IMAGEM (Ajustada para checar se a URL existe)
                     let imageTag = '';
                     if (m.imagemUrl && m.imagemUrl.trim().length > 0) {
-                        // Adiciona a tag <img> com estilo para garantir que caiba no chat
+                        // Se a URL existir, a tag de imagem é criada
                         imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; display: block;">`;
                     }
 
