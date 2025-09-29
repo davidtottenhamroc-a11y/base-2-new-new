@@ -329,7 +329,7 @@
                 <div class="message bot-message">
                     Olá! Sou seu assistente de suporte N2. Posso te dar endpoints por estado (RN, DF, SE, MS) ou detalhes sobre a **Política de Incidentes**.
                     <br><br>
-                    **Dica de Memória:** Use o comando `/lembrar [SIGLA] [sua informação]` para guardar informações por estado. Ex: `/lembrar RN A API de consulta de CFC é lenta.`
+                    **Dica de Memória:** Use o comando `/lembrar [SIGLA] [sua informação]` para guardar informações por estado. Ex: `/lembrar RN A API de consulta de CFC é lenta.`.
                 </div>
             </div>
             <div id="chat-input-container">
@@ -349,18 +349,15 @@
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
         // ⚠️ ATENÇÃO: SUBSTITUA PELA URL PÚBLICA DA SUA API NA VERCEL
-        // Use o domínio Vercel correto, como 'https://base-2-new-new-9xow.vercel.app'
-        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app'; 
+        // Ex: 'https://base-2-new-new-9xow.vercel.app'
+        const BACKEND_URL = 'https://sua-api-aqui.vercel.app'; 
         
         function logout() {
-            // Limpa o estado de login
             localStorage.removeItem('agenteSelecionado');
             localStorage.removeItem('estadoSelecionado');
-            // Redireciona para a tela de login
             window.location.href = 'login.html';
         }
 
-        // Função para mostrar/ocultar o chat
         function toggleChat() {
             const chatWidget = document.getElementById('chat-widget-container');
             const chatOpenBtn = document.getElementById('chat-open-btn');
@@ -552,29 +549,30 @@
             
             let filteredMemories = chatMemories;
             
+            // 1.1. Filtro por Estado
             if (siglaQuery && siglaQuery !== 'todos') {
-                // Filtra pelo estado se a sigla for fornecida na pergunta
-                filteredMemories = filteredMemories.filter(m => m.estado && m.estado.toLowerCase().includes(siglaQuery));
+                // Filtra as memórias para o estado específico OU para TODAS
+                filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
             }
             
-            // Filtra o texto da memória pelas palavras-chave da pergunta
+            // 1.2. Filtro por Palavras-chave
             const matchingMemories = filteredMemories.filter(m => {
                 const memoryTextLower = m.texto.toLowerCase();
-                // Requer que pelo menos 2 palavras-chave da pergunta (excluindo a sigla) estejam na memória
+                // Remove a sigla da busca para que 'N2 de RN' procure 'N2' e 'RN' filtre por estado.
                 const textKeywords = keywords.filter(w => w !== siglaQuery);
                 
-                if (textKeywords.length === 0) return false; // Evita retornar tudo se só digitou a sigla
+                if (textKeywords.length === 0) return false; 
 
+                // Verifica se a memória contém pelo menos uma das palavras-chave
                 return textKeywords.some(keyword => memoryTextLower.includes(keyword));
             });
 
 
             if (matchingMemories.length > 0) {
-                // Se houver correspondência, retorna as 3 mais recentes do banco
+                // Se houver correspondência, retorna as 3 mais relevantes do banco
                 const topMemories = matchingMemories.slice(0, 3).map(m => {
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
                     const estado = m.estado ? `[${m.estado}] ` : '';
-                    // Retorna o texto original da memória salva
                     return `* ${estado}**${m.texto}** (Agente: ${m.agente}, ${date})`;
                 }).join('\n\n');
 
@@ -582,7 +580,7 @@
             }
 
             // --------------------------------------------------------
-            // --- 2. ORIENTAÇÃO POR SIGLA DO ESTADO (BASE DE CONHECIMENTO FIXA) ---
+            // --- 3. ORIENTAÇÃO POR SIGLA DO ESTADO (BASE DE CONHECIMENTO FIXA) ---
             // --------------------------------------------------------
             
             if (lowerCaseMessage.includes("rn") || lowerCaseMessage.includes("rio grande do norte")) {
@@ -619,7 +617,7 @@
             }
 
             // --------------------------------------------------------
-            // --- 3. POLÍTICA DE INCIDENTES (PL.SC.04.00) ---
+            // --- 4. POLÍTICA DE INCIDENTES (PL.SC.04.00) ---
             // --------------------------------------------------------
             const isPolicyRequest = lowerCaseMessage.includes("política") || lowerCaseMessage.includes("incidente") || lowerCaseMessage.includes("sla") || lowerCaseMessage.includes("problema") || lowerCaseMessage.includes("mttr") || lowerCaseMessage.includes("responsabilidade") || lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("categorização");
 
@@ -637,13 +635,14 @@
                     return "As principais responsabilidades são:\n" +
                            "* **Analista de Suporte/NOC:** Identificação, registro, triagem. \n" +
                            "* **Equipe Técnica:** Diagnóstico e implementação de soluções.\n" +
-                           "* **Product Owner:** Priorização de problemas.";
+                           "* **Product Owner:** Priorização de problemas.\n" + 
+                           "Consulte o documento para ver as demais funções.";
                 }
                 return "A Política de Incidentes (PL.SC.04.00) está totalmente coberta. Qual aspecto você deseja detalhar (SLA, Ciclo, Responsabilidades, Categorização)?";
             }
 
             // --------------------------------------------------------
-            // --- 4. RESPOSTA PADRÃO ---
+            // --- 5. RESPOSTA PADRÃO ---
             // --------------------------------------------------------
             return "Desculpe, não encontrei uma resposta na base de conhecimento. Tente digitar a **sigla do estado (RN, DF, SE, MS)** para ver as opções ou use `/lembrar` para me ensinar algo.";
         }
@@ -651,4 +650,3 @@
 </body>
 
 </html>
-
