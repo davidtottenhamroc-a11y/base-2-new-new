@@ -329,11 +329,13 @@
         <div id="chat-body">
             <div id="chat-messages">
                 <div class="message bot-message">
-                    Olá! Sou seu assistente de suporte N2. Posso te dar endpoints por estado (RN, DF, SE, MS) ou detalhes sobre a **Política de Incidentes**. Como posso ajudar?
+                    Olá! Sou seu assistente de suporte N2. Posso te dar endpoints por estado (RN, DF, SE, MS) ou detalhes sobre a **Política de Incidentes**.
+                    <br><br>
+                    **Dica de Memória:** Use o comando `/lembrar [sua informação]` para me ensinar algo que vou guardar nesta sessão. Ex: `/lembrar Meu nome é João.`
                 </div>
             </div>
             <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Ex: 'endpoints RN' ou 'MTTR crítico'">
+                <input type="text" id="chat-input" placeholder="Ex: 'endpoints RN', 'MTTR crítico' ou '/lembrar...'">
                 <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -344,6 +346,9 @@
     </button>
     
     <script>
+        // Variável global para simular o armazenamento de memória durante a sessão
+        let chatMemories = [];
+
         function logout() {
             // Limpa o estado de login
             localStorage.removeItem('agenteSelecionado');
@@ -379,6 +384,33 @@
             }
         });
 
+        // Função para lidar com comandos de memória (simulação do memory tool)
+        function handleMemoryCommands(message) {
+            const lowerCaseMessage = message.toLowerCase();
+
+            // 1. Comando explícito para "lembrar" (/lembrar)
+            if (lowerCaseMessage.startsWith("/lembrar ")) {
+                const memory = message.substring("/lembrar ".length).trim();
+                if (memory) {
+                    chatMemories.push(memory);
+                    // Simula a resposta do tool memory
+                    return `Eu anotei isso para você: "**${memory}**". Você pode verificar suas informações salvas [neste link](#).`;
+                }
+                return "Por favor, use o formato: `/lembrar [informação que você quer que eu guarde]`.";
+            }
+
+            // 2. Comando explícito para "ver memórias" (/minhas memorias)
+            if (lowerCaseMessage.includes("/minhas memorias") || lowerCaseMessage.includes("/minhasmemórias")) {
+                if (chatMemories.length === 0) {
+                    return "Eu não tenho nenhuma informação armazenada explicitamente por você nesta sessão. Use `/lembrar [informação]` para me ensinar algo.";
+                }
+                return "As informações que você me pediu para lembrar nesta sessão são:\n" + chatMemories.map(m => `* ${m}`).join('\n');
+            }
+            
+            return null; // Indica que não foi um comando de memória
+        }
+
+
         // Função principal de envio e resposta
         function sendMessage() {
             const input = document.getElementById('chat-input');
@@ -390,11 +422,24 @@
             appendMessage(messageText, 'user-message');
             input.value = '';
             
-            // 2. Simular a resposta do assistente 
             showTypingIndicator();
+
+            // 2. Processar a mensagem
+            const memoryResponse = handleMemoryCommands(messageText);
+
             setTimeout(() => {
-                const botResponse = getBotResponse(messageText);
                 hideTypingIndicator();
+                
+                let botResponse;
+
+                if (memoryResponse) {
+                    // Responde com o resultado do comando de memória
+                    botResponse = memoryResponse;
+                } else {
+                    // Se não for um comando de memória, usa a base de conhecimento (RN/Política/Outros)
+                    botResponse = getBotResponse(messageText);
+                }
+
                 appendMessage(botResponse, 'bot-message');
             }, 1500);
         }
@@ -456,20 +501,21 @@
                     return "O **Erro 060** refere-se a **Erros de Identificação** (Instrutor/Aluno).\n" +
                            "Causas comuns de erros de abertura:\n" +
                            "* **Identificação:** CPFs inválidos/inativos, matrícula expirada, categoria incompatível.\n" +
-                           "* **Agendamento:** Aula fora do horário permitido (Agendamento deve ser no intervalo de 15 minutos do início da telemetria).";
+                           "* **Agendamento:** Aula fora do horário permitido (Regra: Agendamento deve ser no intervalo de 15 minutos do início da telemetria).";
                 }
                 if (lowerCaseMessage.includes("alerta") || lowerCaseMessage.includes("regra") || lowerCaseMessage.includes("fraude")) {
                     let response = "**AULA COM ALERTA (Prática)** é considerada quando (Exemplos):\n";
                     response += "* Veículo parado por mais de **10 minutos** (exceto aulas de Parada e Estacionamento).\n";
                     response += "* Não houve detecção de pelo menos **uma face humana** nas imagens capturadas.\n";
-                    response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**.";
+                    response += "* Horário coincidente entre a aula e outra aula com o **mesmo veículo** ou **mesmo aluno/instrutor**.\n";
+                    response += "* Tentativa de validação biométrica sem sucesso por **cinco vezes consecutivas**.";
                     return response;
                 }
                 if (lowerCaseMessage.includes("confirmacao") && lowerCaseMessage.includes("pratica")) {
                      return "O método **ConfirmacaoAulaPratica** envia biometrias de Entrada/Saída do Aluno e Instrutor, Placa, CNPJCFC, etc..\n\n" +
                             "**Regra Crítica:** A aula não será aceita se a digital não for validada e não houver foto no envio. O **CodigoRetorno 0** indica Sucesso.";
                 }
-                if (lowerCaseMessage.includes("agendamento") && lowerCaseMessage.includes("teorico")) {
+                 if (lowerCaseMessage.includes("agendamento") && lowerCaseMessage.includes("teorico")) {
                      return "O agendamento teórico (atualização e formação) é realizado **dentro do sistema SuperPrático**.\n\n" +
                             "O fluxo é: **Importar Candidato** > **Criar Turma** > **Agendamento** (repetir para todos os dias e manter 'É virtual' selecionada) > **Inserir Alunos na Turma**.";
                 }
@@ -499,8 +545,13 @@
                     return response;
                 }
                 if (lowerCaseMessage.includes("ciclo") || lowerCaseMessage.includes("etapas")) {
-                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas, começando com a **Identificação** e terminando com o **Encerramento**, após a **Resolução e restauração**.\n\n" +
-                           "O **Relatório Post-Mortem** é obrigatório em casos críticos (Incidente ou Problema).";
+                    return "O **Ciclo de Tratamento do Incidente** possui 7 etapas:\n" +
+                           "1. Identificação\n" +
+                           "2. Registro e classificação\n" +
+                           "3. Triagem e direcionamento\n" +
+                           "4. Diagnóstico e investigação\n" +
+                           "5. Resolução e restauração\n" +
+                           "O **Relatório Post-Mortem** é obrigatório em casos críticos.";
                 }
                 if (lowerCaseMessage.includes("responsabilidades")) {
                     return "As principais responsabilidades são:\n" +
@@ -542,7 +593,7 @@
                            "**URL Base:** https://detranms-superpratico-admin.azurewebsites.net/api/\n" +
                            "**Início Aula Prática:** POST api/pratico/auditoria/aula/inicio\n" +
                            "**Fim Aula:** POST api/pratico/auditoria/aula/fim\n" +
-                           "*(Sincronização Teórica MS é via FTP: ftp.detran.ms.gov.br)*";
+                           "*(Sincronização Teórica MS é via FTP)*";
                 }
                 if (lowerCaseMessage.includes("superprático") || lowerCaseMessage.includes("geral")) {
                     return "Endpoints SuperPrático (Suporte/Geral):\n\n" +
