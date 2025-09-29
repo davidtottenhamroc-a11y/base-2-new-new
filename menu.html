@@ -422,7 +422,7 @@
             window.location.href = 'login.html';
         }
 
-        // Função corrigida para abrir/fechar o chat em tela cheia
+        // Função para abrir/fechar o chat em tela cheia
         function toggleChat() {
             const chatWidget = document.getElementById('chat-widget-container');
             const openBtn = document.getElementById('chat-open-btn');
@@ -452,11 +452,6 @@
                     chatMemories = data;
                     console.log(`[MongoDB] ${data.length} memórias carregadas com SUCESSO!`);
                     
-                    if (data.length === 0) {
-                         // Esta mensagem só aparece no primeiro carregamento, se o banco estiver vazio
-                         // Não vou usar appendMessage aqui para não poluir o histórico do chat
-                         console.warn("[AVISO CHATBOT] Conexão OK, mas o banco está vazio (0 memórias).");
-                    }
                 } else {
                     console.error('Erro ao carregar memórias. Status:', response.status);
                     appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
@@ -480,7 +475,7 @@
             }
         });
 
-        // Função principal de envio e resposta
+        // Função principal de envio e resposta - AJUSTADA PARA CONTINUIDADE
         async function sendMessage() {
             const input = document.getElementById('chat-input');
             const messageText = input.value.trim();
@@ -489,16 +484,21 @@
 
             // 1. Adicionar a mensagem do usuário
             appendMessage(messageText, 'user-message');
-            input.value = '';
+            input.value = ''; // Limpa o campo de entrada IMEDIATAMENTE
             
+            // 2. Desativa input e botão de envio
             showTypingIndicator();
 
             setTimeout(() => {
-                hideTypeningIndicator();
-                
+                // 3. Processa a resposta
                 let botResponse = getBotResponse(messageText);
 
+                // 4. Adiciona a resposta
                 appendMessage(botResponse, 'bot-message');
+                
+                // 5. Reativa input e botão de envio
+                hideTypeningIndicator();
+
             }, 1500);
         }
 
@@ -522,6 +522,10 @@
             typingDiv.innerHTML = 'Digitando...';
             messagesContainer.appendChild(typingDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // NOVIDADE: Desativa os controles enquanto o bot está "digitando"
+            document.getElementById('chat-input').disabled = true;
+            document.getElementById('chat-send-btn').disabled = true;
         }
 
         function hideTypeningIndicator() {
@@ -529,6 +533,11 @@
             if (typingIndicator) {
                 typingIndicator.remove();
             }
+
+            // NOVIDADE: Reativa os controles e foca no input para nova pergunta
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('chat-send-btn').disabled = false;
+            document.getElementById('chat-input').focus(); 
         }
 
         // --- Lógica de Resposta do Chatbot (Otimizada para Inteligência/Busca) ---
@@ -547,7 +556,6 @@
                 // Filtra memórias para o estado específico OU para TODOS os estados
                 filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
             } 
-            // Se siglaQuery não for encontrada, ele busca em TODAS as memórias.
 
             // Remove a sigla da lista de palavras-chave para focar na busca do conteúdo
             const contentKeywords = keywords.filter(w => w !== siglaQuery); 
