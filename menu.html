@@ -230,6 +230,16 @@
         .bot-message strong {
             color: #c0392b; 
         }
+        /* Estilo para blocos de código/JSON (melhora a visualização do corpo da requisição) */
+        .bot-message pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.3;
+        }
 
         #chat-input-container {
             display: flex;
@@ -500,20 +510,45 @@
             }, 1500);
         }
 
-        // Função para adicionar a mensagem (CORRIGIDA PARA ACEITAR HTML)
+        // Função para adicionar a mensagem (AJUSTADA PARA ACEITAR HTML e formatar JSON)
         function appendMessage(text, className) {
             const messagesContainer = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${className}`;
             
-            // Processa quebras de linha e negrito, permitindo que a tag <img> seja injetada
-            const processedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Otimização: Substitui blocos de JSON/código para <pre> para melhor visualização
+            // Expressão para capturar JSON ou blocos técnicos (linhas que começam com { ou estão entre ```)
+            let processedText = text;
+            
+            // 1. Encontra blocos de código/JSON e os envolve em <pre>
+            const codeBlockRegex = /(```json|```|{)\n?([\s\S]*?)(\n?```|\n})/g;
+            processedText = processedText.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
+                // Limpa tags Markdown e remove linhas vazias iniciais/finais
+                content = content.replace(/```json|```|{|}/g, '').trim();
+                
+                // Se for um bloco de JSON, tenta formatá-lo para ser mais legível
+                if (openTag.includes('json') || content.includes(':')) {
+                    try {
+                        const jsonObject = JSON.parse('{' + content.replace(/,\s*([}\]])/g, '$1') + '}');
+                        content = JSON.stringify(jsonObject, null, 2).replace(/^{|}$/g, '').trim(); // Formata e remove chaves externas
+                    } catch (e) {
+                        // Se falhar, mantém o texto simples
+                    }
+                }
+                
+                // Retorna como um bloco <pre>
+                return `\n<pre>${content}</pre>\n`;
+            });
+
+            // 2. Processa quebras de linha e negrito no texto restante
+            processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             
             messageDiv.innerHTML = processedText;
 
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+
 
         function showTypingIndicator() {
             const messagesContainer = document.getElementById('chat-messages');
@@ -541,7 +576,7 @@
             document.getElementById('chat-input').focus(); 
         }
 
-        // --- Lógica de Resposta do Chatbot (Otimizada para Imagem) ---
+        // --- Lógica de Resposta do Chatbot (Otimizada para Imagem e Busca Inteligente) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
             // Palavras-chave com mais de 2 letras
@@ -563,6 +598,7 @@
             let matchingMemories = [];
 
             if (contentKeywords.length === 0) {
+                // CASO 1: Usuário digitou APENAS a sigla (Ex: "DF") ou uma palavra curta
                 if (siglaQuery) {
                     matchingMemories = filteredMemories;
                 } else {
@@ -572,8 +608,10 @@
                     });
                 }
             } else {
+                // CASO 2: Usuário digitou palavras-chave (Ex: "DF Processo")
                 matchingMemories = filteredMemories.filter(m => {
                     const memoryTextLower = m.texto.toLowerCase();
+                    // Usamos 'some' (OU) para ser mais flexível, mas se o usuário for específico, o filtro de texto resolve
                     return contentKeywords.some(keyword => memoryTextLower.includes(keyword));
                 });
             }
@@ -582,28 +620,30 @@
             // 2. Gerar Resposta
             if (matchingMemories.length > 0) {
                 
-                // Se for busca apenas por sigla, retorna o índice de títulos
+                // Se for busca apenas por sigla, retorna o índice de títulos (Permite mais de 3, até 6)
                 if (siglaQuery && contentKeywords.length === 0) {
-                    const titles = matchingMemories.map(m => {
+                    const titles = matchingMemories.slice(0, 6).map(m => {
                         const titleMatch = m.texto.split(':')[0].trim();
                         const cleanTitle = titleMatch.length > 50 ? titleMatch.substring(0, 47) + '...' : titleMatch;
                         return `* **${cleanTitle}**`;
                     }).join('\n');
                     
-                    return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) para **${siglaQuery.toUpperCase()}**:\n\n${titles}\n\n**Dica:** Digite o título completo ou palavras-chave (Ex: 'Endpoint DF Processo') para ver o conteúdo.`;
+                    const remaining = matchingMemories.length - 6;
+                    const remainingMsg = remaining > 0 ? `\n\n*(E mais ${remaining} resultados. Refine sua busca ou pergunte o título completo.)*` : '';
+                    
+                    return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) para **${siglaQuery.toUpperCase()}**:\n\n${titles}${remainingMsg}`;
                 }
 
-                // Retorno padrão para busca detalhada
+                // Retorno padrão para busca detalhada (Exibe até 3 melhores resultados)
                 matchingMemories.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
                 
                 const topMemories = matchingMemories.slice(0, 3).map(m => {
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
                     const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
                     
-                    // LÓGICA PARA EXIBIR A IMAGEM (Ajustada para checar se a URL existe)
+                    // LÓGICA PARA EXIBIR A IMAGEM
                     let imageTag = '';
                     if (m.imagemUrl && m.imagemUrl.trim().length > 0) {
-                        // Se a URL existir, a tag de imagem é criada
                         imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; display: block;">`;
                     }
 
@@ -611,9 +651,9 @@
                     return `${estado}**${m.texto}** (Agente: ${m.agente}, ${date})${imageTag}`;
                 }).join('\n\n');
 
-                const totalMsg = matchingMemories.length > 3 ? `e mais ${matchingMemories.length - 3} resultados semelhantes.` : 'Fim da lista.';
+                const totalMsg = matchingMemories.length > 3 ? `\n\n*E mais ${matchingMemories.length - 3} resultados. Refine sua busca.*` : '\n\n*Fim da lista.*';
 
-                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n* ${topMemories}\n\n${totalMsg}`;
+                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n* ${topMemories}${totalMsg}`;
             }
 
             // 3. Resposta Padrão: Conhecimento Inexistente
