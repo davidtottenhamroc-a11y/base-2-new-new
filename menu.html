@@ -443,9 +443,9 @@
     <script>
         // Variáveis Globais para o Chatbot
         let chatMemories = [];
-        let currentSearchMatches = []; // Armazena todos os resultados da pesquisa atual
-        let resultsPageIndex = 0;      // Rastreia a página atual (lote) de resultados
-        const RESULTS_PER_PAGE = 6;    // Define quantos resultados são mostrados por vez
+        let currentSearchMatches = [];
+        let resultsPageIndex = 0;      
+        const RESULTS_PER_PAGE = 6;    
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
         // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
@@ -650,7 +650,7 @@
             return response;
         }
 
-        // --- Lógica de Resposta do Chatbot (Otimizada para Imagem e Paginação) ---
+        // --- Lógica de Resposta do Chatbot (FINALIZADA para Busca Contextualizada) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
             const keywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2);
@@ -659,11 +659,11 @@
 
             let filteredMemories = chatMemories;
             
-            // 1. PRÉ-FILTRO CONTEXTUAL (RN OU TODOS)
+            // 1. PRÉ-FILTRO CONTEXTUAL (Filtra por estado específico OU TODOS)
             if (siglaQuery && siglaQuery !== 'todos') {
                 filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
             } 
-            // Se o usuário não especificou estado (e a busca não é 'todos'), filteredMemories contém TUDO.
+            // Se o usuário não especificou estado, filteredMemories contém TUDO (busca geral).
 
             let matchingMemories = [];
 
@@ -673,7 +673,7 @@
                 if (siglaQuery) {
                     matchingMemories = filteredMemories; // Lista todo o contexto (RN + TODOS)
                 } else {
-                    // Busca por palavra curta (Ex: "SLA" ou "N2") em TUDO
+                    // Busca por palavra curta (se houver alguma) em TUDO
                     matchingMemories = filteredMemories.filter(m => {
                         const memoryTextLower = m.texto.toLowerCase();
                         return keywords.some(keyword => memoryTextLower.includes(keyword));
@@ -704,7 +704,6 @@
 
                 // 3.2. Listagem Direta ou Busca Detalhada (Exibe Conteúdo)
                 
-                // Ordena por data mais recente antes de pegar o top 3
                 matchingMemories.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
                 
                 const topMemories = matchingMemories.slice(0, 3).map(m => {
