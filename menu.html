@@ -470,6 +470,10 @@
         let resultsPage = 0;
         const PAGE_SIZE = 3;
 
+        // Estado e keywords atuais da última busca — garantem que a paginação respeite o filtro de estado
+        let currentEffectiveState = '';
+        let currentQueryKeywords = []; 
+
         function logout() {
             localStorage.removeItem('agenteSelecionado');
             localStorage.removeItem('estadoSelecionado');
@@ -655,11 +659,15 @@
 
             // Se não há termos, listar os mais recentes do estado
             if (keywords.length === 0) {
-                const list = pool.sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 6);
-                if (list.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
-                lastResults = list;
+                const allSorted = pool.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora));
+                if (allSorted.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
+                // Guardamos todos os resultados relevantes (não apenas os 6 primeiros) para permitir paginação correta
+                lastResults = allSorted;
                 resultsPage = 0;
+                currentEffectiveState = effectiveState || '';
+                currentQueryKeywords = keywords.slice();
                 return formatResultsPage();
+            }
             }
 
             // Monta query para Fuse: pesquisa OR entre palavras
@@ -699,30 +707,42 @@
                 return `Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para essa pesquisa no estado ${effectiveState || 'TODOS'}. Tente termos diferentes ou vá em 'Gerenciar Base de Conhecimento'.`;
             }
 
-            lastResults = finalMatches;
+            lastResults = finalMatches.slice();
             resultsPage = 0;
+            // armazena o estado efetivo e as keywords para que a paginação continue respeitando o estado
+            currentEffectiveState = effectiveState || '';
+            currentQueryKeywords = keywords.slice();
             return formatResultsPage();
         }
 
         function formatResultsPage() {
             const start = resultsPage * PAGE_SIZE;
             const end = start + PAGE_SIZE;
-            const page = lastResults.slice(start, end);
+            // Garante que a paginação continue mostrando apenas itens do estado selecionado
+            let pagePool = lastResults;
+            if (currentEffectiveState && currentEffectiveState !== 'TODOS') {
+                pagePool = lastResults.filter(r => (r.estado || '').toUpperCase() === currentEffectiveState || (r.estado || '').toUpperCase() === 'TODOS');
+            }
+            const page = pagePool.slice(start, end);
             if (page.length === 0) return 'Nenhum resultado nesta página.';
 
-            const total = lastResults.length;
+            const total = pagePool.length;
             const listFormatted = page.map(m => {
                 const date = m.dataHora ? new Date(m.dataHora).toLocaleDateString('pt-BR') : '';
                 const parts = (m.texto || '').split(':');
                 const title = parts[0] || m.titulo || 'Sem título';
                 const content = parts.length > 1 ? parts.slice(1).join(':') : m.texto || '';
-                const keywordsFromQuery = collectLastQueryKeywords();
+                const keywordsFromQuery = currentQueryKeywords.length ? currentQueryKeywords : collectLastQueryKeywords();
                 const highlighted = highlight(content, keywordsFromQuery);
                 const img = m.imagemUrl ? `<br><img src="${m.imagemUrl}" style="max-width:100%;border-radius:6px;margin-top:8px;">` : '';
                 const id = m._id || m.id || (m.idMemoria || '') || '';
                 const actions = `<br><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"><button class="chat-button" onclick="showFullMemory('${id}')">Ver Mais</button><button class="chat-button" onclick="sendFeedback('${id}', true)">👍</button><button class="chat-button" onclick="sendFeedback('${id}', false)">👎</button></div>`;
                 return `**[${m.estado || 'TODOS'}] ${title}**\n\n${highlighted} (Agente: ${m.agente || '—'}, ${date})${img}${actions}`;
-            }).join('\n\n---\n\n');
+            }).join('
+
+---
+
+');
 
             const remaining = Math.max(0, total - ((resultsPage + 1) * PAGE_SIZE));
             const moreBtn = remaining > 0 ? `\n\n<button class="chat-button" onclick="showMoreResults()">Mostrar mais (${remaining} restantes)</button>` : '\n\n*Fim da lista.*';
