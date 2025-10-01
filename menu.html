@@ -277,7 +277,7 @@
             transform: scale(0.95);
         }
 
-        /* Estilo para o botão de "Mostrar Mais" (Mantido o estilo, mas não será gerado) */
+        /* Estilo para o botão de "Mostrar Mais" */
         .chat-button {
             padding: 10px 15px;
             background: #3498db;
@@ -443,6 +443,9 @@
     <script>
         // Variáveis Globais para o Chatbot
         let chatMemories = [];
+        let currentSearchMatches = [];
+        let resultsPageIndex = 0;      
+        const RESULTS_PER_PAGE = 3; // Limite de resultados detalhados por página
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
         // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
@@ -603,43 +606,77 @@
             document.getElementById('chat-input').focus(); 
         }
         
-        // --- FUNÇÕES DE PAGINAÇÃO (REMOVIDAS DO FLUXO PRINCIPAL) ---
-        // (Mantidas vazias para evitar erros, mas o fluxo principal não as utiliza mais)
-        const RESULTS_PER_PAGE_DEFAULT = 6;
-        let currentSearchMatches = [];
-        
+        // NOVIDADE: Função chamada pelo clique do botão para carregar a próxima página
         window.showMoreResults = function(nextIndex, remaining) {
-            // Lógica de Paginação (agora desativada no fluxo principal)
-            console.log("Paginação manual desativada. Use a busca detalhada.");
+            const button = event.target;
+            if (button) {
+                button.disabled = true;
+                button.innerText = 'Carregando...';
+            }
+
+            setTimeout(() => {
+                const nextResponse = generatePagedResponse(currentSearchMatches, nextIndex, 'Pesquisa Anterior');
+                
+                // Injeta a próxima página de resultados
+                appendMessage(nextResponse, 'bot-message');
+                
+            }, 500); 
         }
 
+        // NOVIDADE: Função para gerar a resposta paginada e o botão
         function generatePagedResponse(matches, startIndex, queryName) {
-            // Lógica de Paginação (agora desativada no fluxo principal)
             const total = matches.length;
-            const endIndex = startIndex + RESULTS_PER_PAGE_DEFAULT;
+            const endIndex = startIndex + RESULTS_PER_PAGE;
             const currentResults = matches.slice(startIndex, endIndex);
 
-            const titles = currentResults.map(m => {
-                const titleMatch = m.texto.split(':')[0].trim();
-                const cleanTitle = titleMatch.length > 70 ? titleMatch.substring(0, 67) + '...' : titleMatch;
-                return `* **${cleanTitle}**`;
-            }).join('\n');
+            // Se for uma busca detalhada, mostramos o conteúdo
+            const isDetailedSearch = !queryName.includes('Busca Geral'); 
             
+            let responseContent = '';
+            
+            if (isDetailedSearch) {
+                 // Exibe resultados detalhados (título + conteúdo)
+                responseContent = currentResults.map(m => {
+                    const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
+                    const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
+                    
+                    let imageTag = '';
+                    if (m.imagemUrl && m.imagemUrl.trim().length > 0) {
+                        imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; display: block;">`;
+                    }
+
+                    const parts = m.texto.split(':');
+                    const title = parts[0].trim();
+                    const contentText = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
+
+                    return `${estado}**${title}**\n\n${contentText} (Agente: ${m.agente}, ${date})${imageTag}`;
+                }).join('\n\n');
+
+            } else {
+                 // Exibe apenas títulos para busca geral
+                responseContent = currentResults.map(m => {
+                    const titleMatch = m.texto.split(':')[0].trim();
+                    const cleanTitle = titleMatch.length > 70 ? titleMatch.substring(0, 67) + '...' : titleMatch;
+                    return `* **${cleanTitle}**`;
+                }).join('\n');
+            }
+
+
             const remaining = total - endIndex;
-            let response = `Encontrei **${total}** referências para **${queryName}**:\n\n${titles}`;
+            
+            let response = `Listando resultados ${startIndex + 1} a ${Math.min(endIndex, total)} de ${total}:\n\n${responseContent}`;
             
             if (remaining > 0) {
-                response += `\n\n*Refine sua busca para ver todos os detalhes (Ex: 'RN Nome do Endpoint'). Total de ${total} resultados.*`;
+                const nextIndex = endIndex;
+                response += `\n\n<button class="chat-button" onclick="showMoreResults(${nextIndex}, ${remaining})">Mostrar mais ${Math.min(remaining, RESULTS_PER_PAGE)} resultados</button>`;
             } else {
-                 response += `\n\n*Fim da lista.*`;
+                response += `\n\n*Fim da lista.*`;
             }
 
             return response;
         }
-        // --- FIM DAS FUNÇÕES DE PAGINAÇÃO ---
 
-
-        // --- Lógica de Resposta do Chatbot (VOLTOU AO MODO EXIBIÇÃO SIMPLES) ---
+        // --- Lógica de Resposta do Chatbot (FINALIZADA para Busca Contextualizada) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
             const keywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2);
@@ -678,12 +715,30 @@
             // 3. GERAÇÃO DA RESPOSTA
             if (matchingMemories.length > 0) {
                 
-                // Ordena por data mais recente e define o limite
+                // Ordena por data mais recente
                 matchingMemories.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
                 
-                // Se houver mais de 3 resultados, exibimos os 3 melhores e pedimos para refinar
-                const displayLimit = 3; 
-                const topMemories = matchingMemories.slice(0, displayLimit).map(m => {
+                // ----------------------------------------------------
+                // Sempre preparamos para paginação se houver mais resultados que o limite
+                // ----------------------------------------------------
+                const displayLimit = RESULTS_PER_PAGE;
+                
+                if (matchingMemories.length > displayLimit) {
+                    currentSearchMatches = matchingMemories; // Armazena TUDO para as próximas páginas
+                    const queryName = siglaQuery ? siglaQuery.toUpperCase() : contentKeywords.join(' ');
+                    
+                    // Se for busca detalhada (tem palavras-chave), usamos as palavras-chave como título
+                    if (contentKeywords.length > 0) {
+                        queryName = contentKeywords.join(' ');
+                    }
+                    
+                    return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa.\n\n` + generatePagedResponse(currentSearchMatches, 0, queryName);
+                }
+
+                // ----------------------------------------------------
+                // Listagem Direta (Quando o total é menor ou igual ao limite)
+                // ----------------------------------------------------
+                const topMemories = matchingMemories.map(m => {
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
                     const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
                     
@@ -701,10 +756,7 @@
                     return `${estado}**${title}**\n\n${contentText} (Agente: ${m.agente}, ${date})${imageTag}`;
                 }).join('\n\n');
 
-                const remainingCount = matchingMemories.length - displayLimit;
-                const totalMsg = remainingCount > 0 ? `\n\n*E mais ${remainingCount} resultados. Refine sua busca para ver todos os detalhes.*` : '\n\n*Fim da lista.*';
-
-                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n* ${topMemories}${totalMsg}`;
+                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n* ${topMemories}\n\n*Fim da lista.*`;
             }
 
             // 4. Resposta Padrão: Conhecimento Inexistente
