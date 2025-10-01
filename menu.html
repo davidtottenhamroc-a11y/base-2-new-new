@@ -1,86 +1,789 @@
-<main>
-    <section class="menu-section">
-        <h2><i class="fas fa-map-marker-alt"></i> Documentação por Estado (Endpoints & Fluxos)</h2>
-        <div class="menu-grid">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base para N2 - VSoft</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0d1a2a;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 40px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+        }
+
+        .card-icon {
+            font-size: 40px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .logout-button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #dc3545, #b42a35);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .logout-button:hover {
+            background: linear-gradient(135deg, #c82333, #a71d24);
+        }
+
+        /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
+        #chat-widget-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(13, 26, 42, 0.95); 
+            border-radius: 0;
+            box-shadow: none;
+            display: none; 
+            z-index: 9999;
+            align-items: center; 
+            justify-content: center;
+        }
+
+        .chat-content {
+            width: 90%;
+            max-width: 800px; 
+            height: 90%;
+            max-height: 800px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #chat-header {
+            background: #3498db;
+            color: white;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-header i {
+            margin-right: 10px;
+        }
+        #chat-close-btn {
+            background: none;
+            border: 1px solid white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #chat-close-btn:hover {
+            background: #2980b9;
+        }
+
+        #chat-body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 15px;
+        }
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa; 
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        /* Estilização das Mensagens Aprimorada */
+        .message {
+            max-width: 90%; 
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .user-message {
+            background: #3498db;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px; 
+        }
+        .bot-message {
+            background: #e9ecef; 
+            color: #333;
+            align-self: flex-start;
+            margin-right: auto;
+            border: none;
+            border-bottom-left-radius: 5px; 
+            white-space: pre-wrap;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .bot-message strong {
+            color: #c0392b; 
+        }
+        /* Estilo para blocos de código/JSON (melhora a visualização do corpo da requisição) */
+        .bot-message pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        #chat-input-container {
+            display: flex;
+            padding: 5px 0;
+            border-top: 1px solid #ddd;
+        }
+        #chat-input {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        #chat-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        #chat-send-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s, transform 0.1s;
+        }
+        #chat-send-btn:hover {
+            background: #218838;
+        }
+        #chat-send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Estilo para o botão de "Mostrar Mais" (Mantido o estilo, mas não será gerado) */
+        .chat-button {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: background 0.2s;
+            display: block; 
+            width: 100%;
+        }
+        .chat-button:hover:not(:disabled) {
+            background: #2980b9;
+        }
+        .chat-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+
+        /* Indicador de Digitação */
+        .typing-indicator {
+            background: #e0e0e0;
+            color: #555;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-style: italic;
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Estilo do Botão Flutuante --- */
+        #chat-open-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        #chat-open-btn i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">VSoft</div>
+            <h1>Base para N2</h1>
+            <p class="description">Central de guias e documentações técnicas para suporte de Nível 2.</p>
+        </header>
+
+        <main>
+            <div class="menu-grid">
+                
+                <a href="endpoints.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
+                    <div>
+                        <h2 class="card-title">Documentação Endpoints RN</h2>
+                        <p class="card-description">Endpoints, Regras de Negócio e APIs para o Rio Grande do Norte.</p>
+                    </div>
+                </a>
+
+                <a href="Sergipe.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
+                    <div>
+                        <h2 class="card-title">Documentação Endpoints SE</h2>
+                        <p class="card-description">Endpoints, Regras de Negócio e APIs para Sergipe.</p>
+                    </div>
+                </a>
+                
+                <a href="mshm.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-network-wired"></i></div>
+                    <div>
+                        <h2 class="card-title">Integrações DETRAN-MS / Valid</h2>
+                        <p class="card-description">Documentação completa de fluxos, jobs e endpoints de API.</p>
+                    </div>
+                </a>
+                <a href="endpoints_df.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
+                    <div>
+                        <h2 class="card-title">Endpoints Credenciadas DF</h2>
+                        <p class="card-description">Endpoints de Credenciadas e Fluxos Específicos do Distrito Federal.</p>
+                    </div>
+                </a>
+                <a href="SuperPratico.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div>
+                        <h2 class="card-title">Integrações SuperPrático / Aulas Praticas</h2>
+                        <p class="card-description">Fluxos e documentação completa da integração SuperPrático.</p>
+                    </div>
+                </a>
+                <a href="gerenciamento_incidentes.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div>
+                        <h2 class="card-title">Política de Gerenciamento de Incidentes</h2>
+                        <p class="card-description">Documentação completa do fluxo e SLA de incidentes.</p>
+                    </div>
+                </a>
+                
+                <a href="knowledge_manager.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-database"></i></div>
+                    <div>
+                        <h2 class="card-title">Gerenciar Base de Conhecimento</h2>
+                        <p class="card-description">Interface para adicionar e atualizar informações do chatbot por estado (MongoDB).</p>
+                    </div>
+                </a>
+                
+                <a href="menu2.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-table"></i></div>
+                    <div>
+                        <h2 class="card-title">Registro Diário N2</h2>
+                        <p class="card-description">Base e controle de registro das atividades diárias do Nível 2.</p>
+                    </div>
+                </a>
+
+            </div>
+        </main>
+        <button class="logout-button" onclick="logout()">Sair</button>
+    </div>
+    
+    <div id="chat-widget-container">
+        <div class="chat-content">
+            <div id="chat-header">
+                Assistente VSoft N2 <i class="fas fa-robot"></i>
+                <button id="chat-close-btn" onclick="toggleChat()">X</button>
+            </div>
+            <div id="chat-body">
+                <div id="chat-messages">
+                    <div class="message bot-message">
+                        Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
+                        <br><br>
+                        Clique no **X** para fechar. Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
+                    </div>
+                </div>
+                <div id="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
+                    <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="chat-open-btn" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i> Chat N2
+    </button>
+    
+    <script>
+        // Variáveis Globais para o Chatbot
+        let chatMemories = [];
+        const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
+
+        // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
+        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
+        
+        function logout() {
+            localStorage.removeItem('agenteSelecionado');
+            localStorage.removeItem('estadoSelecionado');
+            window.location.href = 'login.html';
+        }
+
+        // Função para abrir/fechar o chat em tela cheia
+        function toggleChat() {
+            const chatWidget = document.getElementById('chat-widget-container');
+            const openBtn = document.getElementById('chat-open-btn');
+
+            if (chatWidget.style.display === 'flex') {
+                // Fechar
+                chatWidget.style.display = 'none';
+                openBtn.style.display = 'block'; // Mostra o botão flutuante
+                document.body.style.overflow = 'auto'; // Restaura o scroll
+            } else {
+                // Abrir
+                chatWidget.style.display = 'flex';
+                openBtn.style.display = 'none'; // Esconde o botão flutuante
+                document.body.style.overflow = 'hidden'; // Remove o scroll do corpo
+                document.getElementById('chat-input').focus();
+            }
+        }
+        
+        // Listener para fechar com a tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('chat-widget-container').style.display === 'flex') {
+                toggleChat();
+            }
+        });
+
+        // Função para carregar todas as memórias do MongoDB
+        async function loadMemoriesFromDatabase() {
+            console.log(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/memories`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    chatMemories = data;
+                    console.log(`[MongoDB] ${data.length} memórias carregadas com SUCESSO!`);
+                    
+                } else {
+                    console.error('Erro ao carregar memórias. Status:', response.status);
+                    appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
+                }
+            } catch (error) {
+                console.error('Erro de rede/conexão:', error);
+                appendMessage(`[ERRO DE CONEXÃO] Não foi possível acessar o backend Vercel em **${BACKEND_URL}**. Verifique se a URL está correta e se o projeto está implantado e ativo.`, 'bot-message');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMemoriesFromDatabase(); 
+            document.getElementById('chat-open-btn').style.display = 'block';
+        });
+
+        // Adicionar evento para enviar mensagem ao pressionar Enter
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Função principal de envio e resposta
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messageText = input.value.trim();
+            
+            if (messageText === "") return;
+
+            // 1. Adicionar a mensagem do usuário
+            appendMessage(messageText, 'user-message');
+            input.value = ''; 
+            
+            // 2. Desativa input e botão de envio
+            showTypingIndicator();
+
+            setTimeout(() => {
+                // 3. Processa a resposta
+                let botResponse = getBotResponse(messageText);
+
+                // 4. Adiciona a resposta
+                appendMessage(botResponse, 'bot-message');
+                
+                // 5. Reativa input e botão de envio
+                hideTypeningIndicator();
+
+            }, 1500);
+        }
+
+        // Função para adicionar a mensagem (CORRIGIDA PARA ACEITAR HTML e formatar JSON)
+        function appendMessage(text, className) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            
+            // Processa a string para que tags <img> e <button> HTML sejam interpretadas
+            let processedText = text;
+
+            // 1. Processamento de blocos de código/JSON para <pre>
+            const codeBlockRegex = /(```json|```|\{)\n?([\s\S]*?)(\n?```|\n\})/g;
+            processedText = processedText.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
+                content = content.replace(/```json|```|{|}/g, '').trim();
+                
+                // Tenta formatar JSON para melhor legibilidade
+                if (openTag.includes('json') || content.includes(':')) {
+                    try {
+                        let parseContent = content.startsWith('{') && content.endsWith('}') ? content : `{${content}}`;
+                        const jsonObject = JSON.parse(parseContent);
+                        content = JSON.stringify(jsonObject, null, 2).replace(/^\{|\}$/g, '').trim();
+                    } catch (e) {
+                    }
+                }
+                
+                return `\n<pre>${content}</pre>\n`;
+            });
+
+            // 2. Converte quebras de linha e negrito
+            processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // 3. Injeta o HTML (incluindo o botão)
+            messageDiv.innerHTML = processedText;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = 'Digitando...';
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Desativa os controles
+            document.getElementById('chat-input').disabled = true;
+            document.getElementById('chat-send-btn').disabled = true;
+        }
+
+        function hideTypeningIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+
+            // Reativa os controles e foca no input para nova pergunta
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('chat-send-btn').disabled = false;
+            document.getElementById('chat-input').focus(); 
+        }
+        
+        // --- FUNÇÕES DE PAGINAÇÃO (REMOVIDAS DO FLUXO PRINCIPAL) ---
+        // (Mantidas vazias para evitar erros, mas o fluxo principal não as utiliza mais)
+        const RESULTS_PER_PAGE_DEFAULT = 6;
+        let currentSearchMatches = [];
+        
+        window.showMoreResults = function(nextIndex, remaining) {
+            // Lógica de Paginação (agora desativada no fluxo principal)
+            console.log("Paginação manual desativada. Use a busca detalhada.");
+        }
+
+        function generatePagedResponse(matches, startIndex, queryName) {
+            // Lógica de Paginação (agora desativada no fluxo principal)
+            const total = matches.length;
+            const endIndex = startIndex + RESULTS_PER_PAGE_DEFAULT;
+            const currentResults = matches.slice(startIndex, endIndex);
+
+            const titles = currentResults.map(m => {
+                const titleMatch = m.texto.split(':')[0].trim();
+                const cleanTitle = titleMatch.length > 70 ? titleMatch.substring(0, 67) + '...' : titleMatch;
+                return `* **${cleanTitle}**`;
+            }).join('\n');
+            
+            const remaining = total - endIndex;
+            let response = `Encontrei **${total}** referências para **${queryName}**:\n\n${titles}`;
+            
+            if (remaining > 0) {
+                response += `\n\n*Refine sua busca para ver todos os detalhes (Ex: 'RN Nome do Endpoint'). Total de ${total} resultados.*`;
+            } else {
+                 response += `\n\n*Fim da lista.*`;
+            }
+
+            return response;
+        }
+        // --- FIM DAS FUNÇÕES DE PAGINAÇÃO ---
+
+
+        // --- LÓGICA DO CHATBOT APRIMORADA (com Scoring) ---
+
+        // Função de Pontuação (Scoring)
+        function scoreMemory(memoryText, keywords) {
+            let score = 0;
+            const memoryWords = memoryText.toLowerCase().split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2);
+
+            // 1. Pontuação de correspondência simples
+            keywords.forEach(keyword => {
+                if (memoryWords.includes(keyword)) {
+                    score += 10; // Adiciona pontos se a palavra exata estiver presente
+                } else if (memoryText.toLowerCase().includes(keyword)) {
+                    score += 5; // Pontos para correspondência de substring (menos preciso)
+                }
+            });
+
+            // 2. Pontuação para memórias mais recentes (prioridade)
+            const now = new Date();
+            const memoryDate = new Date(memoryText.dataHora);
+            const timeDiff = now.getTime() - memoryDate.getTime(); // diferença em milissegundos
+
+            // 1 mês em milissegundos
+            const oneMonth = 30 * 24 * 60 * 60 * 1000; 
+
+            // Adiciona pontos se a memória for recente (ex: nos últimos 30 dias)
+            if (timeDiff < oneMonth) {
+                score += 20; 
+            }
+
+            // 3. Pontuação bônus se todas as palavras-chave estiverem no texto
+            const allKeywordsPresent = keywords.every(keyword => memoryText.toLowerCase().includes(keyword));
+            if (allKeywordsPresent) {
+                score += 50; 
+            }
+
+            return score;
+        }
+
+        // Lista de palavras irrelevantes (Stop Words) em Português
+        const STOP_WORDS = new Set([
+            'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das',
+            'em', 'no', 'na', 'nos', 'nas', 'é', 'e', 'ou', 'para', 'com', 'por', 'sobre', 'qual', 
+            'como', 'o que', 'que', 'do', 'meu', 'minha', 'meus', 'minhas', 'seu', 'sua', 'seus', 
+            'suas', 'este', 'esta', 'isto', 'esse', 'essa', 'isso', 'aqui', 'ai', 'la', 'ali',
+            'uma', 'um', 'sao', 'ser', 'nao', 'posso', 'poderia', 'gostaria', 'fazer', 'saber', 
+            'dados', 'informacao', 'buscar', 'pesquisar', 'consulta', 'api', 'detalhes'
+        ]);
+        
+        function getBotResponse(message) {
+            const lowerCaseMessage = message.toLowerCase().trim();
+            
+            // 1. Tokenização e Remoção de Stop Words
+            const allKeywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i)
+                .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+
+            // 2. Identifica o Estado (RN, DF, etc.)
+            const siglaQuery = allKeywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w));
             
-            <a href="endpoints.html" class="menu-card">
-                <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
-                <div>
-                    <h2 class="card-title">RN (Rio Grande do Norte)</h2>
-                    <p class="card-description">Endpoints, Regras de Negócio e APIs.</p>
-                </div>
-            </a>
+            // 3. Palavras-chave de Conteúdo (o que realmente interessa)
+            const contentKeywords = allKeywords.filter(w => w !== siglaQuery); 
 
-            <a href="Sergipe.html" class="menu-card">
-                <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
-                <div>
-                    <h2 class="card-title">SE (Sergipe)</h2>
-                    <p class="card-description">Endpoints, Regras de Negócio e APIs.</p>
-                </div>
-            </a>
-            
-            <a href="endpoints_df.html" class="menu-card">
-                <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
-                <div>
-                    <h2 class="card-title">DF (Distrito Federal)</h2>
-                    <p class="card-description">Endpoints de Credenciadas e Fluxos Específicos.</p>
-                </div>
-            </a>
-            
-            <a href="mshm.html" class="menu-card">
-                <div class="card-icon"><i class="fas fa-network-wired"></i></div>
-                <div>
-                    <h2 class="card-title">MS (Mato Grosso do Sul) / Valid</h2>
-                    <p class="card-description">Fluxos de integração DETRAN-MS, jobs e APIs.</p>
-                </div>
-            </a>
-            
-            <a href="SuperPratico.html" class="menu-card">
-                <div class="card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                <div>
-                    <h2 class="card-title">Integrações SuperPrático</h2>
-                    <p class="card-description">Fluxos e documentação de Aulas Práticas.</p>
-                </div>
-            </a>
+            let filteredMemories = chatMemories;
+            let queryName = message;
 
-        </div>
-    </section>
+            // 4. PRÉ-FILTRO CONTEXTUAL (Filtra por estado específico OU TODOS)
+            if (siglaQuery && siglaQuery !== 'todos') {
+                filteredMemories = filteredMemories.filter(m => 
+                    m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS')
+                );
+                // Remove a sigla do nome da pesquisa para a exibição no chat
+                queryName = message.replace(new RegExp(`\\b${siglaQuery}\\b`, 'i'), '').trim();
+            } else {
+                // Se não há sigla de estado, procura apenas nas memórias 'TODOS' ou em todas se a busca for muito específica
+                // Para não sobrecarregar com memórias de todos os estados, filtramos aqui.
+                if(contentKeywords.length > 0) {
+                    filteredMemories = chatMemories; // Se a busca é genérica (sem estado) mas com termo, busca em tudo
+                } else {
+                    filteredMemories = filteredMemories.filter(m => m.estado === 'TODOS');
+                }
+            }
 
-    <section class="menu-section" style="margin-top: 30px;">
-        <h2><i class="fas fa-wrench"></i> Ferramentas e Gestão Interna</h2>
-        <div class="menu-grid">
 
-            <a href="knowledge_manager.html" class="menu-card" style="border-color: #28a745;">
-                <div class="card-icon" style="color: #28a745;"><i class="fas fa-database"></i></div>
-                <div>
-                    <h2 class="card-title">Gerenciar Base de Conhecimento (MongoDB)</h2>
-                    <p class="card-description">Interface para **adicionar, atualizar e excluir** dados do chatbot.</p>
-                </div>
-            </a>
-            
-            <a href="menu2.html" class="menu-card">
-                <div class="card-icon"><i class="fas fa-table"></i></div>
-                <div>
-                    <h2 class="card-title">Registro Diário N2</h2>
-                    <p class="card-description">Base e controle de registro das atividades diárias do Nível 2.</p>
-                </div>
-            </a>
+            // 5. ATRIBUIÇÃO DE PONTUAÇÃO (SCORING)
+            let scoredMatches = filteredMemories.map(m => {
+                // Atribui pontuação apenas com base nas palavras-chave de conteúdo
+                const score = scoreMemory(m.texto, contentKeywords);
+                return { ...m, score };
+            });
 
-        </div>
-    </section>
+            // Filtra e ordena: Remove pontuação 0, ordena por pontuação e depois por data/hora
+            scoredMatches = scoredMatches
+                .filter(m => m.score > 0)
+                .sort((a, b) => {
+                    if (b.score !== a.score) {
+                        return b.score - a.score; // Pontuação decrescente
+                    }
+                    return new Date(b.dataHora) - new Date(a.dataHora); // Data mais recente primeiro (desempate)
+                });
 
-    <section class="menu-section" style="margin-top: 30px;">
-        <h2><i class="fas fa-file-contract"></i> Políticas e Procedimentos</h2>
-        <div class="menu-grid">
 
-            <a href="gerenciamento_incidentes.html" class="menu-card">
-                <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                <div>
-                    <h2 class="card-title">Política de Gerenciamento de Incidentes</h2>
-                    <p class="card-description">Fluxo completo e SLA para tratamento de incidentes críticos.</p>
-                </div>
-            </a>
+            // 6. GERAÇÃO DA RESPOSTA
+            if (scoredMatches.length > 0) {
+                
+                // Define o limite de exibição e formata
+                const displayLimit = 3; 
+                const topMemories = scoredMatches.slice(0, displayLimit).map(m => {
+                    const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
+                    const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
+                    
+                    // LÓGICA PARA EXIBIR A IMAGEM
+                    let imageTag = '';
+                    if (m.imagemUrl && m.imagemUrl.trim().length > 0) {
+                        imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; display: block;">`;
+                    }
 
-        </div>
-    </section>
-</main>
+                    // Separa o Título do Conteúdo Principal (se houver ':')
+                    const parts = m.texto.split(':');
+                    const title = parts[0].trim();
+                    const contentText = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
+
+                    return `${estado}**${title}**\n\n${contentText} (Agente: ${m.agente}, ${date})${imageTag}`;
+                }).join('\n\n--- PRÓXIMO RESULTADO ---\n\n'); // Separador melhor
+
+                const totalCount = scoredMatches.length;
+                const remainingCount = totalCount - displayLimit;
+                
+                const totalMsg = remainingCount > 0 
+                    ? `\n\n*E mais ${remainingCount} resultados. Tente refinar sua busca para uma única resposta mais específica.*` 
+                    : `\n\n*Fim da lista de resultados mais relevantes para **'${queryName}'**.*`;
+
+
+                return `Encontrei **${totalCount}** referências na base de conhecimento (MongoDB) que correspondem à sua pesquisa:\n\n${topMemories}${totalMsg}`;
+            }
+
+            // 7. Resposta Padrão: Conhecimento Inexistente
+            let initialMessage = "❌ Desculpe, não encontrei uma resposta na base de conhecimento (**MongoDB**) para essa pesquisa.";
+
+            if (siglaQuery) {
+                initialMessage += `\n\n**Verifique:** A busca foi filtrada pelo estado **${siglaQuery.toUpperCase()}**. Tente uma busca sem o estado.`;
+            }
+
+            initialMessage += "\n\n**Ação:** Use a página **'Gerenciar Base de Conhecimento'** para inserir o conhecimento necessário.";
+            
+            return initialMessage;
+        }
+    </script>
+</body>
+</html>
