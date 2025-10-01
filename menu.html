@@ -127,31 +127,30 @@
             background: linear-gradient(135deg, #c82333, #a71d24);
         }
 
-        /* --- Estilos do Chatbot (AGORA: Widget Flutuante/Bubble) --- */
+        /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
         #chat-widget-container {
             position: fixed;
-            bottom: 100px; /* Posição vertical (acima do botão) */
-            right: 30px; /* Posição horizontal */
-            width: 380px; /* Largura padrão de chat */
-            height: 500px; /* Altura padrão de chat */
-            background: transparent;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Sombra mais discreta */
+            top: 0;
+            left: 0;
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(13, 26, 42, 0.95); 
+            border-radius: 0;
+            box-shadow: none;
             display: none; 
             z-index: 9999;
-            flex-direction: column; 
-            align-items: stretch; 
-            justify-content: flex-end;
+            align-items: center; 
+            justify-content: center;
         }
 
         .chat-content {
-            width: 100%;
-            max-width: none; /* Remove limitação de largura */
-            height: 100%;
-            max-height: none; /* Remove limitação de altura */
+            width: 90%;
+            max-width: 800px; 
+            height: 90%;
+            max-height: 800px;
             background: #ffffff;
             border-radius: 15px;
-            box-shadow: none; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -172,17 +171,17 @@
         }
         #chat-close-btn {
             background: none;
-            border: none; /* Removido para o estilo 'bubble' */
+            border: 1px solid white; 
+            border-radius: 50%;
             width: 30px;
             height: 30px;
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: background 0.2s;
         }
         #chat-close-btn:hover {
-            color: #f0f0f0;
-            background: none;
+            background: #2980b9;
         }
 
         #chat-body {
@@ -200,7 +199,7 @@
             margin-bottom: 15px;
         }
         
-        /* Estilização das Mensagens Aprimorada (Mantida) */
+        /* Estilização das Mensagens Aprimorada */
         .message {
             max-width: 90%; 
             padding: 12px 18px;
@@ -231,7 +230,7 @@
         .bot-message strong {
             color: #c0392b; 
         }
-        /* Estilo para blocos de código/JSON (Mantida) */
+        /* Estilo para blocos de código/JSON */
         .bot-message pre {
             background: #f4f4f4;
             padding: 10px;
@@ -278,7 +277,46 @@
             transform: scale(0.95);
         }
 
-        /* Estilo do Botão Flutuante (Mantido) */
+        /* Estilo para o botão de "Mostrar Mais" */
+        .chat-button {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: background 0.2s;
+            display: block; 
+            width: 100%;
+        }
+        .chat-button:hover:not(:disabled) {
+            background: #2980b9;
+        }
+        .chat-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+
+        /* Indicador de Digitação */
+        .typing-indicator {
+            background: #e0e0e0;
+            color: #555;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-style: italic;
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Estilo do Botão Flutuante --- */
         #chat-open-btn {
             position: fixed;
             bottom: 30px;
@@ -437,7 +475,7 @@
             window.location.href = 'login.html';
         }
 
-        // Função para abrir/fechar o chat (AGORA EM MODO WIDGET)
+        // Função para abrir/fechar o chat (MODAL/TELA CHEIA)
         function toggleChat() {
             const chatWidget = document.getElementById('chat-widget-container');
             const openBtn = document.getElementById('chat-open-btn');
@@ -445,13 +483,13 @@
             if (chatWidget.style.display === 'flex') {
                 // Fechar
                 chatWidget.style.display = 'none';
-                openBtn.style.display = 'block'; 
-                // document.body.style.overflow = 'auto'; -- REMOVIDO
+                openBtn.style.display = 'block'; // Mostra o botão flutuante
+                document.body.style.overflow = 'auto'; // Restaura o scroll
             } else {
                 // Abrir
                 chatWidget.style.display = 'flex';
-                openBtn.style.display = 'none'; 
-                // document.body.style.overflow = 'hidden'; -- REMOVIDO
+                openBtn.style.display = 'none'; // Esconde o botão flutuante
+                document.body.style.overflow = 'hidden'; // Remove o scroll do corpo
                 document.getElementById('chat-input').focus();
             }
         }
@@ -557,7 +595,7 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Indicador de Digitação (Mantido)
+        // Indicador de Digitação
         function showTypingIndicator() {
             const messagesContainer = document.getElementById('chat-messages');
             const typingDiv = document.createElement('div');
@@ -580,7 +618,7 @@
             document.getElementById('chat-input').focus(); 
         }
         
-        // --- Lógica de Resposta do Chatbot (AGORA INTELIGENTE COM SCORING) ---
+        // --- Lógica de Resposta do Chatbot (INTELIGENTE COM SCORING) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
             const keywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2);
