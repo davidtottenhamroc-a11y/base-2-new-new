@@ -697,9 +697,9 @@
                 const fuseResults = tempFuse.search(searchQuery, { limit: 50 });
                 results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
 
-                // FILTRO EXTRA (definitivo): garantir que todas as keywords aparecem no texto/título normalizado
+                // FILTRO EXTRA 
                 const normalizedKeywords = keywords.map(k => normalizeText(k));
-                results = results.filter(r => normalizedKeywords.every(k =>
+                results = results.filter(r => normalizedKeywords.some(k =>
                     (r.texto_normalizado || '').includes(k) || normalizeText(r.titulo || '').includes(k)
                 ));
             } catch (e) {
@@ -793,3 +793,4 @@
     </script>
 </body>
 </html>
+
