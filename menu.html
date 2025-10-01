@@ -426,6 +426,8 @@
                         Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
                         <br><br>
                         Clique no **X** para fechar. Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
+                        <br><br>
+                        Experimente: **"endpoint RN"** ou **"SLA crítico"**.
                     </div>
                 </div>
                 <div id="chat-input-container">
@@ -444,9 +446,28 @@
         // Variáveis Globais para o Chatbot
         let chatMemories = [];
         let currentSearchMatches = [];
-        let resultsPageIndex = 0;      
+        let resultsPageIndex = 0;     
         const RESULTS_PER_PAGE = 6;    
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
+
+        // Dicionário de sinônimos para buscas mais inteligentes
+        const SYNONYM_MAP = {
+            'endpoint': ['api', 'servico', 'url', 'acesso', 'integracao'],
+            'sla': ['prazo', 'tempo', 'critico', 'atendimento'],
+            'cfc': ['autoescola', 'credenciada'],
+            'fluxo': ['procedimento', 'passos', 'guia', 'rotina'],
+            'job': ['servico', 'tarefa', 'rotina', 'processo'],
+            'incidentes': ['problema', 'erro', 'falha']
+        };
+
+        // Stop Words (Palavras que devem ser ignoradas na busca)
+        const STOP_WORDS_PT = [
+            'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'e', 'é', 'ou',
+            'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às', 'oito', 'nove',
+            'que', 'qual', 'quais', 'quem', 'onde', 'como', 'quando', 'porque', 'porquê', 'pra', 'pela', 'pelo',
+            'dele', 'dela', 'neste', 'nesta', 'isso', 'este', 'esta', 'ser', 'meu', 'minha', 'meus', 'minhas',
+            'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre'
+        ];
 
         // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
         const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
@@ -549,10 +570,10 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${className}`;
             
-            // Processa a string para que tags <img> e <button> HTML sejam interpretadas
             let processedText = text;
 
             // 1. Processamento de blocos de código/JSON para <pre>
+            // Busca por ```json, ``` ou a estrutura { ... }
             const codeBlockRegex = /(```json|```|\{)\n?([\s\S]*?)(\n?```|\n\})/g;
             processedText = processedText.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
                 content = content.replace(/```json|```|{|}/g, '').trim();
@@ -564,6 +585,7 @@
                         const jsonObject = JSON.parse(parseContent);
                         content = JSON.stringify(jsonObject, null, 2).replace(/^\{|\}$/g, '').trim();
                     } catch (e) {
+                        // Se falhar, mantém o conteúdo original sem formatação JSON
                     }
                 }
                 
@@ -607,7 +629,7 @@
         }
         
         // NOVIDADE: Função chamada pelo clique do botão para carregar a próxima página
-        window.showMoreResults = function(nextIndex, remaining) {
+        window.showMoreResults = function(nextIndex) {
             const button = event.target;
             if (button) {
                 button.disabled = true;
@@ -615,8 +637,14 @@
             }
 
             setTimeout(() => {
-                const nextResponse = generatePagedResponse(currentSearchMatches, nextIndex, 'Pesquisa Anterior');
+                const queryName = currentSearchMatches[0].estado ? currentSearchMatches[0].estado.toUpperCase() : 'Todos os Estados';
+                const nextResponse = generatePagedResponse(currentSearchMatches, nextIndex, queryName);
                 
+                // Remove o botão anterior para evitar duplicidade no próximo append
+                if(button && button.parentNode) {
+                    button.remove();
+                }
+
                 appendMessage(nextResponse, 'bot-message');
                 
                 resultsPageIndex = nextIndex;
@@ -631,9 +659,11 @@
             const currentResults = matches.slice(startIndex, endIndex);
 
             const titles = currentResults.map(m => {
-                const titleMatch = m.texto.split(':')[0].trim();
-                const cleanTitle = titleMatch.length > 70 ? titleMatch.substring(0, 67) + '...' : titleMatch;
-                return `* **${cleanTitle}**`;
+                const parts = m.texto.split(':');
+                const title = parts[0].trim();
+                const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
+                const cleanTitle = title.length > 70 ? title.substring(0, 67) + '...' : title;
+                return `* **${estado}${cleanTitle}**`;
             }).join('\n');
 
             const remaining = total - endIndex;
@@ -642,7 +672,7 @@
             
             if (remaining > 0) {
                 const nextIndex = endIndex;
-                response += `\n\n<button class="chat-button" onclick="showMoreResults(${nextIndex}, ${remaining})">Mostrar mais ${Math.min(remaining, RESULTS_PER_PAGE)} resultados</button>`;
+                response += `\n\n<button class="chat-button" onclick="showMoreResults(${nextIndex})">Mostrar mais ${Math.min(remaining, RESULTS_PER_PAGE)} resultados</button>`;
             } else {
                 response += `\n\n*Fim da lista.*`;
             }
@@ -650,86 +680,116 @@
             return response;
         }
 
-        // --- Lógica de Resposta do Chatbot (FINALIZADA para Busca Contextualizada) ---
+        // --- Lógica de Resposta do Chatbot (Aprimorada para Ranqueamento) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
-            const keywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2);
-            const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
-            const contentKeywords = keywords.filter(w => w !== siglaQuery); 
+            const keywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2); // Divide e remove palavras curtas
 
-            let filteredMemories = chatMemories;
+            // 1. Identificação de Estado
+            const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
             
-            // 1. PRÉ-FILTRO CONTEXTUAL (Filtra por estado específico OU TODOS)
+            // 2. Filtragem de Stop Words e Estado para obter o core da busca
+            const coreKeywords = keywords.filter(w => 
+                w !== siglaQuery && 
+                !STOP_WORDS_PT.includes(w)
+            );
+            
+            // 3. Expansão de Sinônimos
+            let expandedKeywords = [...coreKeywords];
+            for (const keyword of coreKeywords) {
+                if (SYNONYM_MAP[keyword]) {
+                    expandedKeywords = [...expandedKeywords, ...SYNONYM_MAP[keyword]];
+                }
+            }
+            // Remove duplicatas
+            expandedKeywords = [...new Set(expandedKeywords)];
+
+
+            // 4. PRÉ-FILTRO CONTEXTUAL (Filtra por estado específico OU TODOS)
+            let filteredMemories = chatMemories;
             if (siglaQuery && siglaQuery !== 'todos') {
                 filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
-            } 
-            // Se o usuário não especificou estado, filteredMemories contém TUDO (busca geral).
+            }
 
-            let matchingMemories = [];
+            let scoredMemories = [];
 
-            // 2. APLICAÇÃO DO FILTRO POR PALAVRA-CHAVE
-            if (contentKeywords.length === 0) {
-                // CASO 1: Apenas Sigla (Ex: "RN") ou uma palavra curta
-                if (siglaQuery) {
-                    matchingMemories = filteredMemories; // Lista todo o contexto (RN + TODOS)
-                } else {
-                    // Busca por palavra curta (se houver alguma) em TUDO
-                    matchingMemories = filteredMemories.filter(m => {
-                        const memoryTextLower = m.texto.toLowerCase();
-                        return keywords.some(keyword => memoryTextLower.includes(keyword));
-                    });
+            // 5. APLICAÇÃO DO FILTRO POR PALAVRA-CHAVE COM PONTUAÇÃO
+            
+            // Se não houver palavras-chave relevantes, mas houver um estado (Ex: "RN"), lista tudo do estado.
+            if (expandedKeywords.length === 0 && siglaQuery) {
+                scoredMemories = filteredMemories.map(m => ({ ...m, score: 1 })); // Pontuação mínima para entrar na lista
+            } else if (expandedKeywords.length > 0) {
+                for (const memory of filteredMemories) {
+                    let score = 0;
+                    const memoryTextLower = memory.texto.toLowerCase();
+                    const parts = memory.texto.split(':');
+                    const titleLower = parts[0].toLowerCase();
+
+                    for (const keyword of expandedKeywords) {
+                        // Pontua a palavra-chave no conteúdo (peso 1)
+                        if (memoryTextLower.includes(keyword)) {
+                            score += 1;
+                        }
+                        
+                        // Pontua a palavra-chave no título (peso 3 - prioriza o título)
+                        if (titleLower.includes(keyword)) {
+                            score += 3;
+                        }
+                    }
+
+                    // Pontuação extra para correspondência exata de parte da frase (alto peso)
+                    if (memoryTextLower.includes(lowerCaseMessage.replace(siglaQuery, '').trim())) {
+                         score += 5;
+                    }
+
+                    if (score > 0) {
+                        scoredMemories.push({ ...memory, score: score });
+                    }
                 }
-            } else {
-                // CASO 2: Sigla + Palavra-chave (Ex: "RN Endpoint") ou Apenas Palavra-chave (Ex: "Endpoint")
-                matchingMemories = filteredMemories.filter(m => {
-                    const memoryTextLower = m.texto.toLowerCase();
-                    // A memória deve conter pelo menos UMA das palavras-chave restantes
-                    return contentKeywords.some(keyword => memoryTextLower.includes(keyword));
-                });
             }
 
 
-            // 3. GERAÇÃO DA RESPOSTA
-            if (matchingMemories.length > 0) {
-                
-                const isGeneralListing = contentKeywords.length === 0;
+            // 6. ORDENAÇÃO POR PONTUAÇÃO E DATA
+            currentSearchMatches = scoredMemories
+                .sort((a, b) => b.score - a.score || new Date(b.dataHora) - new Date(a.dataHora));
 
-                // 3.1. Listagem Paginada (Quando há muitos resultados genéricos)
-                if (isGeneralListing && matchingMemories.length > RESULTS_PER_PAGE) {
-                    currentSearchMatches = matchingMemories.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+
+            // 7. GERAÇÃO DA RESPOSTA
+            if (currentSearchMatches.length > 0) {
+                
+                const isGeneralListing = expandedKeywords.length === 0;
+
+                // 7.1. Listagem Paginada (Muitos resultados ou lista genérica de estado)
+                if (currentSearchMatches.length > RESULTS_PER_PAGE || isGeneralListing) {
                     resultsPageIndex = 0; 
                     const queryName = siglaQuery ? siglaQuery.toUpperCase() : 'Todos os Estados';
                     return generatePagedResponse(currentSearchMatches, 0, queryName);
                 }
 
-                // 3.2. Listagem Direta ou Busca Detalhada (Exibe Conteúdo)
+                // 7.2. Listagem Direta e Detalhada (Poucos resultados relevantes - exibe conteúdo completo)
                 
-                matchingMemories.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
-                
-                const topMemories = matchingMemories.slice(0, 3).map(m => {
+                const topMemories = currentSearchMatches.slice(0, 3).map(m => {
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
                     const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
                     
-                    // LÓGICA PARA EXIBIR A IMAGEM
                     let imageTag = '';
                     if (m.imagemUrl && m.imagemUrl.trim().length > 0) {
                         imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; display: block;">`;
                     }
 
-                    // Separa o Título do Conteúdo Principal (se houver ':')
                     const parts = m.texto.split(':');
                     const title = parts[0].trim();
                     const contentText = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
 
                     return `${estado}**${title}**\n\n${contentText} (Agente: ${m.agente}, ${date})${imageTag}`;
-                }).join('\n\n');
+                }).join('\n\n---\n\n');
 
-                const totalMsg = matchingMemories.length > 3 ? `\n\n*E mais ${matchingMemories.length - 3} resultados. Refine sua busca.*` : '\n\n*Fim da lista.*';
+                const totalMsg = currentSearchMatches.length > 3 ? `\n\n*Exibindo os ${Math.min(3, currentSearchMatches.length)} resultados mais relevantes. Refine sua busca para visualizar outros.*` : '';
 
-                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n* ${topMemories}${totalMsg}`;
+                return `Encontrei **${currentSearchMatches.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n${topMemories}${totalMsg}`;
             }
 
-            // 4. Resposta Padrão: Conhecimento Inexistente
+            // 8. Resposta Padrão: Conhecimento Inexistente
             let initialMessage = "Desculpe, não encontrei uma resposta na base de conhecimento (**MongoDB**) para essa pesquisa.";
 
             if (siglaQuery) {
