@@ -448,7 +448,8 @@
             'job': ['servico', 'tarefa', 'rotina', 'processo'],
             'incidentes': ['problema', 'erro', 'falha', 'indisponibilidade'],
             'consulta': ['pesquisa', 'buscar', 'verificar'],
-            'veiculos': ['veículo', 'carro', 'automovel', 'placa']
+            'veiculos': ['veículo', 'carro', 'automovel', 'placa'],
+            'aula': ['aulas', 'licao', 'lição', 'pratica', 'prática']
         };
 
         // Stop Words (Palavras comuns que devem ser ignoradas na busca)
@@ -555,7 +556,7 @@
                     const options = {
                         includeScore: true,
                         shouldSort: true,
-                        threshold: 0.35, // mais restrito para evitar resultados irrelevantes
+                        threshold: 0.4, // Mais flexível
                         keys: [
                             { name: 'titulo', weight: 0.7 },
                             { name: 'texto', weight: 0.25 },
@@ -592,12 +593,10 @@
             if (messageText === '') return;
             appendMessage(messageText, 'user-message');
 
-            // Guardamos o texto em uma variável local para que as funções
-            // posteriores possam usar o texto (não dependemos do input.value)
             const userMessageForSearch = messageText;
             input.value = '';
             showTypingIndicator();
-            // pequeno delay para UX
+            
             setTimeout(() => {
                 const botResponse = getBotResponse(userMessageForSearch);
                 appendMessage(botResponse, 'bot-message');
@@ -648,7 +647,7 @@
         }
 
         // -------------------------------
-        // Função getBotResponse (CORRIGIDA)
+        // Função getBotResponse (CORRIGIDA - BUSCA FLEXÍVEL)
         // -------------------------------
         function getBotResponse(message) {
             const estadoFilter = (document.getElementById('estado-filter')?.value || '').toUpperCase();
@@ -684,23 +683,24 @@
                 return formatResultsPage();
             }
 
-            // Busca simplificada - verifica se cada keyword aparece no título OU texto
+            // BUSCA FLEXÍVEL: Encontra registros que contenham PELO MENOS UMA das keywords
             let results = pool.filter(memory => {
                 const memoryText = normalizeText(memory.texto || '');
                 const memoryTitle = normalizeText(memory.titulo || '');
+                const fullText = memoryTitle + ' ' + memoryText;
                 
-                // Verifica se TODAS as keywords aparecem em título OU texto
-                return keywords.every(keyword => 
+                // Verifica se PELO MENOS UMA keyword aparece no título OU texto
+                return keywords.some(keyword => 
                     memoryText.includes(keyword) || memoryTitle.includes(keyword)
                 );
             });
 
-            // Se não encontrou com busca exata, usa Fuse para busca fuzzy
+            // Se não encontrou com busca flexível, usa Fuse para busca fuzzy
             if (results.length === 0 && fuse) {
                 try {
                     const tempFuse = new Fuse(pool, { 
                         includeScore: true, 
-                        threshold: 0.4, 
+                        threshold: 0.5, // Mais flexível
                         keys: ['titulo', 'texto'], 
                         ignoreLocation: true 
                     });
@@ -712,20 +712,26 @@
                 }
             }
 
-            // Ordena por relevância (estado matching + keyword matching)
+            // Ordena por relevância (mais keywords matching = mais relevante)
             results = results.map(memory => {
                 let score = 0;
                 const memoryText = normalizeText(memory.texto || '');
                 const memoryTitle = normalizeText(memory.titulo || '');
                 
-                // Pontua por matches no título (mais relevante)
+                // Pontua por cada keyword encontrada
                 keywords.forEach(keyword => {
-                    if (memoryTitle.includes(keyword)) score += 3;
-                    if (memoryText.includes(keyword)) score += 1;
+                    if (memoryTitle.includes(keyword)) score += 3; // Match no título = mais relevante
+                    if (memoryText.includes(keyword)) score += 1;  // Match no texto = menos relevante
                 });
                 
                 // Bônus por matching exato de estado
                 if (effectiveState && memory.estado === effectiveState) score += 2;
+                
+                // Bônus extra se encontrar TODAS as keywords (busca perfeita)
+                const allKeywordsMatch = keywords.every(keyword => 
+                    memoryText.includes(keyword) || memoryTitle.includes(keyword)
+                );
+                if (allKeywordsMatch) score += 5;
                 
                 return { ...memory, _score: score };
             }).sort((a, b) => b._score - a._score);
