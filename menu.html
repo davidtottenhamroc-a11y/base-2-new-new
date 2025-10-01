@@ -604,17 +604,14 @@
         }
         
         // --- FUNÇÕES DE PAGINAÇÃO (REMOVIDAS DO FLUXO PRINCIPAL) ---
-        // (Mantidas vazias para evitar erros, mas o fluxo principal não as utiliza mais)
         const RESULTS_PER_PAGE_DEFAULT = 6;
         let currentSearchMatches = [];
         
         window.showMoreResults = function(nextIndex, remaining) {
-            // Lógica de Paginação (agora desativada no fluxo principal)
             console.log("Paginação manual desativada. Use a busca detalhada.");
         }
 
         function generatePagedResponse(matches, startIndex, queryName) {
-            // Lógica de Paginação (agora desativada no fluxo principal)
             const total = matches.length;
             const endIndex = startIndex + RESULTS_PER_PAGE_DEFAULT;
             const currentResults = matches.slice(startIndex, endIndex);
@@ -639,7 +636,7 @@
         // --- FIM DAS FUNÇÕES DE PAGINAÇÃO ---
 
 
-        // --- LÓGICA DO CHATBOT APRIMORADA (com Scoring) ---
+        // --- FUNÇÕES DE INTELIGÊNCIA (Scoring e Stop Words) ---
 
         // Função de Pontuação (Scoring)
         function scoreMemory(memoryText, keywords) {
@@ -687,6 +684,7 @@
             'dados', 'informacao', 'buscar', 'pesquisar', 'consulta', 'api', 'detalhes'
         ]);
         
+        // --- Lógica de Resposta do Chatbot (AGORA COM SCORING) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase().trim();
             
@@ -711,15 +709,14 @@
                 // Remove a sigla do nome da pesquisa para a exibição no chat
                 queryName = message.replace(new RegExp(`\\b${siglaQuery}\\b`, 'i'), '').trim();
             } else {
-                // Se não há sigla de estado, procura apenas nas memórias 'TODOS' ou em todas se a busca for muito específica
-                // Para não sobrecarregar com memórias de todos os estados, filtramos aqui.
                 if(contentKeywords.length > 0) {
-                    filteredMemories = chatMemories; // Se a busca é genérica (sem estado) mas com termo, busca em tudo
+                    // Se a busca é genérica (sem estado) mas com termo, busca em tudo
+                    filteredMemories = chatMemories; 
                 } else {
+                    // Se a busca é genérica E sem termo relevante (ex: "oi"), mostra apenas TODOS
                     filteredMemories = filteredMemories.filter(m => m.estado === 'TODOS');
                 }
             }
-
 
             // 5. ATRIBUIÇÃO DE PONTUAÇÃO (SCORING)
             let scoredMatches = filteredMemories.map(m => {
@@ -760,14 +757,14 @@
                     const contentText = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
 
                     return `${estado}**${title}**\n\n${contentText} (Agente: ${m.agente}, ${date})${imageTag}`;
-                }).join('\n\n--- PRÓXIMO RESULTADO ---\n\n'); // Separador melhor
+                }).join('\n\n--- PRÓXIMO RESULTADO ---\n\n'); 
 
-                const totalCount = scoredMatches.length;
-                const remainingCount = totalCount - displayLimit;
-                
-                const totalMsg = remainingCount > 0 
-                    ? `\n\n*E mais ${remainingCount} resultados. Tente refinar sua busca para uma única resposta mais específica.*` 
-                    : `\n\n*Fim da lista de resultados mais relevantes para **'${queryName}'**.*`;
+                const totalCount = scoredMatches.length;
+                const remainingCount = totalCount - displayLimit;
+                
+                const totalMsg = remainingCount > 0 
+                    ? `\n\n*E mais ${remainingCount} resultados. Tente refinar sua busca para uma única resposta mais específica.*` 
+                    : `\n\n*Fim da lista de resultados mais relevantes para **'${queryName}'**.*`;
 
 
                 return `Encontrei **${totalCount}** referências na base de conhecimento (MongoDB) que correspondem à sua pesquisa:\n\n${topMemories}${totalMsg}`;
@@ -777,7 +774,9 @@
             let initialMessage = "❌ Desculpe, não encontrei uma resposta na base de conhecimento (**MongoDB**) para essa pesquisa.";
 
             if (siglaQuery) {
-                initialMessage += `\n\n**Verifique:** A busca foi filtrada pelo estado **${siglaQuery.toUpperCase()}**. Tente uma busca sem o estado.`;
+                initialMessage += `\n\n**Verifique:** A busca foi filtrada pelo estado **${siglaQuery.toUpperCase()}** e não houve resultados relevantes.`;
+            } else {
+                 initialMessage += `\n\n**Dica:** Se souber o estado (Ex: RN, DF), inclua na pergunta.`;
             }
 
             initialMessage += "\n\n**Ação:** Use a página **'Gerenciar Base de Conhecimento'** para inserir o conhecimento necessário.";
