@@ -145,9 +145,9 @@
 
         .chat-content {
             width: 90%;
-            max-width: 800px; 
+            max-width: 900px; 
             height: 90%;
-            max-height: 800px;
+            max-height: 820px;
             background: #ffffff;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -159,16 +159,14 @@
         #chat-header {
             background: #3498db;
             color: white;
-            padding: 20px;
-            font-size: 20px;
+            padding: 12px 20px;
+            font-size: 18px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        #chat-header i {
-            margin-right: 10px;
-        }
+        #chat-header i { margin-right: 10px; }
         #chat-close-btn {
             background: none;
             border: 1px solid white; 
@@ -180,9 +178,7 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        #chat-close-btn:hover {
-            background: #2980b9;
-        }
+        #chat-close-btn:hover { background: #2980b9; }
 
         #chat-body {
             display: flex;
@@ -196,7 +192,7 @@
             padding: 10px;
             background: #f8f9fa; 
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         /* Estilização das Mensagens Aprimorada */
@@ -227,10 +223,7 @@
             white-space: pre-wrap;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
-        .bot-message strong {
-            color: #c0392b; 
-        }
-        /* Estilo para blocos de código/JSON */
+        .bot-message strong { color: #c0392b; }
         .bot-message pre {
             background: #f4f4f4;
             padding: 10px;
@@ -243,8 +236,18 @@
 
         #chat-input-container {
             display: flex;
-            padding: 5px 0;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
             border-top: 1px solid #ddd;
+        }
+        #estado-filter {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            width: 120px;
+            background: white;
         }
         #chat-input {
             flex-grow: 1;
@@ -255,10 +258,7 @@
             font-size: 16px;
             transition: border-color 0.2s;
         }
-        #chat-input:focus {
-            border-color: #3498db;
-            outline: none;
-        }
+        #chat-input:focus { border-color: #3498db; outline: none; }
         #chat-send-btn {
             background: #28a745;
             color: white;
@@ -270,38 +270,25 @@
             font-size: 18px;
             transition: background 0.3s, transform 0.1s;
         }
-        #chat-send-btn:hover {
-            background: #218838;
-        }
-        #chat-send-btn:active {
-            transform: scale(0.95);
-        }
+        #chat-send-btn:hover { background: #218838; }
+        #chat-send-btn:active { transform: scale(0.95); }
 
-        /* Estilo para o botão de "Mostrar Mais" */
         .chat-button {
-            padding: 10px 15px;
+            padding: 8px 12px;
             background: #3498db;
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
-            margin-top: 15px;
+            font-size: 13px;
+            margin-top: 8px;
             transition: background 0.2s;
-            display: block; 
-            width: 100%;
+            display: inline-block; 
         }
-        .chat-button:hover:not(:disabled) {
-            background: #2980b9;
-        }
-        .chat-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
+        .chat-button:hover:not(:disabled) { background: #2980b9; }
+        .chat-button:disabled { background: #ccc; cursor: not-allowed; }
 
-
-        /* Indicador de Digitação */
         .typing-indicator {
             background: #e0e0e0;
             color: #555;
@@ -311,10 +298,7 @@
             display: inline-block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Estilo do Botão Flutuante --- */
         #chat-open-btn {
@@ -332,9 +316,9 @@
             font-weight: bold;
             z-index: 1000;
         }
-        #chat-open-btn i {
-            margin-right: 8px;
-        }
+        #chat-open-btn i { margin-right: 8px; }
+
+        mark { background: #ffe58a; padding: 0 3px; border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -347,7 +331,6 @@
 
         <main>
             <div class="menu-grid">
-                
                 <a href="endpoints.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-share-alt"></i></div>
                     <div>
@@ -355,7 +338,6 @@
                         <p class="card-description">Documentação técnica com os Endpoints de RN</p>
                     </div>
                 </a>
-
                 <a href="Sergipe.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-share-alt"></i></div>
                     <div>
@@ -363,7 +345,6 @@
                         <p class="card-description">Documentação técnica com os Endpoints de SE</p>
                     </div>
                 </a>
-                
                 <a href="mshm.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-share-alt"></i></div>
                     <div>
@@ -392,7 +373,6 @@
                         <p class="card-description">Documentação completa do gerenciamento de incidente.</p>
                     </div>
                 </a>
-                
                 <a href="knowledge_manager.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-database"></i></div>
                     <div>
@@ -400,7 +380,6 @@
                         <p class="card-description">Interface para adicionar e atualizar informações do chatbot por estado (MongoDB).</p>
                     </div>
                 </a>
-                
                 <a href="menu2.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-table"></i></div>
                     <div>
@@ -408,7 +387,6 @@
                         <p class="card-description">Base de registro diário do N2</p>
                     </div>
                 </a>
-
             </div>
         </main>
         <button class="logout-button" onclick="logout()">Sair</button>
@@ -417,18 +395,33 @@
     <div id="chat-widget-container">
         <div class="chat-content">
             <div id="chat-header">
-                Assistente VSoft N2 <i class="fas fa-robot"></i>
+                <div style="display:flex;align-items:center;gap:8px;"><i class="fas fa-robot"></i> Assistente VSoft N2</div>
                 <button id="chat-close-btn" onclick="toggleChat()">X</button>
             </div>
             <div id="chat-body">
                 <div id="chat-messages">
                     <div class="message bot-message">
-                        Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo **MongoDB**.
-                        <br><br>
-                        Clique no **X** para fechar. Use a página 'Gerenciar Base de Conhecimento' para me ensinar algo e comece a perguntar sobre a informação salva.
+                        Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo <strong>MongoDB</strong>.<br><br>
+                        Use o filtro de estado e escreva sua dúvida. Por exemplo: <em>"SE veículos"</em> ou escolha o estado no dropdown.
                     </div>
                 </div>
                 <div id="chat-input-container">
+                    <select id="estado-filter">
+                        <option value="">Todos os estados</option>
+                        <option value="RN">RN</option>
+                        <option value="SE">SE</option>
+                        <option value="MS">MS</option>
+                        <option value="DF">DF</option>
+                        <option value="PE">PE</option>
+                        <option value="PB">PB</option>
+                        <option value="BA">BA</option>
+                        <option value="MG">MG</option>
+                        <option value="GO">GO</option>
+                        <option value="MA">MA</option>
+                        <option value="AL">AL</option>
+                        <option value="CE">CE</option>
+                        <option value="TODOS">TODOS</option>
+                    </select>
                     <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
                     <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
@@ -436,10 +429,11 @@
         </div>
     </div>
 
-    <button id="chat-open-btn" onclick="toggleChat()">
-        <i class="fas fa-comment-dots"></i> Chat N2
-    </button>
-    
+    <button id="chat-open-btn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i> Chat N2</button>
+
+    <!-- Fuse.js para pesquisa fuzzy -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+
     <script>
         // Variáveis Globais para o Chatbot
         let chatMemories = [];
@@ -453,7 +447,8 @@
             'fluxo': ['procedimento', 'passos', 'guia', 'rotina', 'etapa'],
             'job': ['servico', 'tarefa', 'rotina', 'processo'],
             'incidentes': ['problema', 'erro', 'falha', 'indisponibilidade'],
-            'consulta': ['pesquisa', 'buscar', 'verificar']
+            'consulta': ['pesquisa', 'buscar', 'verificar'],
+            'veiculos': ['veículo', 'carro', 'automovel', 'placa']
         };
 
         // Stop Words (Palavras comuns que devem ser ignoradas na busca)
@@ -465,55 +460,105 @@
             'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre', 'me', 'meu', 'queria', 'gostaria'
         ];
 
-
         // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
         const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
-        
+
+        // Fuse index
+        let fuse = null;
+        let memoriesIndex = []; // memórias brutas carregadas
+        let lastResults = []; // resultados da última busca (para paginação)
+        let resultsPage = 0;
+        const PAGE_SIZE = 3;
+
         function logout() {
             localStorage.removeItem('agenteSelecionado');
             localStorage.removeItem('estadoSelecionado');
             window.location.href = 'login.html';
         }
 
-        // Função para abrir/fechar o chat (MODAL/TELA CHEIA)
         function toggleChat() {
             const chatWidget = document.getElementById('chat-widget-container');
             const openBtn = document.getElementById('chat-open-btn');
 
             if (chatWidget.style.display === 'flex') {
-                // Fechar
                 chatWidget.style.display = 'none';
-                openBtn.style.display = 'block'; // Mostra o botão flutuante
-                document.body.style.overflow = 'auto'; // Restaura o scroll
+                openBtn.style.display = 'block';
+                document.body.style.overflow = 'auto';
             } else {
-                // Abrir
                 chatWidget.style.display = 'flex';
-                openBtn.style.display = 'none'; // Esconde o botão flutuante
-                document.body.style.overflow = 'hidden'; // Remove o scroll do corpo
+                openBtn.style.display = 'none';
+                document.body.style.overflow = 'hidden';
                 document.getElementById('chat-input').focus();
             }
         }
-        
-        // Listener para fechar com a tecla ESC
+
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape' && document.getElementById('chat-widget-container').style.display === 'flex') {
                 toggleChat();
             }
         });
 
-        // Função para carregar todas as memórias do MongoDB
+        // --- Helpers de texto e busca ---
+        function normalizeText(t) {
+            return (t || '')
+                .normalize('NFD').replace(/[̀-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function expandTerms(terms) {
+            const expanded = new Set();
+            for (const t of terms) {
+                expanded.add(t);
+                const mapped = SYNONYM_MAP[t];
+                if (mapped) mapped.forEach(s => expanded.add(s));
+            }
+            return Array.from(expanded);
+        }
+
+        function highlight(text, terms) {
+            let out = text || '';
+            for (const term of terms) {
+                if (!term || term.length < 2) continue;
+                const safe = term.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+                out = out.replace(new RegExp(`(${safe})`, 'ig'), '<mark>$1</mark>');
+            }
+            return out;
+        }
+
+        // Carrega memórias e cria índice Fuse
         async function loadMemoriesFromDatabase() {
-            console.log(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
+            appendConsoleLog(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
             try {
                 const response = await fetch(`${BACKEND_URL}/api/memories`);
-                
                 if (response.ok) {
                     const data = await response.json();
                     chatMemories = data;
-                    console.log(`[MongoDB] ${data.length} memórias carregadas com SUCESSO!`);
-                    
+                    memoriesIndex = data.map(m => ({
+                        ...m,
+                        titulo: (m.texto || '').split(':')[0] || '',
+                        texto: m.texto || '',
+                        texto_normalizado: normalizeText(m.texto || ''),
+                        estado: (m.estado || 'TODOS').toUpperCase()
+                    }));
+
+                    const options = {
+                        includeScore: true,
+                        shouldSort: true,
+                        threshold: 0.45,
+                        keys: [
+                            { name: 'titulo', weight: 0.7 },
+                            { name: 'texto', weight: 0.25 },
+                            { name: 'estado', weight: 0.05 }
+                        ],
+                        ignoreLocation: true,
+                        useExtendedSearch: true
+                    };
+                    fuse = new Fuse(memoriesIndex, options);
+                    appendConsoleLog(`[MongoDB] ${memoriesIndex.length} memórias indexadas com Fuse.`);
                 } else {
-                    console.error('Erro ao carregar memórias. Status:', response.status);
                     appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
                 }
             } catch (error) {
@@ -523,79 +568,53 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await loadMemoriesFromDatabase(); 
+            await loadMemoriesFromDatabase();
             document.getElementById('chat-open-btn').style.display = 'block';
         });
 
-        // Adicionar evento para enviar mensagem ao pressionar Enter
+        // Enviar com Enter
         document.getElementById('chat-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+            if (e.key === 'Enter') sendMessage();
         });
 
-        // Função principal de envio e resposta
+        // Envio / ciclo de resposta
         async function sendMessage() {
             const input = document.getElementById('chat-input');
             const messageText = input.value.trim();
-            
-            if (messageText === "") return;
-
-            // 1. Adicionar a mensagem do usuário
+            if (messageText === '') return;
             appendMessage(messageText, 'user-message');
-            input.value = ''; 
-            
-            // 2. Desativa input e botão de envio
+            input.value = '';
             showTypingIndicator();
-
+            // pequeno delay para UX
             setTimeout(() => {
-                // 3. Processa a resposta
-                let botResponse = getBotResponse(messageText);
-
-                // 4. Adiciona a resposta
+                const botResponse = getBotResponse(messageText);
                 appendMessage(botResponse, 'bot-message');
-                
-                // 5. Reativa input e botão de envio
                 hideTypeningIndicator();
-
-            }, 1500);
+            }, 600);
         }
 
-        // Função para adicionar a mensagem (com formatação)
         function appendMessage(text, className) {
             const messagesContainer = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${className}`;
-            
-            let processedText = text;
 
-            // 1. Processamento de blocos de código/JSON para <pre>
+            // Processa blocos de código
             const codeBlockRegex = /(```json|```|\{)\n?([\s\S]*?)(\n?```|\n\})/g;
-            processedText = processedText.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
+            let processedText = text.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
                 content = content.replace(/```json|```|{|}/g, '').trim();
-                
-                if (openTag.includes('json') || content.includes(':')) {
-                    try {
-                        let parseContent = content.startsWith('{') && content.endsWith('}') ? content : `{${content}}`;
-                        const jsonObject = JSON.parse(parseContent);
-                        content = JSON.stringify(jsonObject, null, 2).replace(/^\{|\}$/g, '').trim();
-                    } catch (e) { }
-                }
-                
                 return `\n<pre>${content}</pre>\n`;
             });
 
-            // 2. Converte quebras de linha e negrito
             processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-            // 3. Injeta o HTML
             messageDiv.innerHTML = processedText;
-
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Indicador de Digitação
+        function appendConsoleLog(text) {
+            console.log(text);
+        }
+
         function showTypingIndicator() {
             const messagesContainer = document.getElementById('chat-messages');
             const typingDiv = document.createElement('div');
@@ -610,130 +629,139 @@
 
         function hideTypeningIndicator() {
             const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) {
-                typingIndicator.remove();
-            }
+            if (typingIndicator) typingIndicator.remove();
             document.getElementById('chat-input').disabled = false;
             document.getElementById('chat-send-btn').disabled = false;
-            document.getElementById('chat-input').focus(); 
+            document.getElementById('chat-input').focus();
         }
-        
-        // --- Lógica de Resposta do Chatbot (INTELIGENTE COM SCORING) ---
+
+        // Buscar memórias com Fuse + filtros
         function getBotResponse(message) {
-            const lowerCaseMessage = message.toLowerCase();
-            const keywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2);
+            const estadoFilter = (document.getElementById('estado-filter')?.value || '').toUpperCase();
+            const raw = message.trim();
+            const normalized = normalizeText(raw);
 
-            // 1. Identificação de Estado
-            const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
-            
-            // 2. Filtragem de Stop Words e Estado para obter o core da busca
-            const coreKeywords = keywords.filter(w => 
-                w !== siglaQuery && 
-                !STOP_WORDS_PT.includes(w)
-            );
-            
-            // 3. Expansão de Sinônimos
-            let expandedKeywords = [...coreKeywords];
-            for (const keyword of coreKeywords) {
-                if (SYNONYM_MAP[keyword]) {
-                    expandedKeywords = [...expandedKeywords, ...SYNONYM_MAP[keyword]];
+            let keywords = normalized.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS_PT.includes(w));
+            keywords = expandTerms(keywords);
+
+            const possibleState = keywords.find(k => VALID_STATES.map(s => s.toLowerCase()).includes(k));
+            const effectiveState = (estadoFilter || (possibleState ? possibleState.toUpperCase() : '')).toUpperCase();
+
+            // filtra por estado primeiro
+            let pool = memoriesIndex;
+            if (effectiveState && effectiveState !== 'TODOS') {
+                pool = memoriesIndex.filter(m => (m.estado || '').toUpperCase() === effectiveState || (m.estado || '').toUpperCase() === 'TODOS');
+            }
+
+            // Se não há termos, listar os mais recentes do estado
+            if (keywords.length === 0) {
+                const list = pool.sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 6);
+                if (list.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
+                lastResults = list;
+                resultsPage = 0;
+                return formatResultsPage();
+            }
+
+            // Monta query para Fuse: pesquisa OR entre palavras
+            const fuseQueryParts = keywords.map(k => ({ $or: [
+                { titulo: `'${k}` },
+                { texto: `'${k}` },
+                { texto: k }
+            ] }));
+
+            let results = [];
+            try {
+                // Para performance, criamos um Fuse temporário sobre o pool
+                const tempFuse = new Fuse(pool, { includeScore: true, threshold: 0.5, keys: ['titulo', 'texto', 'estado'], ignoreLocation: true, useExtendedSearch: true });
+                const searchQuery = { $or: fuseQueryParts };
+                const fuseResults = tempFuse.search(searchQuery, { limit: 50 });
+                results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
+            } catch (e) {
+                // fallback: busca por contains
+                results = pool.map(m => ({ ...m, __fuseScore: 1.0 })).filter(m => keywords.some(k => (m.texto_normalizado || '').includes(k) || (m.titulo && normalizeText(m.titulo).includes(k))));
+            }
+
+            // pós-processamento de score
+            for (const r of results) {
+                let extra = 0;
+                const titleNorm = normalizeText(r.titulo || '');
+                for (const k of keywords) {
+                    if (titleNorm.includes(k)) extra += 3;
+                    if ((r.texto_normalizado || '').includes(k)) extra += 1;
                 }
-            }
-            // Remove duplicatas
-            expandedKeywords = [...new Set(expandedKeywords)];
-
-
-            // 4. PRÉ-FILTRO CONTEXTUAL (Filtra por estado específico OU TODOS)
-            let filteredMemories = chatMemories;
-            if (siglaQuery && siglaQuery !== 'todos') {
-                filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
+                if (effectiveState && effectiveState !== 'TODOS' && (r.estado || '').toUpperCase() === effectiveState) extra += 2;
+                const base = (typeof r.__fuseScore === 'number') ? (1 - Math.min(r.__fuseScore, 1)) * 5 : 1;
+                r._score = base + extra;
             }
 
-            let scoredMemories = [];
-
-            // 5. APLICAÇÃO DO FILTRO POR PALAVRA-CHAVE COM PONTUAÇÃO
-            const hasDetailedQuery = expandedKeywords.length > 0;
-
-            if (!hasDetailedQuery && siglaQuery) {
-                // CASO 1: Apenas Sigla (Ex: "RN") - Listagem genérica do estado
-                scoredMemories = filteredMemories.map(m => ({ ...m, score: 1 })); 
-            } else if (hasDetailedQuery) {
-                // CASO 2: Busca detalhada (com palavras-chave)
-                for (const memory of filteredMemories) {
-                    let score = 0;
-                    const memoryTextLower = memory.texto.toLowerCase();
-                    const parts = memory.texto.split(':');
-                    const titleLower = parts[0].toLowerCase();
-
-                    for (const keyword of expandedKeywords) {
-                        // Pontua a palavra-chave no conteúdo (peso 1)
-                        if (memoryTextLower.includes(keyword)) {
-                            score += 1;
-                        }
-                        
-                        // Pontua a palavra-chave no título (peso 3 - prioriza o título)
-                        if (titleLower.includes(keyword)) {
-                            score += 3;
-                        }
-                    }
-
-                    // Pontuação extra para correspondência exata de parte da frase (alto peso)
-                    const cleanQuery = lowerCaseMessage.replace(siglaQuery.toLowerCase(), '').trim();
-                    if (cleanQuery.length > 5 && memoryTextLower.includes(cleanQuery)) {
-                         score += 5;
-                    }
-
-                    if (score > 0) {
-                        scoredMemories.push({ ...memory, score: score });
-                    }
-                }
+            const finalMatches = results.sort((a,b) => (b._score || 0) - (a._score || 0));
+            if (finalMatches.length === 0) {
+                return `Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para essa pesquisa no estado ${effectiveState || 'TODOS'}. Tente termos diferentes ou vá em 'Gerenciar Base de Conhecimento'.`;
             }
 
-
-            // 6. ORDENAÇÃO POR PONTUAÇÃO E DATA
-            const finalMatches = scoredMemories
-                .sort((a, b) => b.score - a.score || new Date(b.dataHora) - new Date(a.dataHora));
-
-
-            // 7. GERAÇÃO DA RESPOSTA
-            if (finalMatches.length > 0) {
-                
-                const displayLimit = 3; 
-                const topMemories = finalMatches.slice(0, displayLimit).map(m => {
-                    const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
-                    const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
-                    
-                    // LÓGICA PARA EXIBIR A IMAGEM
-                    let imageTag = '';
-                    if (m.imagemUrl && m.imagemUrl.trim().length > 0) {
-                        imageTag = `<br><img src="${m.imagemUrl}" alt="Imagem de Suporte" style="max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px; display: block;">`;
-                    }
-
-                    // Separa o Título do Conteúdo Principal (se houver ':')
-                    const parts = m.texto.split(':');
-                    const title = parts[0].trim();
-                    const contentText = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
-
-                    return `${estado}**${title}**\n\n${contentText} (Agente: ${m.agente}, ${date})${imageTag}`;
-                }).join('\n\n---\n\n');
-
-                const remainingCount = finalMatches.length - displayLimit;
-                const totalMsg = remainingCount > 0 ? `\n\n*E mais ${remainingCount} resultados. Refine sua busca para ver todos os detalhes.*` : '\n\n*Fim da lista.*';
-
-                return `Encontrei **${finalMatches.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa. O resultado mais relevante está em primeiro:\n\n${topMemories}${totalMsg}`;
-            }
-
-            // 8. Resposta Padrão: Conhecimento Inexistente
-            let initialMessage = "Desculpe, não encontrei uma resposta na base de conhecimento (**MongoDB**) para essa pesquisa.";
-
-            if (siglaQuery) {
-                 initialMessage += `\n\n**Verifique:** Não há informações salvas para a palavra-chave que você usou no estado **${siglaQuery.toUpperCase()}** ou a palavra-chave é muito genérica.`;
-            }
-
-            initialMessage += "\n\nUse a página **'Gerenciar Base de Conhecimento'** para inserir o conhecimento necessário.";
-            
-            return initialMessage;
+            lastResults = finalMatches;
+            resultsPage = 0;
+            return formatResultsPage();
         }
+
+        function formatResultsPage() {
+            const start = resultsPage * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const page = lastResults.slice(start, end);
+            if (page.length === 0) return 'Nenhum resultado nesta página.';
+
+            const total = lastResults.length;
+            const listFormatted = page.map(m => {
+                const date = m.dataHora ? new Date(m.dataHora).toLocaleDateString('pt-BR') : '';
+                const parts = (m.texto || '').split(':');
+                const title = parts[0] || m.titulo || 'Sem título';
+                const content = parts.length > 1 ? parts.slice(1).join(':') : m.texto || '';
+                const keywordsFromQuery = collectLastQueryKeywords();
+                const highlighted = highlight(content, keywordsFromQuery);
+                const img = m.imagemUrl ? `<br><img src="${m.imagemUrl}" style="max-width:100%;border-radius:6px;margin-top:8px;">` : '';
+                const id = m._id || m.id || (m.idMemoria || '') || '';
+                const actions = `<br><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"><button class="chat-button" onclick="showFullMemory('${id}')">Ver Mais</button><button class="chat-button" onclick="sendFeedback('${id}', true)">👍</button><button class="chat-button" onclick="sendFeedback('${id}', false)">👎</button></div>`;
+                return `**[${m.estado || 'TODOS'}] ${title}**\n\n${highlighted} (Agente: ${m.agente || '—'}, ${date})${img}${actions}`;
+            }).join('\n\n---\n\n');
+
+            const remaining = Math.max(0, total - ((resultsPage + 1) * PAGE_SIZE));
+            const moreBtn = remaining > 0 ? `\n\n<button class="chat-button" onclick="showMoreResults()">Mostrar mais (${remaining} restantes)</button>` : '\n\n*Fim da lista.*';
+            return `Encontrei **${total}** referências.\n\n${listFormatted}${moreBtn}`;
+        }
+
+        function collectLastQueryKeywords() {
+            // tenta reconstruir keywords a partir do último input visível (simples)
+            const input = document.getElementById('chat-input');
+            const val = input ? normalizeText(input.value || '') : '';
+            const tokens = val.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS_PT.includes(w));
+            return expandTerms(tokens);
+        }
+
+        function showMoreResults() {
+            resultsPage += 1;
+            appendMessage(formatResultsPage(), 'bot-message');
+        }
+
+        function showFullMemory(id) {
+            const mem = memoriesIndex.find(m => (m._id === id || m.id === id || (m.idMemoria === id)));
+            if (!mem) { appendMessage('Conteúdo não encontrado', 'bot-message'); return; }
+            appendMessage(`**${mem.titulo}**\n\n${mem.texto}\n\n(Agente: ${mem.agente}, ${new Date(mem.dataHora).toLocaleString('pt-BR')})`, 'bot-message');
+        }
+
+        async function sendFeedback(id, positive) {
+            if (!id) { appendMessage('ID da memória inválido para feedback.', 'bot-message'); return; }
+            try {
+                await fetch(`${BACKEND_URL}/api/memories/feedback`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id, positive })
+                });
+                appendMessage(positive ? 'Obrigado pelo feedback positivo!' : 'Obrigado, registramos o feedback e iremos revisar.', 'bot-message');
+            } catch (e) {
+                appendMessage('Erro ao enviar feedback.', 'bot-message');
+            }
+        }
+
     </script>
 </body>
 </html>
