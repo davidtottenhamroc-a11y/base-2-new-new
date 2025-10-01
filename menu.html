@@ -1,809 +1,795 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base para N2 - VSoft</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base para N2 - VSoft</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        body {
-            background: #0d1a2a;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        body {
+            background: #0d1a2a;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        .container {
-            max-width: 1400px;
-            width: 100%;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
 
-        header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        .logo {
-            font-size: 40px;
-            font-weight: bold;
-            color: #3498db;
-            margin-bottom: 10px;
-        }
+        .logo {
+            font-size: 40px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
 
-        .description {
-            font-size: 16px;
-            opacity: 0.9;
-        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
 
-        main {
-            padding: 20px;
-        }
+        main {
+            padding: 20px;
+        }
 
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
 
-        .menu-card {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 25px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+        .menu-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-        .menu-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            border-color: #3498db;
-        }
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+        }
 
-        .card-icon {
-            font-size: 40px;
-            color: #3498db;
-            margin-bottom: 15px;
-        }
-        
-        .card-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+        .card-icon {
+            font-size: 40px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
 
-        .card-description {
-            font-size: 14px;
-            color: #6c757d;
-        }
+        .card-description {
+            font-size: 14px;
+            color: #6c757d;
+        }
 
-        @media (max-width: 768px) {
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .logout-button {
-            margin-top: 20px;
-            padding: 12px 25px;
-            font-size: 16px;
-            background: linear-gradient(135deg, #dc3545, #b42a35);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-        .logout-button:hover {
-            background: linear-gradient(135deg, #c82333, #a71d24);
-        }
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .logout-button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #dc3545, #b42a35);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .logout-button:hover {
+            background: linear-gradient(135deg, #c82333, #a71d24);
+        }
 
-        /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
-        #chat-widget-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw; 
-            height: 100vh;
-            background: rgba(13, 26, 42, 0.95); 
-            border-radius: 0;
-            box-shadow: none;
-            display: none; 
-            z-index: 9999;
-            align-items: center; 
-            justify-content: center;
-        }
+        /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
+        #chat-widget-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(13, 26, 42, 0.95); 
+            border-radius: 0;
+            box-shadow: none;
+            display: none; 
+            z-index: 9999;
+            align-items: center; 
+            justify-content: center;
+        }
 
-        .chat-content {
-            width: 90%;
-            max-width: 900px; 
-            height: 90%;
-            max-height: 820px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        #chat-header {
-            background: #3498db;
-            color: white;
-            padding: 12px 20px;
-            font-size: 18px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        #chat-header i { margin-right: 10px; }
-        #chat-close-btn {
-            background: none;
-            border: 1px solid white; 
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        #chat-close-btn:hover { background: #2980b9; }
+        .chat-content {
+            width: 90%;
+            max-width: 900px; 
+            height: 90%;
+            max-height: 820px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #chat-header {
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-header i { margin-right: 10px; }
+        #chat-close-btn {
+            background: none;
+            border: 1px solid white; 
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #chat-close-btn:hover { background: #2980b9; }
 
-        #chat-body {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 15px;
-        }
-        #chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            background: #f8f9fa; 
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-        
-        /* Estilização das Mensagens Aprimorada */
-        .message {
-            max-width: 90%; 
-            padding: 12px 18px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-            font-size: 15px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease-out;
-        }
-        .user-message {
-            background: #3498db;
-            color: white;
-            align-self: flex-end;
-            margin-left: auto;
-            border-bottom-right-radius: 5px; 
-        }
-        .bot-message {
-            background: #e9ecef; 
-            color: #333;
-            align-self: flex-start;
-            margin-right: auto;
-            border: none;
-            border-bottom-left-radius: 5px; 
-            white-space: pre-wrap;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        .bot-message strong { color: #c0392b; }
-        .bot-message pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            overflow-x: auto;
-            font-size: 13px;
-            line-height: 1.3;
-        }
+        #chat-body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 15px;
+        }
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa; 
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        /* Estilização das Mensagens Aprimorada */
+        .message {
+            max-width: 90%; 
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .user-message {
+            background: #3498db;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px; 
+        }
+        .bot-message {
+            background: #e9ecef; 
+            color: #333;
+            align-self: flex-start;
+            margin-right: auto;
+            border: none;
+            border-bottom-left-radius: 5px; 
+            white-space: pre-wrap;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .bot-message strong { color: #c0392b; }
+        .bot-message pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.3;
+        }
 
-        #chat-input-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 0;
-            border-top: 1px solid #ddd;
-        }
-        #estado-filter {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            width: 120px;
-            background: white;
-        }
-        #chat-input {
-            flex-grow: 1;
-            padding: 12px 20px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            margin-right: 10px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-        #chat-input:focus { border-color: #3498db; outline: none; }
-        #chat-send-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: background 0.3s, transform 0.1s;
-        }
-        #chat-send-btn:hover { background: #218838; }
-        #chat-send-btn:active { transform: scale(0.95); }
+        #chat-input-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            border-top: 1px solid #ddd;
+        }
+        #estado-filter {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            width: 120px;
+            background: white;
+        }
+        #chat-input {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        #chat-input:focus { border-color: #3498db; outline: none; }
+        #chat-send-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s, transform 0.1s;
+        }
+        #chat-send-btn:hover { background: #218838; }
+        #chat-send-btn:active { transform: scale(0.95); }
 
-        .chat-button {
-            padding: 8px 12px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-            margin-top: 8px;
-            transition: background 0.2s;
-            display: inline-block; 
-        }
-        .chat-button:hover:not(:disabled) { background: #2980b9; }
-        .chat-button:disabled { background: #ccc; cursor: not-allowed; }
+        .chat-button {
+            padding: 8px 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 8px;
+            transition: background 0.2s;
+            display: inline-block; 
+        }
+        .chat-button:hover:not(:disabled) { background: #2980b9; }
+        .chat-button:disabled { background: #ccc; cursor: not-allowed; }
 
-        .typing-indicator {
-            background: #e0e0e0;
-            color: #555;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-style: italic;
-            display: inline-block;
-        }
+        .typing-indicator {
+            background: #e0e0e0;
+            color: #555;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-style: italic;
+            display: inline-block;
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Estilo do Botão Flutuante --- */
-        #chat-open-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 15px 20px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 1000;
-        }
-        #chat-open-btn i { margin-right: 8px; }
+        /* --- Estilo do Botão Flutuante --- */
+        #chat-open-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        #chat-open-btn i { margin-right: 8px; }
 
-        mark { background: #ffe58a; padding: 0 3px; border-radius: 2px; }
-    </style>
+        mark { background: #ffe58a; padding: 0 3px; border-radius: 2px; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">VSoft</div>
-            <h1>Base para N2</h1>
-            <p class="description">Central de guias e documentações técnicas para suporte de Nível 2.</p>
-        </header>
+    <div class="container">
+        <header>
+            <div class="logo">VSoft</div>
+            <h1>Base para N2</h1>
+            <p class="description">Central de guias e documentações técnicas para suporte de Nível 2.</p>
+        </header>
 
-        <main>
-            <div class="menu-grid">
-                <a href="endpoints.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Documentação Endpoints RN</h2>
-                        <p class="card-description">Documentação técnica com os Endpoints de RN</p>
-                    </div>
-                </a>
-                <a href="Sergipe.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Documentação Endpoints SE</h2>
-                        <p class="card-description">Documentação técnica com os Endpoints de SE</p>
-                    </div>
-                </a>
-                <a href="mshm.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Integrações DETRAN-MS / Valid</h2>
-                        <p class="card-description">Documentação completa de fluxos, jobs e endpoints de API.</p>
-                    </div>
-                </a>
-                <a href="endpoints_df.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Endpoints Credenciadas DF</h2>
-                        <p class="card-description">Documentação completa de fluxos, jobs e endpoints de API.</p>
-                    </div>
-                </a>
-                <a href="SuperPratico.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Integrações SuperPrático/ Aulas Praticas</h2>
-                        <p class="card-description">Documentação completa de fluxos Do SuperPrático.</p>
-                    </div>
-                    </a>
-                <a href="gerenciamento_incidentes.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Politica de gerenciamento de incidentes</h2>
-                        <p class="card-description">Documentação completa do gerenciamento de incidente.</p>
-                    </div>
-                </a>
-                <a href="knowledge_manager.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-database"></i></div>
-                    <div>
-                        <h2 class="card-title">Gerenciar Base de Conhecimento</h2>
-                        <p class="card-description">Interface para adicionar e atualizar informações do chatbot por estado (MongoDB).</p>
-                    </div>
-                </a>
-                <a href="menu2.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-table"></i></div>
-                    <div>
-                        <h2 class="card-title">Registro Diários</h2>
-                        <p class="card-description">Base de registro diário do N2</p>
-                    </div>
-                </a>
-            </div>
-        </main>
-        <button class="logout-button" onclick="logout()">Sair</button>
-    </div>
-    
-    <div id="chat-widget-container">
-        <div class="chat-content">
-            <div id="chat-header">
-                <div style="display:flex;align-items:center;gap:8px;"><i class="fas fa-robot"></i> Assistente VSoft N2</div>
-                <button id="chat-close-btn" onclick="toggleChat()">X</button>
-            </div>
-            <div id="chat-body">
-                <div id="chat-messages">
-                    <div class="message bot-message">
-                        Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo <strong>MongoDB</strong>.<br><br>
-                        Use o filtro de estado e escreva sua dúvida. Por exemplo: <em>"SE veículos"</em> ou escolha o estado no dropdown.
-                    </div>
-                </div>
-                <div id="chat-input-container">
-                    <select id="estado-filter">
-                        <option value="">Todos os estados</option>
-                        <option value="RN">RN</option>
-                        <option value="SE">SE</option>
-                        <option value="MS">MS</option>
-                        <option value="DF">DF</option>
-                        <option value="PE">PE</option>
-                        <option value="PB">PB</option>
-                        <option value="BA">BA</option>
-                        <option value="MG">MG</option>
-                        <option value="GO">GO</option>
-                        <option value="MA">MA</option>
-                        <option value="AL">AL</option>
-                        <option value="CE">CE</option>
-                        <option value="TODOS">TODOS</option>
-                    </select>
-                    <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
-                    <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
+        <main>
+            <div class="menu-grid">
+                <a href="endpoints.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
+                    <div>
+                        <h2 class="card-title">Documentação Endpoints RN</h2>
+                        <p class="card-description">Documentação técnica com os Endpoints de RN</p>
+                    </div>
+                </a>
+                <a href="Sergipe.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
+                    <div>
+                        <h2 class="card-title">Documentação Endpoints SE</h2>
+                        <p class="card-description">Documentação técnica com os Endpoints de SE</p>
+                    </div>
+                </a>
+                <a href="mshm.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
+                    <div>
+                        <h2 class="card-title">Integrações DETRAN-MS / Valid</h2>
+                        <p class="card-description">Documentação completa de fluxos, jobs e endpoints de API.</p>
+                    </div>
+                </a>
+                <a href="endpoints_df.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
+                    <div>
+                        <h2 class="card-title">Endpoints Credenciadas DF</h2>
+                        <p class="card-description">Documentação completa de fluxos, jobs e endpoints de API.</p>
+                    </div>
+                </a>
+                <a href="SuperPratico.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
+                    <div>
+                        <h2 class="card-title">Integrações SuperPrático/ Aulas Praticas</h2>
+                        <p class="card-description">Documentação completa de fluxos Do SuperPrático.</p>
+                    </div>
+                </a>
+                <a href="gerenciamento_incidentes.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
+                    <div>
+                        <h2 class="card-title">Politica de gerenciamento de incidentes</h2>
+                        <p class="card-description">Documentação completa do gerenciamento de incidente.</p>
+                    </div>
+                </a>
+                <a href="knowledge_manager.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-database"></i></div>
+                    <div>
+                        <h2 class="card-title">Gerenciar Base de Conhecimento</h2>
+                        <p class="card-description">Interface para adicionar e atualizar informações do chatbot por estado (MongoDB).</p>
+                    </div>
+                </a>
+                <a href="menu2.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-table"></i></div>
+                    <div>
+                        <h2 class="card-title">Registro Diários</h2>
+                        <p class="card-description">Base de registro diário do N2</p>
+                    </div>
+                </a>
+            </div>
+        </main>
+        <button class="logout-button" onclick="logout()">Sair</button>
+    </div>
+    
+    <div id="chat-widget-container">
+        <div class="chat-content">
+            <div id="chat-header">
+                <div style="display:flex;align-items:center;gap:8px;"><i class="fas fa-robot"></i> Assistente VSoft N2</div>
+                <button id="chat-close-btn" onclick="toggleChat()">X</button>
+            </div>
+            <div id="chat-body">
+                <div id="chat-messages">
+                    <div class="message bot-message">
+                        Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo <strong>MongoDB</strong>.<br><br>
+                        Use o filtro de estado e escreva sua dúvida. Por exemplo: <em>"SE veículos"</em> ou escolha o estado no dropdown.
+                    </div>
+                </div>
+                <div id="chat-input-container">
+                    <select id="estado-filter">
+                        <option value="">Todos os estados</option>
+                        <option value="RN">RN</option>
+                        <option value="SE">SE</option>
+                        <option value="MS">MS</option>
+                        <option value="DF">DF</option>
+                        <option value="PE">PE</option>
+                        <option value="PB">PB</option>
+                        <option value="BA">BA</option>
+                        <option value="MG">MG</option>
+                        <option value="GO">GO</option>
+                        <option value="MA">MA</option>
+                        <option value="AL">AL</option>
+                        <option value="CE">CE</option>
+                        <option value="TODOS">TODOS</option>
+                    </select>
+                    <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
+                    <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <button id="chat-open-btn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i> Chat N2</button>
+    <button id="chat-open-btn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i> Chat N2</button>
 
-        <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+    <!-- Fuse.js para pesquisa fuzzy -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
 
-    <script>
-        // Variáveis Globais para o Chatbot
-        let chatMemories = [];
-        const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
+    <script>
+        // Variáveis Globais para o Chatbot
+        let chatMemories = [];
+        const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
-        // Dicionário de sinônimos para buscas mais inteligentes
-        const SYNONYM_MAP = {
-            'endpoint': ['api', 'servico', 'url', 'acesso', 'integracao'],
-            'sla': ['prazo', 'tempo', 'critico', 'atendimento'],
-            'cfc': ['autoescola', 'credenciada', 'centro'],
-            'fluxo': ['procedimento', 'passos', 'guia', 'rotina', 'etapa'],
-            'job': ['servico', 'tarefa', 'rotina', 'processo'],
-            'incidentes': ['problema', 'erro', 'falha', 'indisponibilidade'],
-            'consulta': ['pesquisa', 'buscar', 'verificar'],
-            'veiculos': ['veículo', 'carro', 'automovel', 'placa']
-        };
+        // Dicionário de sinônimos para buscas mais inteligentes
+        const SYNONYM_MAP = {
+            'endpoint': ['api', 'servico', 'url', 'acesso', 'integracao'],
+            'sla': ['prazo', 'tempo', 'critico', 'atendimento'],
+            'cfc': ['autoescola', 'credenciada', 'centro'],
+            'fluxo': ['procedimento', 'passos', 'guia', 'rotina', 'etapa'],
+            'job': ['servico', 'tarefa', 'rotina', 'processo'],
+            'incidentes': ['problema', 'erro', 'falha', 'indisponibilidade'],
+            'consulta': ['pesquisa', 'buscar', 'verificar'],
+            'veiculos': ['veículo', 'carro', 'automovel', 'placa']
+        };
 
-        // Stop Words (Palavras comuns que devem ser ignoradas na busca)
-        const STOP_WORDS_PT = [
-            'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'e', 'é', 'ou',
-            'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às',
-            'que', 'qual', 'quais', 'quem', 'onde', 'como', 'quando', 'porque', 'porquê', 'pra', 'pela', 'pelo',
-            'dele', 'dela', 'neste', 'nesta', 'isso', 'este', 'esta', 'ser', 'meu', 'minha', 'meus', 'minhas',
-            'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre', 'me', 'meu', 'queria', 'gostaria'
-        ];
+        // Stop Words (Palavras comuns que devem ser ignoradas na busca)
+        const STOP_WORDS_PT = [
+            'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'e', 'é', 'ou',
+            'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às',
+            'que', 'qual', 'quais', 'quem', 'onde', 'como', 'quando', 'porque', 'porquê', 'pra', 'pela', 'pelo',
+            'dele', 'dela', 'neste', 'nesta', 'isso', 'este', 'esta', 'ser', 'meu', 'minha', 'meus', 'minhas',
+            'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre', 'me', 'meu', 'queria', 'gostaria'
+        ];
 
-        // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
-        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
+        // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
+        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
 
-        // Fuse index
-        let fuse = null;
-        let memoriesIndex = []; // memórias brutas carregadas
-        let lastResults = []; // resultados da última busca (para paginação)
-        let resultsPage = 0;
-        const PAGE_SIZE = 3;
+        // Fuse index
+        let fuse = null;
+        let memoriesIndex = []; // memórias brutas carregadas
+        let lastResults = []; // resultados da última busca (para paginação)
+        let resultsPage = 0;
+        const PAGE_SIZE = 3;
 
-        // Guarda as keywords da última busca para highlight
-        let lastQueryKeywords = [];
+        // Guarda as keywords da última busca para highlight
+        let lastQueryKeywords = [];
 
-        function logout() {
-            localStorage.removeItem('agenteSelecionado');
-            localStorage.removeItem('estadoSelecionado');
-            window.location.href = 'login.html';
-        }
+        function logout() {
+            localStorage.removeItem('agenteSelecionado');
+            localStorage.removeItem('estadoSelecionado');
+            window.location.href = 'login.html';
+        }
 
-        function toggleChat() {
-            const chatWidget = document.getElementById('chat-widget-container');
-            const openBtn = document.getElementById('chat-open-btn');
+        function toggleChat() {
+            const chatWidget = document.getElementById('chat-widget-container');
+            const openBtn = document.getElementById('chat-open-btn');
 
-            if (chatWidget.style.display === 'flex') {
-                chatWidget.style.display = 'none';
-                openBtn.style.display = 'block';
-                document.body.style.overflow = 'auto';
-            } else {
-                chatWidget.style.display = 'flex';
-                openBtn.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-                document.getElementById('chat-input').focus();
-            }
-        }
+            if (chatWidget.style.display === 'flex') {
+                chatWidget.style.display = 'none';
+                openBtn.style.display = 'block';
+                document.body.style.overflow = 'auto';
+            } else {
+                chatWidget.style.display = 'flex';
+                openBtn.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+                document.getElementById('chat-input').focus();
+            }
+        }
 
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && document.getElementById('chat-widget-container').style.display === 'flex') {
-                toggleChat();
-            }
-        });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('chat-widget-container').style.display === 'flex') {
+                toggleChat();
+            }
+        });
 
-        // --- Helpers de texto e busca ---
-        function normalizeText(t) {
-            return (t || '')
-                .normalize('NFD').replace(/[̀-\u036f]/g, '')
-                .toLowerCase()
-                .replace(/[^a-z0-9\s]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        }
+        // --- Helpers de texto e busca ---
+        function normalizeText(t) {
+            return (t || '')
+                .normalize('NFD').replace(/[̀-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
 
-        function expandTerms(terms) {
-            const expanded = new Set();
-            for (const t of terms) {
-                expanded.add(t);
-                const mapped = SYNONYM_MAP[t];
-                if (mapped) mapped.forEach(s => expanded.add(s));
-            }
-            return Array.from(expanded);
-        }
+        function expandTerms(terms) {
+            const expanded = new Set();
+            for (const t of terms) {
+                expanded.add(t);
+                const mapped = SYNONYM_MAP[t];
+                if (mapped) mapped.forEach(s => expanded.add(s));
+            }
+            return Array.from(expanded);
+        }
 
-        function highlight(text, terms) {
-            let out = text || '';
-            // Expande as keywords originais com sinônimos para o destaque ser mais completo
-            const highlightTerms = expandTerms(terms); 
+        function highlight(text, terms) {
+            let out = text || '';
+            for (const term of terms) {
+                if (!term || term.length < 2) continue;
+                const safe = term.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+                out = out.replace(new RegExp(`(${safe})`, 'ig'), '<mark>$1</mark>');
+            }
+            return out;
+        }
 
-            for (const term of highlightTerms) {
-                if (!term || term.length < 2) continue;
-                const safe = term.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
-                // Regex para encontrar a palavra toda, mas permite palavras parciais também
-                out = out.replace(new RegExp(`(${safe})`, 'ig'), '<mark>$1</mark>');
-            }
-            return out;
-        }
+        // Carrega memórias e cria índice Fuse
+        async function loadMemoriesFromDatabase() {
+            appendConsoleLog(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/memories`);
+                if (response.ok) {
+                    const data = await response.json();
+                    chatMemories = data;
+                    memoriesIndex = data.map(m => ({
+                        ...m,
+                        titulo: (m.texto || '').split(':')[0] || '',
+                        texto: m.texto || '',
+                        texto_normalizado: normalizeText(m.texto || ''),
+                        estado: (m.estado || 'TODOS').toUpperCase()
+                    }));
 
-        // Carrega memórias e cria índice Fuse
-        async function loadMemoriesFromDatabase() {
-            appendConsoleLog(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/memories`);
-                if (response.ok) {
-                    const data = await response.json();
-                    chatMemories = data;
-                    memoriesIndex = data.map(m => ({
-                        ...m,
-                        titulo: (m.texto || '').split(':')[0] || '',
-                        texto: m.texto || '',
-                        texto_normalizado: normalizeText(m.texto || ''),
-                        estado: (m.estado || 'TODOS').toUpperCase()
-                    }));
+                    const options = {
+                        includeScore: true,
+                        shouldSort: true,
+                        threshold: 0.35, // mais restrito para evitar resultados irrelevantes
+                        keys: [
+                            { name: 'titulo', weight: 0.7 },
+                            { name: 'texto', weight: 0.25 },
+                            { name: 'estado', weight: 0.05 }
+                        ],
+                        ignoreLocation: true,
+                        useExtendedSearch: true
+                    };
+                    fuse = new Fuse(memoriesIndex, options);
+                    appendConsoleLog(`[MongoDB] ${memoriesIndex.length} memórias indexadas com Fuse.`);
+                } else {
+                    appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
+                }
+            } catch (error) {
+                console.error('Erro de rede/conexão:', error);
+                appendMessage(`[ERRO DE CONEXÃO] Não foi possível acessar o backend Vercel em **${BACKEND_URL}**. Verifique se a URL está correta e se o projeto está implantado e ativo.`, 'bot-message');
+            }
+        }
 
-                    const options = {
-                        includeScore: true,
-                        shouldSort: true,
-                        threshold: 0.35, // mais restrito para evitar resultados irrelevantes
-                        keys: [
-                            { name: 'titulo', weight: 0.7 },
-                            { name: 'texto', weight: 0.25 },
-                            { name: 'estado', weight: 0.05 }
-                        ],
-                        ignoreLocation: true,
-                        useExtendedSearch: true
-                    };
-                    fuse = new Fuse(memoriesIndex, options);
-                    appendConsoleLog(`[MongoDB] ${memoriesIndex.length} memórias indexadas com Fuse.`);
-                } else {
-                    appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
-                }
-            } catch (error) {
-                console.error('Erro de rede/conexão:', error);
-                appendMessage(`[ERRO DE CONEXÃO] Não foi possível acessar o backend Vercel em **${BACKEND_URL}**. Verifique se a URL está correta e se o projeto está implantado e ativo.`, 'bot-message');
-            }
-        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMemoriesFromDatabase();
+            document.getElementById('chat-open-btn').style.display = 'block';
+        });
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadMemoriesFromDatabase();
-            document.getElementById('chat-open-btn').style.display = 'block';
-        });
+        // Enviar com Enter
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
 
-        // Enviar com Enter
-        document.getElementById('chat-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') sendMessage();
-        });
+        // Envio / ciclo de resposta
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const messageText = input.value.trim();
+            if (messageText === '') return;
+            appendMessage(messageText, 'user-message');
 
-        // Envio / ciclo de resposta
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const messageText = input.value.trim();
-            if (messageText === '') return;
-            appendMessage(messageText, 'user-message');
+            // Guardamos o texto em uma variável local para que as funções
+            // posteriores possam usar o texto (não dependemos do input.value)
+            const userMessageForSearch = messageText;
+            input.value = '';
+            showTypingIndicator();
+            // pequeno delay para UX
+            setTimeout(() => {
+                const botResponse = getBotResponse(userMessageForSearch);
+                appendMessage(botResponse, 'bot-message');
+                hideTypeningIndicator();
+            }, 600);
+        }
 
-            // Guardamos o texto em uma variável local para que as funções
-            // posteriores possam usar o texto (não dependemos do input.value)
-            const userMessageForSearch = messageText;
-            input.value = '';
-            showTypingIndicator();
-            // pequeno delay para UX
-            setTimeout(() => {
-                const botResponse = getBotResponse(userMessageForSearch);
-                appendMessage(botResponse, 'bot-message');
-                hideTypeningIndicator();
-            }, 600);
-        }
+        function appendMessage(text, className) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
 
-        function appendMessage(text, className) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${className}`;
+            // Processa blocos de código
+            const codeBlockRegex = /(```json|```|\{)\n?([\s\S]*?)(\n?```|\n\})/g;
+            let processedText = text.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
+                content = content.replace(/```json|```|{|}/g, '').trim();
+                return `\n<pre>${content}</pre>\n`;
+            });
 
-            // Processa blocos de código
-            const codeBlockRegex = /(```json|```|\{)\n?([\s\S]*?)(\n?```|\n\})/g;
-            let processedText = text.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
-                content = content.replace(/```json|```|{|}/g, '').trim();
-                return `\n<pre>${content}</pre>\n`;
-            });
+            processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            messageDiv.innerHTML = processedText;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
 
-            processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            messageDiv.innerHTML = processedText;
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+        function appendConsoleLog(text) {
+            console.log(text);
+        }
 
-        function appendConsoleLog(text) {
-            console.log(text);
-        }
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = 'Digitando...';
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            document.getElementById('chat-input').disabled = true;
+            document.getElementById('chat-send-btn').disabled = true;
+        }
 
-        function showTypingIndicator() {
-            const messagesContainer = document.getElementById('chat-messages');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot-message typing-indicator';
-            typingDiv.id = 'typing-indicator';
-            typingDiv.innerHTML = 'Digitando...';
-            messagesContainer.appendChild(typingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            document.getElementById('chat-input').disabled = true;
-            document.getElementById('chat-send-btn').disabled = true;
-        }
+        function hideTypeningIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) typingIndicator.remove();
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('chat-send-btn').disabled = false;
+            document.getElementById('chat-input').focus();
+        }
 
-        function hideTypeningIndicator() {
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) typingIndicator.remove();
-            document.getElementById('chat-input').disabled = false;
-            document.getElementById('chat-send-btn').disabled = false;
-            document.getElementById('chat-input').focus();
-        }
+        // -------------------------------
+        // Função getBotResponse (corrigida)
+        // -------------------------------
+        function getBotResponse(message) {
+            const estadoFilter = (document.getElementById('estado-filter')?.value || '').toUpperCase();
+            const raw = message.trim();
+            const normalized = normalizeText(raw);
 
-        // -------------------------------
-        // Função getBotResponse (CORRIGIDA)
-        // -------------------------------
-        function getBotResponse(message) {
-            const estadoFilter = (document.getElementById('estado-filter')?.value || '').toUpperCase();
-            const raw = message.trim();
-            const normalized = normalizeText(raw);
+            // keywords iniciais (filtrando stopwords e palavras curtas)
+            let keywords = normalized.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS_PT.includes(w));
+            // expande sinônimos
+            keywords = expandTerms(keywords);
 
-            // 1. EXTRAÇÃO DE KEYWORDS
-            // keywords iniciais (filtrando stopwords e palavras curtas)
-            let keywords = normalized.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS_PT.includes(w));
-            
-            // Salva as keywords originais (sem sinônimos) para highlight
-            lastQueryKeywords = keywords.slice(); 
+            // REMOÇÃO: remove tokens que sejam códigos de estado para evitar match apenas por estado
+            const stateTokens = VALID_STATES.map(s => s.toLowerCase());
+            keywords = keywords.filter(k => !stateTokens.includes(k));
 
-            // expande sinônimos para a busca (melhora a chance de match)
-            keywords = expandTerms(keywords);
+            // salva para highlight/paginação
+            lastQueryKeywords = keywords.slice();
 
+            // detecta estado via input ou texto
+            const possibleState = normalized.split(/\s+/).find(w => stateTokens.includes(w));
+            const effectiveState = (estadoFilter || (possibleState ? possibleState.toUpperCase() : '')).toUpperCase();
 
-            // 2. DETECÇÃO E FILTRO DE ESTADO
-            const stateTokens = VALID_STATES.map(s => s.toLowerCase());
-            const possibleState = normalized.split(/\s+/).find(w => stateTokens.includes(w));
-            const effectiveState = (estadoFilter || (possibleState ? possibleState.toUpperCase() : '')).toUpperCase();
+            // filtra pool por estado (se houver)
+            let pool = memoriesIndex;
+            if (effectiveState && effectiveState !== 'TODOS') {
+                pool = memoriesIndex.filter(m => (m.estado || '').toUpperCase() === effectiveState);
+            }
 
-            // Filtra pool por estado (inclui o estado específico OU memórias de 'TODOS')
-            let pool = memoriesIndex;
-            if (effectiveState && effectiveState !== 'TODOS' && effectiveState !== '') {
-                pool = memoriesIndex.filter(m => 
-                    (m.estado || '').toUpperCase() === effectiveState || 
-                    (m.estado || '').toUpperCase() === 'TODOS' 
-                );
-            }
+            // se não há termos (usuário só abriu sem digitar), mostra últimos registros do estado
+            if (keywords.length === 0) {
+                const list = pool.sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 6);
+                if (list.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
+                lastResults = list;
+                resultsPage = 0;
+                return formatResultsPage();
+            }
 
-            // Se não há keywords relevantes, mostra os últimos registros
-            if (keywords.length === 0 || pool.length === 0) {
-                if (raw.toLowerCase().includes('gerenciar base') || raw.toLowerCase().includes('knowledge')) {
-                    return `Use o menu principal ou acesse o card **Gerenciar Base de Conhecimento** para configurar o MongoDB.`;
-                }
-                
-                const list = pool.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 6);
-                if (list.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
-                lastResults = list;
-                resultsPage = 0;
-                return formatResultsPage();
-            }
+            // monta query do Fuse (cada keyword deve existir em título OU texto — usaremos AND entre elas)
+            const fuseQueryParts = keywords.map(k => ({
+                $or: [
+                    { titulo: k },
+                    { texto: k }
+                ]
+            }));
 
-            // 3. BUSCA FUSE.JS
-            // Junta as keywords (incluindo sinônimos) para a busca no modo Extended Search
-            const searchQuery = keywords.join(' '); 
-            
-            let results = [];
-            try {
-                // Cria Fuse local apenas sobre o pool filtrado por estado
-                const tempFuse = new Fuse(pool, { 
-                    includeScore: true, 
-                    threshold: 0.35, 
-                    keys: ['titulo', 'texto', 'estado'], 
-                    ignoreLocation: true, 
-                    useExtendedSearch: true 
-                });
-                
-                const fuseResults = tempFuse.search(searchQuery, { limit: 50 });
-                results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
+            let results = [];
+            try {
+                // cria Fuse local apenas sobre o pool filtrado por estado
+                const tempFuse = new Fuse(pool, { includeScore: true, threshold: 0.35, keys: ['titulo', 'texto'], ignoreLocation: true, useExtendedSearch: true });
+                const searchQuery = { $and: fuseQueryParts };
+                const fuseResults = tempFuse.search(searchQuery, { limit: 50 });
+                results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
 
-            } catch (e) {
-                // Fallback (caso o Fuse falhe)
-                console.error("Erro no Fuse, usando fallback:", e);
-                results = pool.map(m => ({ ...m, __fuseScore: 1.0 })).filter(m => keywords.every(k =>
-                    (m.texto_normalizado || '').includes(k) || (m.titulo && normalizeText(m.titulo).includes(k))
-                ));
-            }
-            
-            // 4. PÓS-PROCESSAMENTO E ORDENAÇÃO
-            for (const r of results) {
-                let extra = 0;
-                
-                // Bonificação: palavras-chave no título
-                const titleNorm = normalizeText(r.titulo || '');
-                for (const k of lastQueryKeywords) { 
-                    if (titleNorm.includes(k)) extra += 3;
-                }
-                
-                // Bonificação: Match exato de estado
-                if (effectiveState && effectiveState !== 'TODOS' && (r.estado || '').toUpperCase() === effectiveState) extra += 2;
-                
-                // Calcula o score final (o score do Fuse é melhor quanto mais perto de 0)
-                const base = (typeof r.__fuseScore === 'number') ? (1 - Math.min(r.__fuseScore, 1)) * 5 : 1;
-                r._score = base + extra;
-            }
+                // FILTRO EXTRA 
+                const normalizedKeywords = keywords.map(k => normalizeText(k));
+                results = results.filter(r => normalizedKeywords.some(k =>
+                    (r.texto_normalizado || '').includes(k) || normalizeText(r.titulo || '').includes(k)
+                ));
+            } catch (e) {
+                // fallback rígido: contains em texto/título normalizado
+                results = pool.map(m => ({ ...m, __fuseScore: 1.0 })).filter(m => keywords.every(k =>
+                    (m.texto_normalizado || '').includes(k) || (m.titulo && normalizeText(m.titulo).includes(k))
+                ));
+            }
 
-            const finalMatches = results.sort((a,b) => (b._score || 0) - (a._score || 0));
+            // pós-processamento de score
+            for (const r of results) {
+                let extra = 0;
+                const titleNorm = normalizeText(r.titulo || '');
+                for (const k of keywords) {
+                    if (titleNorm.includes(k)) extra += 3;
+                    if ((r.texto_normalizado || '').includes(k)) extra += 1;
+                }
+                if (effectiveState && effectiveState !== 'TODOS' && (r.estado || '').toUpperCase() === effectiveState) extra += 2;
+                const base = (typeof r.__fuseScore === 'number') ? (1 - Math.min(r.__fuseScore, 1)) * 5 : 1;
+                r._score = base + extra;
+            }
 
-            if (finalMatches.length === 0) {
-                return `Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para essa pesquisa no estado ${effectiveState || 'TODOS'}. Tente termos diferentes ou vá em 'Gerenciar Base de Conhecimento'.`;
-            }
+            const finalMatches = results.sort((a,b) => (b._score || 0) - (a._score || 0));
+            if (finalMatches.length === 0) {
+                return `Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para essa pesquisa no estado ${effectiveState || 'TODOS'}. Tente termos diferentes ou vá em 'Gerenciar Base de Conhecimento'.`;
+            }
 
-            lastResults = finalMatches;
-            resultsPage = 0;
-            return formatResultsPage();
-        }
+            lastResults = finalMatches;
+            resultsPage = 0;
+            return formatResultsPage();
+        }
 
-        // -------------------------------
-        // formatação / paginação / utilitários
-        // -------------------------------
-        function formatResultsPage() {
-            const start = resultsPage * PAGE_SIZE;
-            const end = start + PAGE_SIZE;
-            const page = lastResults.slice(start, end);
-            if (page.length === 0) return 'Nenhum resultado nesta página.';
+        // -------------------------------
+        // formatação / paginação / utilitários
+        // -------------------------------
+        function formatResultsPage() {
+            const start = resultsPage * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const page = lastResults.slice(start, end);
+            if (page.length === 0) return 'Nenhum resultado nesta página.';
 
-            const total = lastResults.length;
-            const listFormatted = page.map(m => {
-                const date = m.dataHora ? new Date(m.dataHora).toLocaleDateString('pt-BR') : '';
-                const parts = (m.texto || '').split(':');
-                const title = parts[0] || m.titulo || 'Sem título';
-                const content = parts.length > 1 ? parts.slice(1).join(':') : m.texto || '';
-                // usa lastQueryKeywords que foi salvo durante a busca
-                const keywordsFromQuery = lastQueryKeywords || [];
-                const highlighted = highlight(content, keywordsFromQuery);
-                const img = m.imagemUrl ? `<br><img src="${m.imagemUrl}" style="max-width:100%;border-radius:6px;margin-top:8px;">` : '';
-                const id = m._id || m.id || (m.idMemoria || '') || '';
-                const actions = `<br><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"><button class="chat-button" onclick="showFullMemory('${id}')">Ver Mais</button><button class="chat-button" onclick="sendFeedback('${id}', true)">👍</button><button class="chat-button" onclick="sendFeedback('${id}', false)">👎</button></div>`;
-                return `**[${m.estado || 'TODOS'}] ${title}**\n\n${highlighted} (Agente: ${m.agente || '—'}, ${date})${img}${actions}`;
-            }).join('\n\n---\n\n');
+            const total = lastResults.length;
+            const listFormatted = page.map(m => {
+                const date = m.dataHora ? new Date(m.dataHora).toLocaleDateString('pt-BR') : '';
+                const parts = (m.texto || '').split(':');
+                const title = parts[0] || m.titulo || 'Sem título';
+                const content = parts.length > 1 ? parts.slice(1).join(':') : m.texto || '';
+                // usa lastQueryKeywords que foi salvo durante a busca
+                const keywordsFromQuery = lastQueryKeywords || [];
+                const highlighted = highlight(content, keywordsFromQuery);
+                const img = m.imagemUrl ? `<br><img src="${m.imagemUrl}" style="max-width:100%;border-radius:6px;margin-top:8px;">` : '';
+                const id = m._id || m.id || (m.idMemoria || '') || '';
+                const actions = `<br><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"><button class="chat-button" onclick="showFullMemory('${id}')">Ver Mais</button><button class="chat-button" onclick="sendFeedback('${id}', true)">👍</button><button class="chat-button" onclick="sendFeedback('${id}', false)">👎</button></div>`;
+                return `**[${m.estado || 'TODOS'}] ${title}**\n\n${highlighted} (Agente: ${m.agente || '—'}, ${date})${img}${actions}`;
+            }).join('\n\n---\n\n');
 
-            const remaining = Math.max(0, total - ((resultsPage + 1) * PAGE_SIZE));
-            const moreBtn = remaining > 0 ? `\n\n<button class="chat-button" onclick="showMoreResults()">Mostrar mais (${remaining} restantes)</button>` : '\n\n*Fim da lista.*';
-            return `Encontrei **${total}** referências.\n\n${listFormatted}${moreBtn}`;
-        }
+            const remaining = Math.max(0, total - ((resultsPage + 1) * PAGE_SIZE));
+            const moreBtn = remaining > 0 ? `\n\n<button class="chat-button" onclick="showMoreResults()">Mostrar mais (${remaining} restantes)</button>` : '\n\n*Fim da lista.*';
+            return `Encontrei **${total}** referências.\n\n${listFormatted}${moreBtn}`;
+        }
 
-        function collectLastQueryKeywords() {
-            return lastQueryKeywords || [];
-        }
+        function collectLastQueryKeywords() {
+            return lastQueryKeywords || [];
+        }
 
-        function showMoreResults() {
-            resultsPage += 1;
-            appendMessage(formatResultsPage(), 'bot-message');
-        }
+        function showMoreResults() {
+            resultsPage += 1;
+            appendMessage(formatResultsPage(), 'bot-message');
+        }
 
-        function showFullMemory(id) {
-            const mem = memoriesIndex.find(m => (m._id === id || m.id === id || (m.idMemoria === id)));
-            if (!mem) { appendMessage('Conteúdo não encontrado', 'bot-message'); return; }
-            appendMessage(`**${mem.titulo}**\n\n${mem.texto}\n\n(Agente: ${mem.agente}, ${new Date(mem.dataHora).toLocaleString('pt-BR')})`, 'bot-message');
-        }
+        function showFullMemory(id) {
+            const mem = memoriesIndex.find(m => (m._id === id || m.id === id || (m.idMemoria === id)));
+            if (!mem) { appendMessage('Conteúdo não encontrado', 'bot-message'); return; }
+            appendMessage(`**${mem.titulo}**\n\n${mem.texto}\n\n(Agente: ${mem.agente}, ${new Date(mem.dataHora).toLocaleString('pt-BR')})`, 'bot-message');
+        }
 
-        async function sendFeedback(id, positive) {
-            if (!id) { appendMessage('ID da memória inválido para feedback.', 'bot-message'); return; }
-            try {
-                await fetch(`${BACKEND_URL}/api/memories/feedback`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id, positive })
-                });
-                appendMessage(positive ? 'Obrigado pelo feedback positivo!' : 'Obrigado, registramos o feedback e iremos revisar.', 'bot-message');
-            } catch (e) {
-                appendMessage('Erro ao enviar feedback.', 'bot-message');
-            }
-        }
+        async function sendFeedback(id, positive) {
+            if (!id) { appendMessage('ID da memória inválido para feedback.', 'bot-message'); return; }
+            try {
+                await fetch(`${BACKEND_URL}/api/memories/feedback`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id, positive })
+                });
+                appendMessage(positive ? 'Obrigado pelo feedback positivo!' : 'Obrigado, registramos o feedback e iremos revisar.', 'bot-message');
+            } catch (e) {
+                appendMessage('Erro ao enviar feedback.', 'bot-message');
+            }
+        }
 
-    </script>
+    </script>
 </body>
 </html>
