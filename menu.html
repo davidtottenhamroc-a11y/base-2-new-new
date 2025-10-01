@@ -454,7 +454,7 @@
         // Stop Words (Palavras comuns que devem ser ignoradas na busca)
         const STOP_WORDS_PT = [
             'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'e', 'é', 'ou',
-            'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às', 'oito', 'nove',
+            'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às',
             'que', 'qual', 'quais', 'quem', 'onde', 'como', 'quando', 'porque', 'porquê', 'pra', 'pela', 'pelo',
             'dele', 'dela', 'neste', 'nesta', 'isso', 'este', 'esta', 'ser', 'meu', 'minha', 'meus', 'minhas',
             'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre', 'me', 'meu', 'queria', 'gostaria'
@@ -469,6 +469,9 @@
         let lastResults = []; // resultados da última busca (para paginação)
         let resultsPage = 0;
         const PAGE_SIZE = 3;
+
+        // Guarda as keywords da última busca para highlight
+        let lastQueryKeywords = [];
 
         function logout() {
             localStorage.removeItem('agenteSelecionado');
@@ -547,7 +550,7 @@
                     const options = {
                         includeScore: true,
                         shouldSort: true,
-                        threshold: 0.45,
+                        threshold: 0.35, // mais restrito para evitar resultados irrelevantes
                         keys: [
                             { name: 'titulo', weight: 0.7 },
                             { name: 'texto', weight: 0.25 },
@@ -583,11 +586,15 @@
             const messageText = input.value.trim();
             if (messageText === '') return;
             appendMessage(messageText, 'user-message');
+
+            // Guardamos o texto em uma variável local para que as funções
+            // posteriores possam usar o texto (não dependemos do input.value)
+            const userMessageForSearch = messageText;
             input.value = '';
             showTypingIndicator();
             // pequeno delay para UX
             setTimeout(() => {
-                const botResponse = getBotResponse(messageText);
+                const botResponse = getBotResponse(userMessageForSearch);
                 appendMessage(botResponse, 'bot-message');
                 hideTypeningIndicator();
             }, 600);
@@ -644,16 +651,20 @@
             let keywords = normalized.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS_PT.includes(w));
             keywords = expandTerms(keywords);
 
+            // salva keywords para highlight/paginação
+            lastQueryKeywords = keywords.slice();
+
             const possibleState = keywords.find(k => VALID_STATES.map(s => s.toLowerCase()).includes(k));
             const effectiveState = (estadoFilter || (possibleState ? possibleState.toUpperCase() : '')).toUpperCase();
 
             // filtra por estado primeiro
             let pool = memoriesIndex;
             if (effectiveState && effectiveState !== 'TODOS') {
-                pool = memoriesIndex.filter(m => (m.estado || '').toUpperCase() === effectiveState || (m.estado || '').toUpperCase() === 'TODOS');
+                // IMPORTANTE: agora **não** incluímos memórias marcadas como 'TODOS' quando o usuário escolhe um estado
+                pool = memoriesIndex.filter(m => (m.estado || '').toUpperCase() === effectiveState);
             }
 
-            // Se não há termos, listar os mais recentes do estado
+            // Se não há termos, listar os mais recentes do estado (ou geral)
             if (keywords.length === 0) {
                 const list = pool.sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 6);
                 if (list.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
@@ -662,23 +673,26 @@
                 return formatResultsPage();
             }
 
-            // Monta query para Fuse: pesquisa OR entre palavras
-            const fuseQueryParts = keywords.map(k => ({ $or: [
-                { titulo: `'${k}` },
-                { texto: `'${k}` },
-                { texto: k }
-            ] }));
+            // Monta query para Fuse: agora usamos $and entre palavras, e cada palavra pode estar em titulo OU texto
+            const fuseQueryParts = keywords.map(k => ({
+                $or: [
+                    { titulo: k },
+                    { texto: k }
+                ]
+            }));
 
             let results = [];
             try {
-                // Para performance, criamos um Fuse temporário sobre o pool
-                const tempFuse = new Fuse(pool, { includeScore: true, threshold: 0.5, keys: ['titulo', 'texto', 'estado'], ignoreLocation: true, useExtendedSearch: true });
-                const searchQuery = { $or: fuseQueryParts };
+                // Para performance, criamos um Fuse temporário sobre o pool com um threshold mais conservador
+                const tempFuse = new Fuse(pool, { includeScore: true, threshold: 0.35, keys: ['titulo', 'texto', 'estado'], ignoreLocation: true, useExtendedSearch: true });
+                const searchQuery = { $and: fuseQueryParts };
                 const fuseResults = tempFuse.search(searchQuery, { limit: 50 });
                 results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
             } catch (e) {
-                // fallback: busca por contains
-                results = pool.map(m => ({ ...m, __fuseScore: 1.0 })).filter(m => keywords.some(k => (m.texto_normalizado || '').includes(k) || (m.titulo && normalizeText(m.titulo).includes(k))));
+                // fallback: busca por contains (mais rígida)
+                results = pool.map(m => ({ ...m, __fuseScore: 1.0 })).filter(m => keywords.every(k =>
+                    (m.texto_normalizado || '').includes(k) || (m.titulo && normalizeText(m.titulo).includes(k))
+                ));
             }
 
             // pós-processamento de score
@@ -716,7 +730,8 @@
                 const parts = (m.texto || '').split(':');
                 const title = parts[0] || m.titulo || 'Sem título';
                 const content = parts.length > 1 ? parts.slice(1).join(':') : m.texto || '';
-                const keywordsFromQuery = collectLastQueryKeywords();
+                // usa lastQueryKeywords que foi salvo durante a busca
+                const keywordsFromQuery = lastQueryKeywords || [];
                 const highlighted = highlight(content, keywordsFromQuery);
                 const img = m.imagemUrl ? `<br><img src="${m.imagemUrl}" style="max-width:100%;border-radius:6px;margin-top:8px;">` : '';
                 const id = m._id || m.id || (m.idMemoria || '') || '';
@@ -730,11 +745,7 @@
         }
 
         function collectLastQueryKeywords() {
-            // tenta reconstruir keywords a partir do último input visível (simples)
-            const input = document.getElementById('chat-input');
-            const val = input ? normalizeText(input.value || '') : '';
-            const tokens = val.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS_PT.includes(w));
-            return expandTerms(tokens);
+            return lastQueryKeywords || [];
         }
 
         function showMoreResults() {
