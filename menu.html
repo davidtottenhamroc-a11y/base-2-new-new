@@ -127,30 +127,31 @@
             background: linear-gradient(135deg, #c82333, #a71d24);
         }
 
-        /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
+        /* --- Estilos do Chatbot (AGORA: Widget Flutuante/Bubble) --- */
         #chat-widget-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw; 
-            height: 100vh;
-            background: rgba(13, 26, 42, 0.95); 
-            border-radius: 0;
-            box-shadow: none;
+            bottom: 100px; /* Posição vertical (acima do botão) */
+            right: 30px; /* Posição horizontal */
+            width: 380px; /* Largura padrão de chat */
+            height: 500px; /* Altura padrão de chat */
+            background: transparent;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Sombra mais discreta */
             display: none; 
             z-index: 9999;
-            align-items: center; 
-            justify-content: center;
+            flex-direction: column; 
+            align-items: stretch; 
+            justify-content: flex-end;
         }
 
         .chat-content {
-            width: 90%;
-            max-width: 800px; 
-            height: 90%;
-            max-height: 800px;
+            width: 100%;
+            max-width: none; /* Remove limitação de largura */
+            height: 100%;
+            max-height: none; /* Remove limitação de altura */
             background: #ffffff;
             border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: none; 
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -171,17 +172,17 @@
         }
         #chat-close-btn {
             background: none;
-            border: 1px solid white;
-            border-radius: 50%;
+            border: none; /* Removido para o estilo 'bubble' */
             width: 30px;
             height: 30px;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: color 0.2s;
         }
         #chat-close-btn:hover {
-            background: #2980b9;
+            color: #f0f0f0;
+            background: none;
         }
 
         #chat-body {
@@ -199,7 +200,7 @@
             margin-bottom: 15px;
         }
         
-        /* Estilização das Mensagens Aprimorada */
+        /* Estilização das Mensagens Aprimorada (Mantida) */
         .message {
             max-width: 90%; 
             padding: 12px 18px;
@@ -230,7 +231,7 @@
         .bot-message strong {
             color: #c0392b; 
         }
-        /* Estilo para blocos de código/JSON (melhora a visualização do corpo da requisição) */
+        /* Estilo para blocos de código/JSON (Mantida) */
         .bot-message pre {
             background: #f4f4f4;
             padding: 10px;
@@ -277,46 +278,7 @@
             transform: scale(0.95);
         }
 
-        /* Estilo para o botão de "Mostrar Mais" (Mantido o estilo, mas não será gerado) */
-        .chat-button {
-            padding: 10px 15px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 15px;
-            transition: background 0.2s;
-            display: block; 
-            width: 100%;
-        }
-        .chat-button:hover:not(:disabled) {
-            background: #2980b9;
-        }
-        .chat-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-
-        /* Indicador de Digitação */
-        .typing-indicator {
-            background: #e0e0e0;
-            color: #555;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-style: italic;
-            display: inline-block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- Estilo do Botão Flutuante --- */
+        /* Estilo do Botão Flutuante (Mantido) */
         #chat-open-btn {
             position: fixed;
             bottom: 30px;
@@ -445,6 +407,27 @@
         let chatMemories = [];
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
+        // Dicionário de sinônimos para buscas mais inteligentes
+        const SYNONYM_MAP = {
+            'endpoint': ['api', 'servico', 'url', 'acesso', 'integracao'],
+            'sla': ['prazo', 'tempo', 'critico', 'atendimento'],
+            'cfc': ['autoescola', 'credenciada', 'centro'],
+            'fluxo': ['procedimento', 'passos', 'guia', 'rotina', 'etapa'],
+            'job': ['servico', 'tarefa', 'rotina', 'processo'],
+            'incidentes': ['problema', 'erro', 'falha', 'indisponibilidade'],
+            'consulta': ['pesquisa', 'buscar', 'verificar']
+        };
+
+        // Stop Words (Palavras comuns que devem ser ignoradas na busca)
+        const STOP_WORDS_PT = [
+            'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'e', 'é', 'ou',
+            'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às', 'oito', 'nove',
+            'que', 'qual', 'quais', 'quem', 'onde', 'como', 'quando', 'porque', 'porquê', 'pra', 'pela', 'pelo',
+            'dele', 'dela', 'neste', 'nesta', 'isso', 'este', 'esta', 'ser', 'meu', 'minha', 'meus', 'minhas',
+            'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre', 'me', 'meu', 'queria', 'gostaria'
+        ];
+
+
         // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
         const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
         
@@ -454,7 +437,7 @@
             window.location.href = 'login.html';
         }
 
-        // Função para abrir/fechar o chat em tela cheia
+        // Função para abrir/fechar o chat (AGORA EM MODO WIDGET)
         function toggleChat() {
             const chatWidget = document.getElementById('chat-widget-container');
             const openBtn = document.getElementById('chat-open-btn');
@@ -462,13 +445,13 @@
             if (chatWidget.style.display === 'flex') {
                 // Fechar
                 chatWidget.style.display = 'none';
-                openBtn.style.display = 'block'; // Mostra o botão flutuante
-                document.body.style.overflow = 'auto'; // Restaura o scroll
+                openBtn.style.display = 'block'; 
+                // document.body.style.overflow = 'auto'; -- REMOVIDO
             } else {
                 // Abrir
                 chatWidget.style.display = 'flex';
-                openBtn.style.display = 'none'; // Esconde o botão flutuante
-                document.body.style.overflow = 'hidden'; // Remove o scroll do corpo
+                openBtn.style.display = 'none'; 
+                // document.body.style.overflow = 'hidden'; -- REMOVIDO
                 document.getElementById('chat-input').focus();
             }
         }
@@ -540,13 +523,12 @@
             }, 1500);
         }
 
-        // Função para adicionar a mensagem (CORRIGIDA PARA ACEITAR HTML e formatar JSON)
+        // Função para adicionar a mensagem (com formatação)
         function appendMessage(text, className) {
             const messagesContainer = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${className}`;
             
-            // Processa a string para que tags <img> e <button> HTML sejam interpretadas
             let processedText = text;
 
             // 1. Processamento de blocos de código/JSON para <pre>
@@ -554,14 +536,12 @@
             processedText = processedText.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
                 content = content.replace(/```json|```|{|}/g, '').trim();
                 
-                // Tenta formatar JSON para melhor legibilidade
                 if (openTag.includes('json') || content.includes(':')) {
                     try {
                         let parseContent = content.startsWith('{') && content.endsWith('}') ? content : `{${content}}`;
                         const jsonObject = JSON.parse(parseContent);
                         content = JSON.stringify(jsonObject, null, 2).replace(/^\{|\}$/g, '').trim();
-                    } catch (e) {
-                    }
+                    } catch (e) { }
                 }
                 
                 return `\n<pre>${content}</pre>\n`;
@@ -570,13 +550,14 @@
             // 2. Converte quebras de linha e negrito
             processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             
-            // 3. Injeta o HTML (incluindo o botão)
+            // 3. Injeta o HTML
             messageDiv.innerHTML = processedText;
 
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
+        // Indicador de Digitação (Mantido)
         function showTypingIndicator() {
             const messagesContainer = document.getElementById('chat-messages');
             const typingDiv = document.createElement('div');
@@ -585,8 +566,6 @@
             typingDiv.innerHTML = 'Digitando...';
             messagesContainer.appendChild(typingDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            // Desativa os controles
             document.getElementById('chat-input').disabled = true;
             document.getElementById('chat-send-btn').disabled = true;
         }
@@ -596,94 +575,93 @@
             if (typingIndicator) {
                 typingIndicator.remove();
             }
-
-            // Reativa os controles e foca no input para nova pergunta
             document.getElementById('chat-input').disabled = false;
             document.getElementById('chat-send-btn').disabled = false;
             document.getElementById('chat-input').focus(); 
         }
         
-        // --- FUNÇÕES DE PAGINAÇÃO (REMOVIDAS DO FLUXO PRINCIPAL) ---
-        // (Mantidas vazias para evitar erros, mas o fluxo principal não as utiliza mais)
-        const RESULTS_PER_PAGE_DEFAULT = 6;
-        let currentSearchMatches = [];
-        
-        window.showMoreResults = function(nextIndex, remaining) {
-            // Lógica de Paginação (agora desativada no fluxo principal)
-            console.log("Paginação manual desativada. Use a busca detalhada.");
-        }
-
-        function generatePagedResponse(matches, startIndex, queryName) {
-            // Lógica de Paginação (agora desativada no fluxo principal)
-            const total = matches.length;
-            const endIndex = startIndex + RESULTS_PER_PAGE_DEFAULT;
-            const currentResults = matches.slice(startIndex, endIndex);
-
-            const titles = currentResults.map(m => {
-                const titleMatch = m.texto.split(':')[0].trim();
-                const cleanTitle = titleMatch.length > 70 ? titleMatch.substring(0, 67) + '...' : titleMatch;
-                return `* **${cleanTitle}**`;
-            }).join('\n');
-            
-            const remaining = total - endIndex;
-            let response = `Encontrei **${total}** referências para **${queryName}**:\n\n${titles}`;
-            
-            if (remaining > 0) {
-                response += `\n\n*Refine sua busca para ver todos os detalhes (Ex: 'RN Nome do Endpoint'). Total de ${total} resultados.*`;
-            } else {
-                 response += `\n\n*Fim da lista.*`;
-            }
-
-            return response;
-        }
-        // --- FIM DAS FUNÇÕES DE PAGINAÇÃO ---
-
-
-        // --- Lógica de Resposta do Chatbot (VOLTOU AO MODO EXIBIÇÃO SIMPLES) ---
+        // --- Lógica de Resposta do Chatbot (AGORA INTELIGENTE COM SCORING) ---
         function getBotResponse(message) {
             const lowerCaseMessage = message.toLowerCase();
             const keywords = lowerCaseMessage.split(/[^a-z0-9à-ú]+/i).filter(w => w.length > 2);
-            const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
-            const contentKeywords = keywords.filter(w => w !== siglaQuery); 
 
-            let filteredMemories = chatMemories;
+            // 1. Identificação de Estado
+            const siglaQuery = keywords.find(w => VALID_STATES.map(s => s.toLowerCase()).includes(w)) || '';
             
-            // 1. PRÉ-FILTRO CONTEXTUAL (Filtra por estado específico OU TODOS)
+            // 2. Filtragem de Stop Words e Estado para obter o core da busca
+            const coreKeywords = keywords.filter(w => 
+                w !== siglaQuery && 
+                !STOP_WORDS_PT.includes(w)
+            );
+            
+            // 3. Expansão de Sinônimos
+            let expandedKeywords = [...coreKeywords];
+            for (const keyword of coreKeywords) {
+                if (SYNONYM_MAP[keyword]) {
+                    expandedKeywords = [...expandedKeywords, ...SYNONYM_MAP[keyword]];
+                }
+            }
+            // Remove duplicatas
+            expandedKeywords = [...new Set(expandedKeywords)];
+
+
+            // 4. PRÉ-FILTRO CONTEXTUAL (Filtra por estado específico OU TODOS)
+            let filteredMemories = chatMemories;
             if (siglaQuery && siglaQuery !== 'todos') {
                 filteredMemories = filteredMemories.filter(m => m.estado && (m.estado.toLowerCase() === siglaQuery.toLowerCase() || m.estado === 'TODOS'));
-            } 
+            }
 
-            let matchingMemories = [];
+            let scoredMemories = [];
 
-            // 2. APLICAÇÃO DO FILTRO POR PALAVRA-CHAVE
-            if (contentKeywords.length === 0) {
-                // CASO 1: Apenas Sigla (Ex: "RN") ou uma palavra curta
-                if (siglaQuery) {
-                    matchingMemories = filteredMemories; // Lista todo o contexto (RN + TODOS)
-                } else {
-                    matchingMemories = filteredMemories.filter(m => {
-                        const memoryTextLower = m.texto.toLowerCase();
-                        return keywords.some(keyword => memoryTextLower.includes(keyword));
-                    });
+            // 5. APLICAÇÃO DO FILTRO POR PALAVRA-CHAVE COM PONTUAÇÃO
+            const hasDetailedQuery = expandedKeywords.length > 0;
+
+            if (!hasDetailedQuery && siglaQuery) {
+                // CASO 1: Apenas Sigla (Ex: "RN") - Listagem genérica do estado
+                scoredMemories = filteredMemories.map(m => ({ ...m, score: 1 })); 
+            } else if (hasDetailedQuery) {
+                // CASO 2: Busca detalhada (com palavras-chave)
+                for (const memory of filteredMemories) {
+                    let score = 0;
+                    const memoryTextLower = memory.texto.toLowerCase();
+                    const parts = memory.texto.split(':');
+                    const titleLower = parts[0].toLowerCase();
+
+                    for (const keyword of expandedKeywords) {
+                        // Pontua a palavra-chave no conteúdo (peso 1)
+                        if (memoryTextLower.includes(keyword)) {
+                            score += 1;
+                        }
+                        
+                        // Pontua a palavra-chave no título (peso 3 - prioriza o título)
+                        if (titleLower.includes(keyword)) {
+                            score += 3;
+                        }
+                    }
+
+                    // Pontuação extra para correspondência exata de parte da frase (alto peso)
+                    const cleanQuery = lowerCaseMessage.replace(siglaQuery.toLowerCase(), '').trim();
+                    if (cleanQuery.length > 5 && memoryTextLower.includes(cleanQuery)) {
+                         score += 5;
+                    }
+
+                    if (score > 0) {
+                        scoredMemories.push({ ...memory, score: score });
+                    }
                 }
-            } else {
-                // CASO 2: Sigla + Palavra-chave (Ex: "RN Endpoint") ou Apenas Palavra-chave (Ex: "Endpoint")
-                matchingMemories = filteredMemories.filter(m => {
-                    const memoryTextLower = m.texto.toLowerCase();
-                    return contentKeywords.some(keyword => memoryTextLower.includes(keyword));
-                });
             }
 
 
-            // 3. GERAÇÃO DA RESPOSTA
-            if (matchingMemories.length > 0) {
+            // 6. ORDENAÇÃO POR PONTUAÇÃO E DATA
+            const finalMatches = scoredMemories
+                .sort((a, b) => b.score - a.score || new Date(b.dataHora) - new Date(a.dataHora));
+
+
+            // 7. GERAÇÃO DA RESPOSTA
+            if (finalMatches.length > 0) {
                 
-                // Ordena por data mais recente e define o limite
-                matchingMemories.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
-                
-                // Se houver mais de 3 resultados, exibimos os 3 melhores e pedimos para refinar
                 const displayLimit = 3; 
-                const topMemories = matchingMemories.slice(0, displayLimit).map(m => {
+                const topMemories = finalMatches.slice(0, displayLimit).map(m => {
                     const date = new Date(m.dataHora).toLocaleDateString('pt-BR');
                     const estado = m.estado && m.estado !== 'TODOS' ? `[${m.estado}] ` : '';
                     
@@ -699,19 +677,19 @@
                     const contentText = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
 
                     return `${estado}**${title}**\n\n${contentText} (Agente: ${m.agente}, ${date})${imageTag}`;
-                }).join('\n\n');
+                }).join('\n\n---\n\n');
 
-                const remainingCount = matchingMemories.length - displayLimit;
+                const remainingCount = finalMatches.length - displayLimit;
                 const totalMsg = remainingCount > 0 ? `\n\n*E mais ${remainingCount} resultados. Refine sua busca para ver todos os detalhes.*` : '\n\n*Fim da lista.*';
 
-                return `Encontrei **${matchingMemories.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa:\n\n* ${topMemories}${totalMsg}`;
+                return `Encontrei **${finalMatches.length}** referências na memória permanente (MongoDB) que correspondem à sua pesquisa. O resultado mais relevante está em primeiro:\n\n${topMemories}${totalMsg}`;
             }
 
-            // 4. Resposta Padrão: Conhecimento Inexistente
+            // 8. Resposta Padrão: Conhecimento Inexistente
             let initialMessage = "Desculpe, não encontrei uma resposta na base de conhecimento (**MongoDB**) para essa pesquisa.";
 
             if (siglaQuery) {
-                 initialMessage += `\n\n**Verifique:** Não há informações salvas para a palavra-chave que você usou no estado **${siglaQuery.toUpperCase()}**.`;
+                 initialMessage += `\n\n**Verifique:** Não há informações salvas para a palavra-chave que você usou no estado **${siglaQuery.toUpperCase()}** ou a palavra-chave é muito genérica.`;
             }
 
             initialMessage += "\n\nUse a página **'Gerenciar Base de Conhecimento'** para inserir o conhecimento necessário.";
