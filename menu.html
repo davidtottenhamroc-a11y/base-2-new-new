@@ -448,7 +448,8 @@
             'job': ['servico', 'tarefa', 'rotina', 'processo'],
             'incidentes': ['problema', 'erro', 'falha', 'indisponibilidade'],
             'consulta': ['pesquisa', 'buscar', 'verificar'],
-            'veiculos': ['veículo', 'carro', 'automovel', 'placa']
+            'veiculos': ['veículo', 'carro', 'automovel', 'placa'],
+            'aula': ['aulas', 'licao', 'lição', 'pratica', 'prática']
         };
 
         // Stop Words (Palavras comuns que devem ser ignoradas na busca)
@@ -513,10 +514,15 @@
 
         function expandTerms(terms) {
             const expanded = new Set();
+            const stateTokens = VALID_STATES.map(s => s.toLowerCase());
+            
             for (const t of terms) {
                 expanded.add(t);
-                const mapped = SYNONYM_MAP[t];
-                if (mapped) mapped.forEach(s => expanded.add(s));
+                // Não expande tokens de estado
+                if (!stateTokens.includes(t)) {
+                    const mapped = SYNONYM_MAP[t];
+                    if (mapped) mapped.forEach(s => expanded.add(s));
+                }
             }
             return Array.from(expanded);
         }
@@ -550,7 +556,7 @@
                     const options = {
                         includeScore: true,
                         shouldSort: true,
-                        threshold: 0.35, // mais restrito para evitar resultados irrelevantes
+                        threshold: 0.4, // Mais flexível
                         keys: [
                             { name: 'titulo', weight: 0.7 },
                             { name: 'texto', weight: 0.25 },
@@ -587,12 +593,10 @@
             if (messageText === '') return;
             appendMessage(messageText, 'user-message');
 
-            // Guardamos o texto em uma variável local para que as funções
-            // posteriores possam usar o texto (não dependemos do input.value)
             const userMessageForSearch = messageText;
             input.value = '';
             showTypingIndicator();
-            // pequeno delay para UX
+            
             setTimeout(() => {
                 const botResponse = getBotResponse(userMessageForSearch);
                 appendMessage(botResponse, 'bot-message');
@@ -643,36 +647,34 @@
         }
 
         // -------------------------------
-        // Função getBotResponse (corrigida)
+        // Função getBotResponse (CORRIGIDA - BUSCA FLEXÍVEL)
         // -------------------------------
         function getBotResponse(message) {
             const estadoFilter = (document.getElementById('estado-filter')?.value || '').toUpperCase();
             const raw = message.trim();
             const normalized = normalizeText(raw);
 
-            // keywords iniciais (filtrando stopwords e palavras curtas)
-            let keywords = normalized.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS_PT.includes(w));
-            // expande sinônimos
-            keywords = expandTerms(keywords);
-
-            // REMOÇÃO: remove tokens que sejam códigos de estado para evitar match apenas por estado
+            // Detecta estado via input dropdown OU texto do usuário
             const stateTokens = VALID_STATES.map(s => s.toLowerCase());
-            keywords = keywords.filter(k => !stateTokens.includes(k));
-
-            // salva para highlight/paginação
-            lastQueryKeywords = keywords.slice();
-
-            // detecta estado via input ou texto
             const possibleState = normalized.split(/\s+/).find(w => stateTokens.includes(w));
             const effectiveState = (estadoFilter || (possibleState ? possibleState.toUpperCase() : '')).toUpperCase();
 
-            // filtra pool por estado (se houver)
+            // Keywords INCLUINDO tokens de estado (não remover mais)
+            let keywords = normalized.split(/\s+/).filter(w => w.length > 1 && !STOP_WORDS_PT.includes(w));
+            
+            // Expandir sinônimos (mantém os tokens de estado)
+            keywords = expandTerms(keywords);
+
+            // Salva para highlight/paginação
+            lastQueryKeywords = keywords.slice();
+
+            // Filtra pool por estado (se houver)
             let pool = memoriesIndex;
             if (effectiveState && effectiveState !== 'TODOS') {
                 pool = memoriesIndex.filter(m => (m.estado || '').toUpperCase() === effectiveState);
             }
 
-            // se não há termos (usuário só abriu sem digitar), mostra últimos registros do estado
+            // Se não há termos (usuário só abriu sem digitar), mostra últimos registros do estado
             if (keywords.length === 0) {
                 const list = pool.sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 6);
                 if (list.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
@@ -681,53 +683,64 @@
                 return formatResultsPage();
             }
 
-            // monta query do Fuse (cada keyword deve existir em título OU texto — usaremos AND entre elas)
-            const fuseQueryParts = keywords.map(k => ({
-                $or: [
-                    { titulo: k },
-                    { texto: k }
-                ]
-            }));
+            // BUSCA FLEXÍVEL: Encontra registros que contenham PELO MENOS UMA das keywords
+            let results = pool.filter(memory => {
+                const memoryText = normalizeText(memory.texto || '');
+                const memoryTitle = normalizeText(memory.titulo || '');
+                const fullText = memoryTitle + ' ' + memoryText;
+                
+                // Verifica se PELO MENOS UMA keyword aparece no título OU texto
+                return keywords.some(keyword => 
+                    memoryText.includes(keyword) || memoryTitle.includes(keyword)
+                );
+            });
 
-            let results = [];
-            try {
-                // cria Fuse local apenas sobre o pool filtrado por estado
-                const tempFuse = new Fuse(pool, { includeScore: true, threshold: 0.35, keys: ['titulo', 'texto'], ignoreLocation: true, useExtendedSearch: true });
-                const searchQuery = { $and: fuseQueryParts };
-                const fuseResults = tempFuse.search(searchQuery, { limit: 50 });
-                results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
-
-                // FILTRO EXTRA 
-                const normalizedKeywords = keywords.map(k => normalizeText(k));
-                results = results.filter(r => normalizedKeywords.some(k =>
-                    (r.texto_normalizado || '').includes(k) || normalizeText(r.titulo || '').includes(k)
-                ));
-            } catch (e) {
-                // fallback rígido: contains em texto/título normalizado
-                results = pool.map(m => ({ ...m, __fuseScore: 1.0 })).filter(m => keywords.every(k =>
-                    (m.texto_normalizado || '').includes(k) || (m.titulo && normalizeText(m.titulo).includes(k))
-                ));
-            }
-
-            // pós-processamento de score
-            for (const r of results) {
-                let extra = 0;
-                const titleNorm = normalizeText(r.titulo || '');
-                for (const k of keywords) {
-                    if (titleNorm.includes(k)) extra += 3;
-                    if ((r.texto_normalizado || '').includes(k)) extra += 1;
+            // Se não encontrou com busca flexível, usa Fuse para busca fuzzy
+            if (results.length === 0 && fuse) {
+                try {
+                    const tempFuse = new Fuse(pool, { 
+                        includeScore: true, 
+                        threshold: 0.5, // Mais flexível
+                        keys: ['titulo', 'texto'], 
+                        ignoreLocation: true 
+                    });
+                    
+                    const fuseResults = tempFuse.search(keywords.join(' '), { limit: 20 });
+                    results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
+                } catch (e) {
+                    console.log('Fuse search failed, using fallback');
                 }
-                if (effectiveState && effectiveState !== 'TODOS' && (r.estado || '').toUpperCase() === effectiveState) extra += 2;
-                const base = (typeof r.__fuseScore === 'number') ? (1 - Math.min(r.__fuseScore, 1)) * 5 : 1;
-                r._score = base + extra;
             }
 
-            const finalMatches = results.sort((a,b) => (b._score || 0) - (a._score || 0));
-            if (finalMatches.length === 0) {
-                return `Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para essa pesquisa no estado ${effectiveState || 'TODOS'}. Tente termos diferentes ou vá em 'Gerenciar Base de Conhecimento'.`;
+            // Ordena por relevância (mais keywords matching = mais relevante)
+            results = results.map(memory => {
+                let score = 0;
+                const memoryText = normalizeText(memory.texto || '');
+                const memoryTitle = normalizeText(memory.titulo || '');
+                
+                // Pontua por cada keyword encontrada
+                keywords.forEach(keyword => {
+                    if (memoryTitle.includes(keyword)) score += 3; // Match no título = mais relevante
+                    if (memoryText.includes(keyword)) score += 1;  // Match no texto = menos relevante
+                });
+                
+                // Bônus por matching exato de estado
+                if (effectiveState && memory.estado === effectiveState) score += 2;
+                
+                // Bônus extra se encontrar TODAS as keywords (busca perfeita)
+                const allKeywordsMatch = keywords.every(keyword => 
+                    memoryText.includes(keyword) || memoryTitle.includes(keyword)
+                );
+                if (allKeywordsMatch) score += 5;
+                
+                return { ...memory, _score: score };
+            }).sort((a, b) => b._score - a._score);
+
+            if (results.length === 0) {
+                return `Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para "${raw}" no estado ${effectiveState || 'TODOS'}. Tente termos diferentes ou vá em 'Gerenciar Base de Conhecimento'.`;
             }
 
-            lastResults = finalMatches;
+            lastResults = results;
             resultsPage = 0;
             return formatResultsPage();
         }
