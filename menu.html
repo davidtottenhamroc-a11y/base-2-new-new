@@ -3,807 +3,730 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base para N2 - VSoft</title>
+    <title>Menu Principal - Ferramentas de Suporte Técnico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* Variáveis CSS para cores */
+        :root {
+            --dark-blue-bg: #1a202c; /* Azul escuro fosco */
+            --light-bg: #eef2f5;
+            --white: #ffffff;
+            --primary-blue: #0056b3;
+            --secondary-green: #28a745;
+            --text-color: #333;
+            --light-text-color: #555;
+            --border-color: #dee2e6;
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --shadow-dark: rgba(0, 86, 179, 0.15);
+            --management-yellow: #ffc107; /* Amarelo de alerta para o botão de gerenciar */
         }
 
         body {
-            background: #0d1a2a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--dark-blue-bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center; /* Centraliza o main-content */
+            align-items: flex-start;
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .main-content {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 1400px;
+            gap: 30px;
+            max-width: 1100px;
             width: 100%;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-bottom: 30px;
+            justify-content: center; /* Centraliza o conteúdo principal quando há espaço suficiente */
         }
 
+        .menu-container {
+            flex: 1;
+            max-width: 700px; /* Mantém a largura máxima */
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px var(--shadow-light);
+        }
+
+        /* Estilos do Menu */
         header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin-bottom: 35px;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 20px;
         }
-
-        .logo {
-            font-size: 40px;
-            font-weight: bold;
-            color: #3498db;
-            margin-bottom: 10px;
-        }
-
-        h1 {
+        header h1 {
+            color: var(--primary-blue);
+            margin: 0;
             font-size: 28px;
-            margin-bottom: 5px;
         }
-
-        .description {
+        header p {
+            margin: 8px 0 0;
+            color: var(--light-text-color);
             font-size: 16px;
-            opacity: 0.9;
         }
-
-        main {
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu-item {
+            margin-bottom: 18px;
+        }
+        .menu-link {
+            display: block;
             padding: 20px;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .menu-card {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 25px;
-            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            color: var(--text-color);
             text-decoration: none;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .menu-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            border-color: #3498db;
-        }
-
-        .card-icon {
-            font-size: 40px;
-            color: #3498db;
-            margin-bottom: 15px;
-        }
-        
-        .card-title {
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-weight: 600;
             font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .card-description {
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        @media (max-width: 768px) {
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .logout-button {
-            margin-top: 20px;
-            padding: 12px 25px;
-            font-size: 16px;
-            background: linear-gradient(135deg, #dc3545, #b42a35);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
             transition: all 0.3s ease;
-            width: 100%;
-        }
-        .logout-button:hover {
-            background: linear-gradient(135deg, #c82333, #a71d24);
-        }
-
-        /* --- Estilos do Chatbot (Modal/Tela Cheia) --- */
-        #chat-widget-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw; 
-            height: 100vh;
-            background: rgba(13, 26, 42, 0.95); 
-            border-radius: 0;
-            box-shadow: none;
-            display: none; 
-            z-index: 9999;
-            align-items: center; 
-            justify-content: center;
-        }
-
-        .chat-content {
-            width: 90%;
-            max-width: 900px; 
-            height: 90%;
-            max-height: 820px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
+            position: relative;
             overflow: hidden;
         }
-        
-        #chat-header {
-            background: #3498db;
-            color: white;
-            padding: 12px 20px;
-            font-size: 18px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .menu-link:before {
+            content: '→';
+            position: absolute;
+            left: 20px;
+            opacity: 0.5;
+            transition: all 0.3s ease;
         }
-        #chat-header i { margin-right: 10px; }
-        #chat-close-btn {
-            background: none;
-            border: 1px solid white; 
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
+        .menu-link span {
+            margin-left: 25px;
+            display: block;
         }
-        #chat-close-btn:hover { background: #2980b9; }
-
-        #chat-body {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 15px;
+        .menu-link:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 6px 15px var(--shadow-dark);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
         }
-        #chat-messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            background: #f8f9fa; 
-            border-radius: 8px;
-            margin-bottom: 12px;
+        .menu-link:hover:before {
+            transform: translateX(5px);
+            opacity: 1;
         }
         
-        /* Estilização das Mensagens Aprimorada */
-        .message {
-            max-width: 90%; 
-            padding: 12px 18px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-            font-size: 15px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease-out;
+        /* --- BOTÃO GERENCIAR BASE DE CONHECIMENTO - AGORA AMARELO --- */
+        .management-link {
+            background-color: var(--management-yellow); /* Fundo amarelo vibrante */
+            background-image: linear-gradient(145deg, var(--management-yellow), #fcd34d); /* Gradiente para um visual mais moderno */
+            color: #333; /* Cor do texto mais escura para contraste */
+            border: 1px solid #e0a800; /* Borda um pouco mais escura para o amarelo */
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 700; /* Mais negrito */
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3); /* Sombra mais amarelada */
         }
-        .user-message {
-            background: #3498db;
-            color: white;
-            align-self: flex-end;
-            margin-left: auto;
-            border-bottom-right-radius: 5px; 
+        .management-link:hover {
+            background-color: #e0a800; /* Tom mais escuro do amarelo no hover */
+            background-image: linear-gradient(145deg, #e0a800, #fcd34d); /* Gradiente ajustado no hover */
+            border-color: #c58e00; /* Borda ainda mais escura no hover */
+            color: #333; /* Mantém a cor do texto */
+            transform: translateY(-2px) scale(1.01); /* Um pequeno "lift" */
+            box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
         }
-        .bot-message {
-            background: #e9ecef; 
-            color: #333;
-            align-self: flex-start;
-            margin-right: auto;
-            border: none;
-            border-bottom-left-radius: 5px; 
-            white-space: pre-wrap;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        .management-link:before { /* Ajuste o ícone de seta para ter cor contrastante */
+            color: #555; /* Cor mais escura para a seta */
+            opacity: 0.7;
         }
-        .bot-message strong { color: #c0392b; }
-        .bot-message pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            overflow-x: auto;
-            font-size: 13px;
-            line-height: 1.3;
+        .management-link:hover:before {
+            color: #333; /* Seta mais escura no hover */
+            opacity: 1;
         }
 
-        #chat-input-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 0;
-            border-top: 1px solid #ddd;
-        }
-        #estado-filter {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+        footer {
+            text-align: center;
+            margin-top: 30px;
             font-size: 14px;
-            width: 120px;
-            background: white;
-        }
-        #chat-input {
-            flex-grow: 1;
-            padding: 12px 20px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            margin-right: 10px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-        #chat-input:focus { border-color: #3498db; outline: none; }
-        #chat-send-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: background 0.3s, transform 0.1s;
-        }
-        #chat-send-btn:hover { background: #218838; }
-        #chat-send-btn:active { transform: scale(0.95); }
-
-        .chat-button {
-            padding: 8px 12px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-            margin-top: 8px;
-            transition: background 0.2s;
-            display: inline-block; 
-        }
-        .chat-button:hover:not(:disabled) { background: #2980b9; }
-        .chat-button:disabled { background: #ccc; cursor: not-allowed; }
-
-        .typing-indicator {
-            background: #e0e0e0;
-            color: #555;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-style: italic;
-            display: inline-block;
+            color: #777;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- Estilo do Botão Flutuante --- */
-        #chat-open-btn {
+        /* --- Ícone do Chatbot --- */
+        .chatbot-icon-container {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            padding: 15px 20px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 1000;
+            z-index: 1001;
         }
-        #chat-open-btn i { margin-right: 8px; }
+        .chatbot-icon {
+            background-color: var(--secondary-green);
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            box-shadow: 0 4px 15px var(--shadow-medium);
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .chatbot-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            background-color: #218838;
+        }
 
-        mark { background: #ffe58a; padding: 0 3px; border-radius: 2px; }
+        /* --- Modal do Chatbot (Tela Cheia) --- */
+        .chatbot-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .chatbot-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .chatbot-container {
+            width: 90%;
+            max-width: 800px;
+            height: 90%;
+            max-height: 700px;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease-out;
+        }
+        .chatbot-modal-overlay.active .chatbot-container {
+            transform: scale(1);
+        }
+
+        .chatbot-header {
+            text-align: center;
+            color: var(--secondary-green);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-green);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .chatbot-header h2 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .chatbot-header small {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Estilo do seletor de estado */
+        #estado-filter {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #f0f0f0;
+            font-size: 0.9em;
+            color: var(--text-color);
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20128c3.6%203.6%207.8%205.4%2012.9%205.4s9.3-1.8%2012.9-5.4l128-128c3.6-3.6%205.4-7.8%205.4-12.9a17.6%2017.6%200%200%200-5.4-12.9z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 30px;
+            cursor: pointer;
+            width: 200px;
+        }
+        #estado-filter:hover {
+            border-color: var(--primary-blue);
+        }
+        #estado-filter:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+
+        .chatbot-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+        .message-bubble {
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            margin-left: auto;
+        }
+        .bot-message {
+            background-color: #e9ecef;
+            color: var(--text-color);
+            margin-right: auto;
+        }
+
+        /* --- Estilos para os cards de resposta do bot --- */
+        .bot-response-card {
+            background-color: #f8fcf8;
+            border: 1px solid #d4edda;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot-response-card h4 {
+            color: var(--secondary-green);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bot-response-card h4 .state-tag {
+            background-color: var(--secondary-green);
+            color: var(--white);
+            font-size: 0.7em;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: normal;
+        }
+        .bot-response-card pre {
+            background-color: #e9f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #388e3c;
+            border-left: 3px solid var(--secondary-green);
+            margin-top: 10px;
+        }
+        .bot-response-card p {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .bot-response-card ul, .bot-response-card ol {
+            margin: 10px 0 10px 20px;
+            padding: 0;
+            font-size: 0.9em;
+            color: #444;
+        }
+        .bot-response-card li {
+            margin-bottom: 5px;
+        }
+        .bot-response-card strong {
+            color: var(--primary-blue);
+        }
+        .bot-response-card .alert-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            color: #664d03;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bot-response-card .alert-box i {
+            color: #ffc107;
+            font-size: 1.2em;
+        }
+
+
+        .chatbot-input-area {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+        }
+        #chat-input {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        #send-button {
+            background-color: var(--secondary-green);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        #send-button:hover {
+            background-color: #218838;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            display: none;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Botão de fechar do modal */
+        .close-chatbot-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2.5em;
+            color: #aaa;
+            cursor: pointer;
+            border: none;
+            background: none;
+            line-height: 1;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+        .close-chatbot-button:hover {
+            color: #555;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1000px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .menu-container {
+                max-width: 90%;
+                padding: 30px;
+            }
+            .chatbot-icon-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            .chatbot-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+            .chatbot-container {
+                padding: 20px;
+                width: 95%;
+                height: 95%;
+            }
+            .chatbot-header h2 {
+                font-size: 1.5em;
+            }
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .menu-container {
+                padding: 20px;
+            }
+            header h1 {
+                font-size: 24px;
+            }
+            .menu-link {
+                font-size: 16px;
+                padding: 15px;
+            }
+            .menu-link span {
+                margin-left: 20px;
+            }
+            .chatbot-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+            }
+            #estado-filter {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">VSoft</div>
-            <h1>Base para N2</h1>
-            <p class="description">Central de guias e documentações técnicas para suporte de Nível 2.</p>
-        </header>
 
-        <main>
-            <div class="menu-grid">
-                <a href="endpoints.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Documentação Endpoints RN</h2>
-                        <p class="card-description">Documentação técnica com os Endpoints de RN</p>
-                    </div>
-                </a>
-                <a href="Sergipe.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Documentação Endpoints SE</h2>
-                        <p class="card-description">Documentação técnica com os Endpoints de SE</p>
-                    </div>
-                </a>
-                <a href="mshm.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Integrações DETRAN-MS / Valid</h2>
-                        <p class="card-description">Documentação completa de fluxos, jobs e endpoints de API.</p>
-                    </div>
-                </a>
-                <a href="endpoints_df.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Endpoints Credenciadas DF</h2>
-                        <p class="card-description">Documentação completa de fluxos, jobs e endpoints de API.</p>
-                    </div>
-                </a>
-                <a href="SuperPratico.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Integrações SuperPrático/ Aulas Praticas</h2>
-                        <p class="card-description">Documentação completa de fluxos Do SuperPrático.</p>
-                    </div>
-                </a>
-                <a href="gerenciamento_incidentes.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
-                    <div>
-                        <h2 class="card-title">Politica de gerenciamento de incidentes</h2>
-                        <p class="card-description">Documentação completa do gerenciamento de incidente.</p>
-                    </div>
-                </a>
-                <a href="knowledge_manager.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-database"></i></div>
-                    <div>
-                        <h2 class="card-title">Gerenciar Base de Conhecimento</h2>
-                        <p class="card-description">Interface para adicionar e atualizar informações do chatbot por estado (MongoDB).</p>
-                    </div>
-                </a>
-                <a href="menu2.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-table"></i></div>
-                    <div>
-                        <h2 class="card-title">Registro Diários</h2>
-                        <p class="card-description">Base de registro diário do N2</p>
-                    </div>
-                </a>
-            </div>
-        </main>
-        <button class="logout-button" onclick="logout()">Sair</button>
+    <div class="main-content">
+        <div class="menu-container">
+            <header>
+                <h1>Painel de Ferramentas Técnicas</h1>
+                <p>Selecione um dos simuladores abaixo para iniciar.</p>
+            </header>
+
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="guia_atendimento.html" class="menu-link" target="_blank">
+                        <span><i class="fas fa-book"></i> Guia Interativo de Atendimento ao CFC</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="desligamento.html" class="menu-link" target="_blank">
+                        <span><i class="fas fa-car-crash"></i> Simulador de Análise de Desligamento de Aulas (RN)</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="abertura.html" class="menu-link" target="_blank">
+                        <span><i class="fas fa-sign-in-alt"></i> Fluxograma Técnico de Abertura de Aula</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="troca_de_placa.html" class="menu-link" target="_blank">
+                        <span><i class="fas fa-exchange-alt"></i> Fluxograma para Troca de Placa</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="capiturador.html" class="menu-link" target="_blank">
+                        <span><i class="fas fa-video"></i> Fluxograma para Instalação de capturador</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="universidade_suporte.html" class="menu-link" target="_blank">
+                        <span><i class="fas fa-graduation-cap"></i> Universidade do Suporte</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="gerenciar_base.html" class="menu-link management-link">
+                        <span><i class="fas fa-database"></i> Gerenciar Base de Conhecimento</span>
+                    </a>
+                </li>
+            </ul>
+
+            <footer>
+                <p>Central de Recursos para Suporte N1</p>
+            </footer>
+        </div>
     </div>
-    
-    <div id="chat-widget-container">
-        <div class="chat-content">
-            <div id="chat-header">
-                <div style="display:flex;align-items:center;gap:8px;"><i class="fas fa-robot"></i> Assistente VSoft N2</div>
-                <button id="chat-close-btn" onclick="toggleChat()">X</button>
-            </div>
-            <div id="chat-body">
-                <div id="chat-messages">
-                    <div class="message bot-message">
-                        Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo <strong>MongoDB</strong>.<br><br>
-                        Use o filtro de estado e escreva sua dúvida. Por exemplo: <em>"SE veículos"</em> ou escolha o estado no dropdown.
-                    </div>
-                </div>
-                <div id="chat-input-container">
-                    <select id="estado-filter">
-                        <option value="">Todos os estados</option>
-                        <option value="RN">RN</option>
-                        <option value="SE">SE</option>
-                        <option value="MS">MS</option>
-                        <option value="DF">DF</option>
-                        <option value="PE">PE</option>
-                        <option value="PB">PB</option>
-                        <option value="BA">BA</option>
-                        <option value="MG">MG</option>
-                        <option value="GO">GO</option>
-                        <option value="MA">MA</option>
-                        <option value="AL">AL</option>
-                        <option value="CE">CE</option>
-                        <option value="TODOS">TODOS</option>
+
+    <div class="chatbot-icon-container">
+        <div class="chatbot-icon" id="openChatbotButton" title="Abrir Chatbot">
+            <i class="fas fa-robot"></i>
+        </div>
+    </div>
+
+    <div class="chatbot-modal-overlay" id="chatbotModal">
+        <div class="chatbot-container">
+            <button class="close-chatbot-button" id="closeChatbotButton">&times;</button>
+            <div class="chatbot-header">
+                <h2><i class="fas fa-robot"></i> Chatbot Base de Conhecimento</h2>
+                <small>Pergunte sobre erros, processos ou palavras-chave.</small>
+                <select id="estado-filter">
+                    <option value="">Todos os estados</option>
+                    <option value="RN">RN</option>
+                    <option value="SE">SE</option>
+                    <option value="MS">MS</option>
+                    <option value="DF">DF</option>
+                    <option value="PE">PE</option>
+                    <option value="PB">PB</option>
+                    <option value="BA">BA</option>
+                    <option value="MG">MG</option>
+                    <option value="GO">GO</option>
+                    <option value="MA">MA</option>
+                    <option value="AL">AL</option>
+                    <option value="CE">CE</option>
                     </select>
-                    <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC DF'">
-                    <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-                </div>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="message-bubble bot-message">Olá! Sou seu assistente de Suporte N1. Como posso te ajudar hoje? Tente buscar por **Erro 060** ou **Regras RN**.</div>
+            </div>
+            <div class="loader" id="loader"></div>
+            <div class="chatbot-input-area">
+                <input type="text" id="chat-input" placeholder="Digite sua pergunta..." onkeypress="if(event.keyCode == 13) document.getElementById('send-button').click()">
+                <button id="send-button" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
 
-    <button id="chat-open-btn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i> Chat N2</button>
-
-    <!-- Fuse.js para pesquisa fuzzy -->
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
-
     <script>
-        // Variáveis Globais para o Chatbot
-        let chatMemories = [];
-        const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
+        // ⚠️ ATENÇÃO: Use a URL do seu projeto Vercel para o backend
+        const BACKEND_URL = 'https://basen1-new.vercel.app'; // Atualize se necessário
 
-        // Dicionário de sinônimos para buscas mais inteligentes
-        const SYNONYM_MAP = {
-            'endpoint': ['api', 'servico', 'url', 'acesso', 'integracao'],
-            'sla': ['prazo', 'tempo', 'critico', 'atendimento'],
-            'cfc': ['autoescola', 'credenciada', 'centro'],
-            'fluxo': ['procedimento', 'passos', 'guia', 'rotina', 'etapa'],
-            'job': ['servico', 'tarefa', 'rotina', 'processo'],
-            'incidentes': ['problema', 'erro', 'falha', 'indisponibilidade'],
-            'consulta': ['pesquisa', 'buscar', 'verificar'],
-            'veiculos': ['veículo', 'carro', 'automovel', 'placa'],
-            'aula': ['aulas', 'licao', 'lição', 'pratica', 'prática']
-        };
+        const messagesDiv = document.getElementById('chatbot-messages');
+        const inputField = document.getElementById('chat-input');
+        const loader = document.getElementById('loader');
+        const openChatbotButton = document.getElementById('openChatbotButton');
+        const closeChatbotButton = document.getElementById('closeChatbotButton');
+        const chatbotModal = document.getElementById('chatbotModal');
+        const estadoFilter = document.getElementById('estado-filter');
 
-        // Stop Words (Palavras comuns que devem ser ignoradas na busca)
-        const STOP_WORDS_PT = [
-            'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'e', 'é', 'ou',
-            'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às',
-            'que', 'qual', 'quais', 'quem', 'onde', 'como', 'quando', 'porque', 'porquê', 'pra', 'pela', 'pelo',
-            'dele', 'dela', 'neste', 'nesta', 'isso', 'este', 'esta', 'ser', 'meu', 'minha', 'meus', 'minhas',
-            'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre', 'me', 'meu', 'queria', 'gostaria'
-        ];
+        function appendMessage(text, sender, isBotResponseCard = false, itemData = null) {
+            if (isBotResponseCard && itemData) {
+                const cardContainer = document.createElement('div');
+                cardContainer.classList.add('message-bubble', 'bot-message');
+                cardContainer.style.backgroundColor = 'transparent';
+                cardContainer.style.boxShadow = 'none';
+                cardContainer.style.padding = '0';
+                cardContainer.style.maxWidth = '100%';
 
-        // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
-        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
+                const card = document.createElement('div');
+                card.classList.add('bot-response-card');
 
-        // Fuse index
-        let fuse = null;
-        let memoriesIndex = []; // memórias brutas carregadas
-        let lastResults = []; // resultados da última busca (para paginação)
-        let resultsPage = 0;
-        const PAGE_SIZE = 3;
-
-        // Guarda as keywords da última busca para highlight
-        let lastQueryKeywords = [];
-
-        function logout() {
-            localStorage.removeItem('agenteSelecionado');
-            localStorage.removeItem('estadoSelecionado');
-            window.location.href = 'login.html';
-        }
-
-        function toggleChat() {
-            const chatWidget = document.getElementById('chat-widget-container');
-            const openBtn = document.getElementById('chat-open-btn');
-
-            if (chatWidget.style.display === 'flex') {
-                chatWidget.style.display = 'none';
-                openBtn.style.display = 'block';
-                document.body.style.overflow = 'auto';
-            } else {
-                chatWidget.style.display = 'flex';
-                openBtn.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-                document.getElementById('chat-input').focus();
-            }
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && document.getElementById('chat-widget-container').style.display === 'flex') {
-                toggleChat();
-            }
-        });
-
-        // --- Helpers de texto e busca ---
-        function normalizeText(t) {
-            return (t || '')
-                .normalize('NFD').replace(/[̀-\u036f]/g, '')
-                .toLowerCase()
-                .replace(/[^a-z0-9\s]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        }
-
-        function expandTerms(terms) {
-            const expanded = new Set();
-            const stateTokens = VALID_STATES.map(s => s.toLowerCase());
-            
-            for (const t of terms) {
-                expanded.add(t);
-                // Não expande tokens de estado
-                if (!stateTokens.includes(t)) {
-                    const mapped = SYNONYM_MAP[t];
-                    if (mapped) mapped.forEach(s => expanded.add(s));
+                const titleElement = document.createElement('h4');
+                titleElement.innerHTML = `<i class="fas fa-info-circle"></i> ${itemData.title}`;
+                if (itemData.estado) {
+                    const stateTag = document.createElement('span');
+                    stateTag.classList.add('state-tag');
+                    stateTag.innerText = itemData.estado;
+                    titleElement.appendChild(stateTag);
                 }
+                card.appendChild(titleElement);
+
+                const contentLines = itemData.content.split('\n');
+                let inList = false;
+                let listElement = null;
+
+                contentLines.forEach(line => {
+                    line = line.trim();
+                    if (line.match(/^(\d+\.|[•-])\s*/)) {
+                        if (!inList) {
+                            listElement = document.createElement(line.match(/^\d+\./) ? 'ol' : 'ul');
+                            card.appendChild(listElement);
+                            inList = true;
+                        }
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = line.replace(/^(\d+\.|[•-])\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        listElement.appendChild(listItem);
+                    } else if (line.startsWith('**') && line.endsWith('**') && line.includes(':')) {
+                        const alertBox = document.createElement('div');
+                        alertBox.classList.add('alert-box');
+                        alertBox.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}`;
+                        card.appendChild(alertBox);
+                        inList = false;
+                    } else if (line !== '') {
+                        if (inList) {
+                            inList = false;
+                            listElement = null;
+                        }
+                        const p = document.createElement('p');
+                        p.innerHTML = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        card.appendChild(p);
+                    }
+                });
+
+                cardContainer.appendChild(card);
+                messagesDiv.appendChild(cardContainer);
+
+            } else {
+                const bubble = document.createElement('div');
+                bubble.classList.add('message-bubble');
+                bubble.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+                bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                messagesDiv.appendChild(bubble);
             }
-            return Array.from(expanded);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
-        function highlight(text, terms) {
-            let out = text || '';
-            for (const term of terms) {
-                if (!term || term.length < 2) continue;
-                const safe = term.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
-                out = out.replace(new RegExp(`(${safe})`, 'ig'), '<mark>$1</mark>');
-            }
-            return out;
-        }
+        async function sendMessage() {
+            const userText = inputField.value.trim();
+            if (userText === '') return;
 
-        // Carrega memórias e cria índice Fuse
-        async function loadMemoriesFromDatabase() {
-            appendConsoleLog(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
+            const selectedEstado = estadoFilter.value;
+
+            appendMessage(userText, 'user');
+            inputField.value = '';
+            loader.style.display = 'block';
+
             try {
-                const response = await fetch(`${BACKEND_URL}/api/memories`);
+                const requestBody = { query: userText };
+                if (selectedEstado) {
+                    requestBody.estado = selectedEstado;
+                }
+
+                const response = await fetch(`${BACKEND_URL}/api/search-knowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
                 if (response.ok) {
                     const data = await response.json();
-                    chatMemories = data;
-                    memoriesIndex = data.map(m => ({
-                        ...m,
-                        titulo: (m.texto || '').split(':')[0] || '',
-                        texto: m.texto || '',
-                        texto_normalizado: normalizeText(m.texto || ''),
-                        estado: (m.estado || 'TODOS').toUpperCase()
-                    }));
-
-                    const options = {
-                        includeScore: true,
-                        shouldSort: true,
-                        threshold: 0.4, // Mais flexível
-                        keys: [
-                            { name: 'titulo', weight: 0.7 },
-                            { name: 'texto', weight: 0.25 },
-                            { name: 'estado', weight: 0.05 }
-                        ],
-                        ignoreLocation: true,
-                        useExtendedSearch: true
-                    };
-                    fuse = new Fuse(memoriesIndex, options);
-                    appendConsoleLog(`[MongoDB] ${memoriesIndex.length} memórias indexadas com Fuse.`);
-                } else {
-                    appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
-                }
-            } catch (error) {
-                console.error('Erro de rede/conexão:', error);
-                appendMessage(`[ERRO DE CONEXÃO] Não foi possível acessar o backend Vercel em **${BACKEND_URL}**. Verifique se a URL está correta e se o projeto está implantado e ativo.`, 'bot-message');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadMemoriesFromDatabase();
-            document.getElementById('chat-open-btn').style.display = 'block';
-        });
-
-        // Enviar com Enter
-        document.getElementById('chat-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // Envio / ciclo de resposta
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const messageText = input.value.trim();
-            if (messageText === '') return;
-            appendMessage(messageText, 'user-message');
-
-            const userMessageForSearch = messageText;
-            input.value = '';
-            showTypingIndicator();
-            
-            setTimeout(() => {
-                const botResponse = getBotResponse(userMessageForSearch);
-                appendMessage(botResponse, 'bot-message');
-                hideTypeningIndicator();
-            }, 600);
-        }
-
-        function appendMessage(text, className) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${className}`;
-
-            // Processa blocos de código
-            const codeBlockRegex = /(```json|```|\{)\n?([\s\S]*?)(\n?```|\n\})/g;
-            let processedText = text.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
-                content = content.replace(/```json|```|{|}/g, '').trim();
-                return `\n<pre>${content}</pre>\n`;
-            });
-
-            processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            messageDiv.innerHTML = processedText;
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function appendConsoleLog(text) {
-            console.log(text);
-        }
-
-        function showTypingIndicator() {
-            const messagesContainer = document.getElementById('chat-messages');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot-message typing-indicator';
-            typingDiv.id = 'typing-indicator';
-            typingDiv.innerHTML = 'Digitando...';
-            messagesContainer.appendChild(typingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            document.getElementById('chat-input').disabled = true;
-            document.getElementById('chat-send-btn').disabled = true;
-        }
-
-        function hideTypeningIndicator() {
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) typingIndicator.remove();
-            document.getElementById('chat-input').disabled = false;
-            document.getElementById('chat-send-btn').disabled = false;
-            document.getElementById('chat-input').focus();
-        }
-
-        // -------------------------------
-        // Função getBotResponse (CORRIGIDA - BUSCA FLEXÍVEL)
-        // -------------------------------
-        function getBotResponse(message) {
-            const estadoFilter = (document.getElementById('estado-filter')?.value || '').toUpperCase();
-            const raw = message.trim();
-            const normalized = normalizeText(raw);
-
-            // Detecta estado via input dropdown OU texto do usuário
-            const stateTokens = VALID_STATES.map(s => s.toLowerCase());
-            const possibleState = normalized.split(/\s+/).find(w => stateTokens.includes(w));
-            const effectiveState = (estadoFilter || (possibleState ? possibleState.toUpperCase() : '')).toUpperCase();
-
-            // Keywords INCLUINDO tokens de estado (não remover mais)
-            let keywords = normalized.split(/\s+/).filter(w => w.length > 1 && !STOP_WORDS_PT.includes(w));
-            
-            // Expandir sinônimos (mantém os tokens de estado)
-            keywords = expandTerms(keywords);
-
-            // Salva para highlight/paginação
-            lastQueryKeywords = keywords.slice();
-
-            // Filtra pool por estado (se houver)
-            let pool = memoriesIndex;
-            if (effectiveState && effectiveState !== 'TODOS') {
-                pool = memoriesIndex.filter(m => (m.estado || '').toUpperCase() === effectiveState);
-            }
-
-            // Se não há termos (usuário só abriu sem digitar), mostra últimos registros do estado
-            if (keywords.length === 0) {
-                const list = pool.sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 6);
-                if (list.length === 0) return `Não encontrei memórias para o estado ${effectiveState || 'TODOS'}. Use 'Gerenciar Base de Conhecimento' para inserir.`;
-                lastResults = list;
-                resultsPage = 0;
-                return formatResultsPage();
-            }
-
-            // BUSCA FLEXÍVEL: Encontra registros que contenham PELO MENOS UMA das keywords
-            let results = pool.filter(memory => {
-                const memoryText = normalizeText(memory.texto || '');
-                const memoryTitle = normalizeText(memory.titulo || '');
-                const fullText = memoryTitle + ' ' + memoryText;
-                
-                // Verifica se PELO MENOS UMA keyword aparece no título OU texto
-                return keywords.some(keyword => 
-                    memoryText.includes(keyword) || memoryTitle.includes(keyword)
-                );
-            });
-
-            // Se não encontrou com busca flexível, usa Fuse para busca fuzzy
-            if (results.length === 0 && fuse) {
-                try {
-                    const tempFuse = new Fuse(pool, { 
-                        includeScore: true, 
-                        threshold: 0.5, // Mais flexível
-                        keys: ['titulo', 'texto'], 
-                        ignoreLocation: true 
-                    });
                     
-                    const fuseResults = tempFuse.search(keywords.join(' '), { limit: 20 });
-                    results = fuseResults.map(r => ({ ...r.item, __fuseScore: r.score }));
-                } catch (e) {
-                    console.log('Fuse search failed, using fallback');
+                    if (data.results && data.results.length > 0) {
+                        appendMessage('Encontrei as seguintes informações na Base de Conhecimento:', 'bot');
+                        data.results.forEach((item) => {
+                            appendMessage('', 'bot', true, item);
+                        });
+                    } else {
+                        let noResultsMessage = `Desculpe, não encontrei nada na base de conhecimento para a busca: "**${userText}**"`;
+                        if (selectedEstado) {
+                            noResultsMessage += ` no estado de **${selectedEstado}**`;
+                        }
+                        noResultsMessage += `. Tente refinar sua pergunta ou selecione "Todos os estados".`;
+                        appendMessage(noResultsMessage, 'bot');
+                    }
+                    
+                } else {
+                    appendMessage('Erro ao comunicar com o servidor da base de dados. Tente novamente mais tarde.', 'bot');
                 }
-            }
 
-            // Ordena por relevância (mais keywords matching = mais relevante)
-            results = results.map(memory => {
-                let score = 0;
-                const memoryText = normalizeText(memory.texto || '');
-                const memoryTitle = normalizeText(memory.titulo || '');
-                
-                // Pontua por cada keyword encontrada
-                keywords.forEach(keyword => {
-                    if (memoryTitle.includes(keyword)) score += 3; // Match no título = mais relevante
-                    if (memoryText.includes(keyword)) score += 1;  // Match no texto = menos relevante
-                });
-                
-                // Bônus por matching exato de estado
-                if (effectiveState && memory.estado === effectiveState) score += 2;
-                
-                // Bônus extra se encontrar TODAS as keywords (busca perfeita)
-                const allKeywordsMatch = keywords.every(keyword => 
-                    memoryText.includes(keyword) || memoryTitle.includes(keyword)
-                );
-                if (allKeywordsMatch) score += 5;
-                
-                return { ...memory, _score: score };
-            }).sort((a, b) => b._score - a._score);
-
-            if (results.length === 0) {
-                return `Desculpe, não encontrei uma resposta na base de conhecimento (MongoDB) para "${raw}" no estado ${effectiveState || 'TODOS'}. Tente termos diferentes ou vá em 'Gerenciar Base de Conhecimento'.`;
-            }
-
-            lastResults = results;
-            resultsPage = 0;
-            return formatResultsPage();
-        }
-
-        // -------------------------------
-        // formatação / paginação / utilitários
-        // -------------------------------
-        function formatResultsPage() {
-            const start = resultsPage * PAGE_SIZE;
-            const end = start + PAGE_SIZE;
-            const page = lastResults.slice(start, end);
-            if (page.length === 0) return 'Nenhum resultado nesta página.';
-
-            const total = lastResults.length;
-            const listFormatted = page.map(m => {
-                const date = m.dataHora ? new Date(m.dataHora).toLocaleDateString('pt-BR') : '';
-                const parts = (m.texto || '').split(':');
-                const title = parts[0] || m.titulo || 'Sem título';
-                const content = parts.length > 1 ? parts.slice(1).join(':') : m.texto || '';
-                // usa lastQueryKeywords que foi salvo durante a busca
-                const keywordsFromQuery = lastQueryKeywords || [];
-                const highlighted = highlight(content, keywordsFromQuery);
-                const img = m.imagemUrl ? `<br><img src="${m.imagemUrl}" style="max-width:100%;border-radius:6px;margin-top:8px;">` : '';
-                const id = m._id || m.id || (m.idMemoria || '') || '';
-                const actions = `<br><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"><button class="chat-button" onclick="showFullMemory('${id}')">Ver Mais</button><button class="chat-button" onclick="sendFeedback('${id}', true)">👍</button><button class="chat-button" onclick="sendFeedback('${id}', false)">👎</button></div>`;
-                return `**[${m.estado || 'TODOS'}] ${title}**\n\n${highlighted} (Agente: ${m.agente || '—'}, ${date})${img}${actions}`;
-            }).join('\n\n---\n\n');
-
-            const remaining = Math.max(0, total - ((resultsPage + 1) * PAGE_SIZE));
-            const moreBtn = remaining > 0 ? `\n\n<button class="chat-button" onclick="showMoreResults()">Mostrar mais (${remaining} restantes)</button>` : '\n\n*Fim da lista.*';
-            return `Encontrei **${total}** referências.\n\n${listFormatted}${moreBtn}`;
-        }
-
-        function collectLastQueryKeywords() {
-            return lastQueryKeywords || [];
-        }
-
-        function showMoreResults() {
-            resultsPage += 1;
-            appendMessage(formatResultsPage(), 'bot-message');
-        }
-
-        function showFullMemory(id) {
-            const mem = memoriesIndex.find(m => (m._id === id || m.id === id || (m.idMemoria === id)));
-            if (!mem) { appendMessage('Conteúdo não encontrado', 'bot-message'); return; }
-            appendMessage(`**${mem.titulo}**\n\n${mem.texto}\n\n(Agente: ${mem.agente}, ${new Date(mem.dataHora).toLocaleString('pt-BR')})`, 'bot-message');
-        }
-
-        async function sendFeedback(id, positive) {
-            if (!id) { appendMessage('ID da memória inválido para feedback.', 'bot-message'); return; }
-            try {
-                await fetch(`${BACKEND_URL}/api/memories/feedback`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id, positive })
-                });
-                appendMessage(positive ? 'Obrigado pelo feedback positivo!' : 'Obrigado, registramos o feedback e iremos revisar.', 'bot-message');
-            } catch (e) {
-                appendMessage('Erro ao enviar feedback.', 'bot-message');
+            } catch (error) {
+                console.error('Erro de rede/API:', error);
+                appendMessage('Erro de conexão. Verifique se o backend está ativo.', 'bot');
+            } finally {
+                loader.style.display = 'none';
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
         }
 
+        openChatbotButton.addEventListener('click', () => {
+            chatbotModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            inputField.focus();
+        });
+
+        closeChatbotButton.addEventListener('click', () => {
+            chatbotModal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        chatbotModal.addEventListener('click', (event) => {
+            if (event.target === chatbotModal) {
+                chatbotModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && chatbotModal.classList.contains('active')) {
+                chatbotModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
     </script>
 </body>
 </html>
-
