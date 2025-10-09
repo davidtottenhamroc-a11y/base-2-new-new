@@ -73,7 +73,7 @@ const Memory = mongoose.model('Memory', memorySchema); 
 // ------------------------------------
 
 // Rota para criar um novo usuário (Para fins de teste e inserção inicial de dados)
-app.post('/api/user', async (req, res) => {
+app.post('/api/users', async (req, res) => {
     try {
         // ATENÇÃO: Em produção, o campo 'senha' deve ser hasheado com bcrypt antes de salvar
         const novoUsuario = new User(req.body);
@@ -88,15 +88,15 @@ app.post('/api/user', async (req, res) => {
 
 
 // Rota para autenticação - AGORA CONSULTA O BANCO DE DADOS
-app.post('/api/user', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
         // Procura no banco de dados por um usuário na coleção 'user'
         const user = await User.findOne({
-            login: login,
+            login: username,
             // ATENÇÃO: Para produção, a senha aqui deve ser comparada com a versão hasheada
-            senha: senha 
+            senha: password 
         });
 
         if (user) {
