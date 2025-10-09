@@ -144,7 +144,7 @@
                     
                     // O servidor deve retornar { authenticated: true } se o login for OK
                     if (data.authenticated) {
-                        window.location.href = 'menu.html';
+                        window.location.href = 'knowledge_manager.html';
                     } else {
                         // O servidor indicou falha de autenticação
                         errorMessage.textContent = 'Usuário ou senha incorretos. Tente novamente.';
@@ -164,4 +164,5 @@
         });
     </script>
 </body>
+
 </html>
