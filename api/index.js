@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcrypt'); // NOVIDADE: Importando o bcrypt para hashing de senhas
 
 const app = express();
 
@@ -26,7 +27,7 @@ mongoose.connect(MONGODB_URI)
 // SCHEMA PARA USUÁRIO (LOGIN E SENHA)
 const userSchema = new mongoose.Schema({
     login: { type: String, required: true, unique: true }, // Nome de usuário/Login
-    senha: { type: String, required: true } // Senha (no mundo real, deve ser hasheada com bcrypt)
+    senha: { type: String, required: true } // Senha (AGORA SERÁ O HASH DA SENHA)
 });
 
 const aulaSchema = new mongoose.Schema({
@@ -72,38 +73,59 @@ const Memory = mongoose.model('Memory', memorySchema); 
 // --- Rotas da API ---
 // ------------------------------------
 
-// Rota para criar um novo usuário (Para fins de teste e inserção inicial de dados)
+// Rota para criar um novo usuário - AGORA COM HASH DE SENHA
 app.post('/api/users', async (req, res) => {
     try {
-        // ATENÇÃO: Em produção, o campo 'senha' deve ser hasheado com bcrypt antes de salvar
-        const novoUsuario = new User(req.body);
+        const { login, senha } = req.body;
+
+        if (!login || !senha) {
+            return res.status(400).send({ message: "Login e senha são obrigatórios." });
+        }
+        
+        // Cria o hash da senha (10 é o número de 'salt rounds' - nível de segurança)
+        const hashedPassword = await bcrypt.hash(senha, 10); 
+        
+        const novoUsuario = new User({
+            login: login,
+            senha: hashedPassword // Salva o hash da senha
+        });
+        
         await novoUsuario.save();
-        // Remove a senha do objeto de resposta por segurança
-        novoUsuario.senha = undefined;
+        
+        // Remove a senha/hash do objeto de resposta por segurança
+        novoUsuario.senha = undefined; 
         res.status(201).send(novoUsuario);
     } catch (error) {
+        // Tratamento de erro de login duplicado
+        if (error.code === 11000) {
+            return res.status(409).send({ message: "Este login já está em uso.", error: error.message });
+        }
         res.status(400).send({ message: "Erro ao criar usuário.", error: error.message });
     }
 });
 
 
-// Rota para autenticação - AGORA CONSULTA O BANCO DE DADOS
+// Rota para autenticação - AGORA COMPARA HASHES COM BCRYPT
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Procura no banco de dados por um usuário na coleção 'user'
-        const user = await User.findOne({
-            login: username,
-            // ATENÇÃO: Para produção, a senha aqui deve ser comparada com a versão hasheada
-            senha: password 
-        });
+        // 1. Procura o usuário APENAS pelo login
+        const user = await User.findOne({ login: username });
 
         if (user) {
-            // Usuário encontrado: Autenticação bem-sucedida
-            res.json({ authenticated: true, message: 'Login bem-sucedido.' });
+            // 2. Compara a senha fornecida (password) com a senha hasheada no banco (user.senha)
+            const isMatch = await bcrypt.compare(password, user.senha);
+            
+            if (isMatch) {
+                // Usuário encontrado e senha correta: Autenticação bem-sucedida
+                res.json({ authenticated: true, message: 'Login bem-sucedido.' });
+            } else {
+                // Senha incorreta
+                res.status(401).json({ authenticated: false, message: 'Credenciais inválidas.' });
+            }
         } else {
-            // Usuário não encontrado ou senha incorreta
+            // Usuário não encontrado
             res.status(401).json({ authenticated: false, message: 'Credenciais inválidas.' });
         }
     } catch (error) {
