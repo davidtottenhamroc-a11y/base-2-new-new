@@ -18,19 +18,16 @@
         align-items: center;
         justify-content: center;
         color: #f4f4f4;
-        padding: 20px;
     }
     .login-container {
         max-width: 400px;
         width: 100%;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         text-align: center;
         padding: 40px 30px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .logo {
         font-size: 48px;
@@ -62,77 +59,81 @@
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 16px;
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255,255,255,0.85);
         color: #1f1f1f;
-        transition: border-color 0.3s ease;
-    }
-    input:focus {
-        outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
     }
     button {
         width: 100%;
         padding: 15px;
         font-size: 18px;
-        background: linear-gradient(135deg, #28a745, #1e7e34);
-        color: white;
         border: none;
         border-radius: 50px;
         cursor: pointer;
         font-weight: bold;
         transition: all 0.3s ease;
     }
-    button:hover {
+    .login-btn {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        color: white;
+        margin-bottom: 10px;
+    }
+    .login-btn:hover {
         background: linear-gradient(135deg, #218838, #1e7e34);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
-    .secondary-btn {
-        margin-top: 15px;
+    .register-btn {
         background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
     }
-    .secondary-btn:hover {
+    .register-btn:hover {
         background: linear-gradient(135deg, #0069d9, #0056b3);
     }
-    .error-message, .success-message {
+    .error-message {
         margin-top: 15px;
+        color: #dc3545;
         font-weight: bold;
         display: none;
     }
-    .error-message { color: #dc3545; }
-    .success-message { color: #28a745; }
-
-    /* Modal */
+    /* Estilo do pop-up */
     .modal {
         display: none;
         position: fixed;
-        z-index: 10;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.7);
+        inset: 0;
+        background: rgba(0,0,0,0.6);
         justify-content: center;
         align-items: center;
     }
     .modal-content {
-        background: #fff;
+        background: white;
         color: #222;
         padding: 30px;
         border-radius: 10px;
         width: 90%;
         max-width: 400px;
         text-align: center;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
     }
-    .modal-content input {
-        margin: 10px 0;
+    .close-btn, .register-confirm-btn, .admin-btn {
+        margin-top: 15px;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .register-confirm-btn {
+        background: #28a745;
+        color: white;
     }
     .close-btn {
         background: #dc3545;
-        margin-top: 10px;
+        color: white;
     }
-    .close-btn:hover {
-        background: #b52a37;
+    .admin-btn {
+        background: #007bff;
+        color: white;
+    }
+    .error-popup {
+        color: red;
+        margin-top: 10px;
     }
 </style>
 </head>
@@ -145,140 +146,127 @@
     <form id="login-form">
         <div class="form-group">
             <label for="username">Usuário:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" required>
         </div>
         <div class="form-group">
             <label for="password">Senha:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" required>
         </div>
-        <button type="submit">Entrar</button>
+        <button type="submit" class="login-btn">Entrar</button>
     </form>
-
-    <button class="secondary-btn" id="register-btn">Cadastrar Usuário</button>
-
-    <p class="error-message" id="error-message">Usuário ou senha incorretos. Tente novamente.</p>
+    <button id="open-register" class="register-btn">Cadastrar Usuário</button>
+    <p class="error-message" id="login-error">Usuário ou senha incorretos.</p>
 </div>
 
-<!-- Modal de Senha Mestra -->
-<div id="master-modal" class="modal">
-    <div class="modal-content" id="master-step">
-        <h3>Autenticação Necessária</h3>
-        <p>Digite a senha mestra para liberar o cadastro:</p>
-        <input type="password" id="master-password" placeholder="Senha mestra">
-        <button id="verify-master">Verificar</button>
-        <button class="close-btn" onclick="closeModal()">Cancelar</button>
-        <p class="error-message" id="master-error">Senha incorreta.</p>
+<!-- Pop-up de senha admin -->
+<div class="modal" id="admin-modal">
+    <div class="modal-content">
+        <h2>Senha de Acesso</h2>
+        <input type="password" id="admin-password" placeholder="Digite a senha otimus32" />
+        <div>
+            <button class="admin-btn" id="confirm-admin">Confirmar</button>
+            <button class="close-btn" onclick="closeAdminModal()">Fechar</button>
+        </div>
+        <p class="error-popup" id="admin-error"></p>
     </div>
+</div>
 
-    <!-- Formulário de Cadastro (inicialmente oculto) -->
-    <div class="modal-content" id="register-step" style="display:none;">
-        <h3>Cadastrar Novo Usuário</h3>
-        <input type="text" id="new-username" placeholder="Usuário" required>
-        <input type="password" id="new-password" placeholder="Senha" required>
-        <button id="create-user">Cadastrar</button>
-        <button class="close-btn" onclick="closeModal()">Fechar</button>
-        <p class="success-message" id="success-register">Usuário criado com sucesso!</p>
-        <p class="error-message" id="error-register">Erro ao criar usuário.</p>
+<!-- Pop-up de cadastro -->
+<div class="modal" id="register-modal">
+    <div class="modal-content">
+        <h2>Cadastrar Novo Usuário</h2>
+        <input type="text" id="new-username" placeholder="Usuário" />
+        <input type="password" id="new-password" placeholder="Senha" />
+        <div>
+            <button class="register-confirm-btn" id="register-btn">Cadastrar</button>
+            <button class="close-btn" onclick="closeRegisterModal()">Fechar</button>
+        </div>
+        <p class="error-popup" id="register-error"></p>
     </div>
 </div>
 
 <script>
-    const registerBtn = document.getElementById('register-btn');
-    const masterModal = document.getElementById('master-modal');
-    const masterStep = document.getElementById('master-step');
-    const registerStep = document.getElementById('register-step');
-    const masterError = document.getElementById('master-error');
-    const successRegister = document.getElementById('success-register');
-    const errorRegister = document.getElementById('error-register');
+    const API_BASE = "https://SEU_BACKEND_URL_AQUI.vercel.app"; // <-- troque pela URL do seu backend
 
-    function closeModal() {
-        masterModal.style.display = 'none';
-        masterStep.style.display = 'block';
-        registerStep.style.display = 'none';
-        document.getElementById('master-password').value = '';
-        masterError.style.display = 'none';
-        successRegister.style.display = 'none';
-        errorRegister.style.display = 'none';
-    }
+    // LOGIN
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('login-error');
 
-    registerBtn.addEventListener('click', () => {
-        masterModal.style.display = 'flex';
-    });
+        try {
+            const response = await fetch(`${API_BASE}/api/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username, password })
+            });
 
-    document.getElementById('verify-master').addEventListener('click', () => {
-        const masterPass = document.getElementById('master-password').value;
-        if (masterPass === 'otimus32') {
-            masterStep.style.display = 'none';
-            registerStep.style.display = 'block';
-        } else {
-            masterError.style.display = 'block';
+            const data = await response.json();
+            if (response.ok && data.authenticated) {
+                window.location.href = 'menu.html';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        } catch (err) {
+            console.error(err);
+            errorMsg.style.display = 'block';
         }
     });
 
-    document.getElementById('create-user').addEventListener('click', async () => {
+    // MODAL ADMIN
+    const adminModal = document.getElementById('admin-modal');
+    const registerModal = document.getElementById('register-modal');
+    document.getElementById('open-register').addEventListener('click', () => {
+        adminModal.style.display = 'flex';
+    });
+    document.getElementById('confirm-admin').addEventListener('click', () => {
+        const pass = document.getElementById('admin-password').value;
+        const err = document.getElementById('admin-error');
+        if (pass === 'otimus32') {
+            adminModal.style.display = 'none';
+            registerModal.style.display = 'flex';
+            err.textContent = '';
+        } else {
+            err.textContent = 'Senha incorreta.';
+        }
+    });
+
+    // CADASTRAR USUÁRIO
+    document.getElementById('register-btn').addEventListener('click', async () => {
         const login = document.getElementById('new-username').value.trim();
         const senha = document.getElementById('new-password').value.trim();
-        successRegister.style.display = 'none';
-        errorRegister.style.display = 'none';
+        const err = document.getElementById('register-error');
 
         if (!login || !senha) {
-            errorRegister.textContent = 'Preencha todos os campos.';
-            errorRegister.style.display = 'block';
+            err.textContent = 'Preencha todos os campos.';
             return;
         }
 
         try {
-            const response = await fetch('/api/users', {
+            const response = await fetch(`${API_BASE}/api/users`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ login, senha })
             });
 
+            const data = await response.json();
             if (response.ok) {
-                successRegister.style.display = 'block';
-                document.getElementById('new-username').value = '';
-                document.getElementById('new-password').value = '';
+                err.style.color = 'green';
+                err.textContent = 'Usuário criado com sucesso!';
+                setTimeout(() => closeRegisterModal(), 1500);
             } else {
-                errorRegister.textContent = 'Erro ao criar usuário.';
-                errorRegister.style.display = 'block';
+                err.textContent = data.message || 'Erro ao criar usuário.';
             }
         } catch (error) {
             console.error('Erro:', error);
-            errorRegister.textContent = 'Falha de conexão com o servidor.';
-            errorRegister.style.display = 'block';
+            err.textContent = 'Erro ao conectar com o servidor.';
         }
     });
 
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorMessage = document.getElementById('error-message');
-
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                if (data.authenticated) {
-                    window.location.href = 'menu.html';
-                } else {
-                    errorMessage.style.display = 'block';
-                }
-            } else {
-                errorMessage.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            errorMessage.textContent = 'Erro ao conectar com o servidor.';
-            errorMessage.style.display = 'block';
-        }
-    });
+    // FECHAR MODAIS
+    function closeRegisterModal() { registerModal.style.display = 'none'; }
+    function closeAdminModal() { adminModal.style.display = 'none'; }
 </script>
 </body>
 </html>
