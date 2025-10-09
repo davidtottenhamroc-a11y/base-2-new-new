@@ -19,7 +19,16 @@ mongoose.connect(MONGODB_URI)
     .then(() => console.log('Conectado ao MongoDB!'))
     .catch(err => console.error('Erro de conexão com o MongoDB:', err));
 
+// ------------------------------------
 // --- Schemas (Modelos de Dados) ---
+// ------------------------------------
+
+// SCHEMA PARA USUÁRIO (LOGIN E SENHA)
+const userSchema = new mongoose.Schema({
+    login: { type: String, required: true, unique: true }, // Nome de usuário/Login
+    senha: { type: String, required: true } // Senha (no mundo real, deve ser hasheada com bcrypt)
+});
+
 const aulaSchema = new mongoose.Schema({
     agente: String,
     estado: String,
@@ -50,24 +59,57 @@ const memorySchema = new mongoose.Schema({
     imagemUrl: String // NOVIDADE: Campo para a URL da imagem
 });
 
+// ------------------------------------
+// --- Modelos Mongoose ---
+// ------------------------------------
+// NOME DA COLLECTION FORÇADO PARA 'user' (terceiro argumento)
+const User = mongoose.model('User', userSchema, 'user'); 
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
 const Memory = mongoose.model('Memory', memorySchema); 
 
+// ------------------------------------
 // --- Rotas da API ---
+// ------------------------------------
 
-// Rota para autenticação
-app.post('/api/login', (req, res) => {
-    const users = {
-        'Wesley': '1234',
-        'David': '456'
-    };
-    const { username, password } = req.body;
-    if (users[username] && users[username] === password) {
-        res.json({ authenticated: true });
-    } else {
-        res.status(401).json({ authenticated: false, message: 'Invalid credentials' });
-    }
+// Rota para criar um novo usuário (Para fins de teste e inserção inicial de dados)
+app.post('/api/user', async (req, res) => {
+    try {
+        // ATENÇÃO: Em produção, o campo 'senha' deve ser hasheado com bcrypt antes de salvar
+        const novoUsuario = new User(req.body);
+        await novoUsuario.save();
+        // Remove a senha do objeto de resposta por segurança
+        novoUsuario.senha = undefined;
+        res.status(201).send(novoUsuario);
+    } catch (error) {
+        res.status(400).send({ message: "Erro ao criar usuário.", error: error.message });
+    }
+});
+
+
+// Rota para autenticação - AGORA CONSULTA O BANCO DE DADOS
+app.post('/api/user', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        // Procura no banco de dados por um usuário na coleção 'user'
+        const user = await User.findOne({
+            login: login,
+            // ATENÇÃO: Para produção, a senha aqui deve ser comparada com a versão hasheada
+            senha: senha 
+        });
+
+        if (user) {
+            // Usuário encontrado: Autenticação bem-sucedida
+            res.json({ authenticated: true, message: 'Login bem-sucedido.' });
+        } else {
+            // Usuário não encontrado ou senha incorreta
+            res.status(401).json({ authenticated: false, message: 'Credenciais inválidas.' });
+        }
+    } catch (error) {
+        console.error('Erro durante a autenticação:', error);
+        res.status(500).json({ authenticated: false, message: 'Erro interno do servidor.' });
+    }
 });
 
 // --- Rotas de Aulas ---
