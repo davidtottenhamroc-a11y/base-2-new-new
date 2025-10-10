@@ -3,8 +3,8 @@
 
     {
       "source": "/",
-      "destination": "/index.html" 
-      // Se sua tela de login se chama 'login.html', use: "/login.html"
+      "destination": "/login.html" 
+      
     },
     
 
@@ -23,4 +23,5 @@
     }
   ]
 }
+
 
