@@ -6,8 +6,11 @@
       "destination": "/login.html" 
       
     },
-    
-
+    {
+      "source": "/",
+      "destination": "/cadastro_user.html" 
+      
+    },
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
@@ -23,5 +26,6 @@
     }
   ]
 }
+
 
 
