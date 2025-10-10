@@ -119,50 +119,33 @@
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
+        document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const username = document.getElementById('username').value;
+            // Pega os valores e remove espaços em branco (trim)
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('error-message');
 
             // Oculta a mensagem de erro antes de uma nova tentativa
             errorMessage.style.display = 'none';
 
-            try {
-                // Requisição para o backend, onde o banco de dados será consultado
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
-                });
+            // --- Lógica de Autenticação Frontend Personalizada (Substituição) ---
 
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    // O servidor deve retornar { authenticated: true } se o login for OK
-                    if (data.authenticated) {
-                        window.location.href = 'knowledge_manager.html';
-                    } else {
-                        // O servidor indicou falha de autenticação
-                        errorMessage.textContent = 'Usuário ou senha incorretos. Tente novamente.';
-                        errorMessage.style.display = 'block';
-                    }
-                } else {
-                    // Trata outros erros HTTP (ex: 401 Unauthorized, 404 Not Found)
-                    errorMessage.textContent = 'Erro de autenticação. Verifique as credenciais.';
-                    errorMessage.style.display = 'block';
-                }
-            } catch (error) {
-                // Erro de rede ou servidor não está online
-                console.error('Erro:', error);
-                errorMessage.textContent = 'Erro ao conectar com o servidor. Tente novamente mais tarde.';
+            // Lista de usuários permitidos (comparação sem distinção de maiúsculas/minúsculas)
+            const allowedUsers = ["hyuri", "david", "helio", "renataoliveira"];
+            
+
+            // Verifica se o nome de usuário está na lista e se a senha corresponde
+            if (allowedUsers.includes(username.toLowerCase()) && password === fixedPassword) {
+                // Autenticação bem-sucedida: Redireciona
+                window.location.href = 'knowledge_manager.html';
+            } else {
+                // Falha na autenticação: Exibe a mensagem de erro
+                errorMessage.textContent = 'Usuário ou senha incorretos. Tente novamente.';
                 errorMessage.style.display = 'block';
             }
         });
     </script>
 </body>
-
 </html>
