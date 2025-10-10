@@ -5,34 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login - VSoft</title>
 <style>
+    /* RESET BÁSICO */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    
+    /* ESTILO DO BODY E FUNDO */
     body {
         background: linear-gradient(135deg, #0d1a2a, #2c3e50);
-        min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #f4f4f4;
+        min-height: 100vh; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #f4f4f4;
     }
+    
+    /* CONTAINER PRINCIPAL DE LOGIN */
     .login-container {
-        max-width: 400px; width: 100%; background: rgba(255,255,255,0.1);
-        border-radius: 15px; text-align: center; padding: 40px 30px;
-        backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        max-width: 400px; 
+        width: 100%; 
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px; 
+        text-align: center; 
+        padding: 40px 30px;
+        backdrop-filter: blur(10px); 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .logo { font-size: 48px; font-weight: bold; color: #3498db; margin-bottom: 10px; }
     h1 { font-size: 26px; margin-bottom: 5px; }
     .description { opacity: .8; margin-bottom: 25px; }
-    input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; }
-    button { width: 100%; padding: 12px; font-weight: bold; border-radius: 50px; border: none; cursor: pointer; }
+    
+    /* CAMPOS DE INPUT */
+    input { 
+        width: 100%; 
+        padding: 12px; 
+        margin-bottom: 15px; 
+        border-radius: 8px; 
+        border: none; 
+    }
+    
+    /* BOTÕES GERAIS */
+    button { 
+        width: 100%; 
+        padding: 12px; 
+        font-weight: bold; 
+        border-radius: 50px; 
+        border: none; 
+        cursor: pointer; 
+    }
+    
+    /* BOTÕES ESPECÍFICOS DO LOGIN */
     .login-btn { background: linear-gradient(135deg, #28a745, #1e7e34); color: white; }
     .register-btn { background: linear-gradient(135deg, #007bff, #0056b3); color: white; margin-top: 10px; }
+    
+    /* MENSAGEM DE ERRO */
     .error { color: #ff4444; margin-top: 10px; display: none; }
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
-    .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 400px; text-align: center; color: #222; }
-    /* Estilos dos botões do modal - RESTAURADOS para 100% de largura */
+    
+    /* MODAL DE CADASTRO */
+    .modal { 
+        display: none; 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(0,0,0,0.6); 
+        justify-content: center; 
+        align-items: center; 
+    }
+    .modal-content { 
+        background: white; 
+        padding: 30px; 
+        border-radius: 10px; 
+        max-width: 400px; 
+        text-align: center; 
+        color: #222; 
+    }
+    
+    /* BOTÕES DENTRO DO MODAL - RESTAURADOS PARA 100% */
     .close-btn { 
         background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 20px; 
-        margin-top: 10px; cursor: pointer; width: 100%; /* Corrigido */
+        margin-top: 10px; cursor: pointer; width: 100%; 
     }
     .confirm-btn { 
         background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 20px; 
-        margin-top: 10px; cursor: pointer; width: 100%; margin-bottom: 10px; /* Corrigido */
+        margin-top: 10px; cursor: pointer; width: 100%; margin-bottom: 10px; 
     }
     .access-password-section { margin-bottom: 15px; }
 </style>
@@ -60,17 +112,17 @@
         
                 <input type="text" id="new-user" placeholder="Novo Usuário">
         <input type="password" id="new-pass" placeholder="Nova Senha">
-                <button class="confirm-btn" id="register-confirm">Cadastrar</button> 
+        <button class="confirm-btn" id="register-confirm">Cadastrar</button> 
         <button class="close-btn" id="close-register">Fechar</button>
         <p id="register-msg" style="margin-top:10px;"></p>
     </div>
 </div>
 
 <script>
-// Mantido o API_BASE original com a barra para funcionar com o código JS
+// URL da sua API hospedada. 
 const API_BASE = "https://base-2-new-new-9xow.vercel.app/";
 
-// LOGIN
+// --- LÓGICA DE LOGIN ---
 document.getElementById("login-btn").addEventListener("click", async () => {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -84,7 +136,7 @@ document.getElementById("login-btn").addEventListener("click", async () => {
             body: JSON.stringify({ username, password })
         });
         
-        // Se a resposta for um erro 4xx/5xx (servidor respondeu com erro)
+        // Trata a resposta de erro do servidor (ex: 401 Unauthorized)
         if (!res.ok) {
             const data = await res.json();
             err.textContent = data.message || "Usuário ou senha incorretos.";
@@ -101,13 +153,13 @@ document.getElementById("login-btn").addEventListener("click", async () => {
         }
     } catch (e) {
         console.error("Erro de conexão de rede durante o login:", e);
-        // Erro de rede (servidor inalcançável)
+        // Trata falha na conexão de rede (API Inalcançável)
         err.textContent = "Erro ao conectar com o servidor. Verifique a URL da API.";
         err.style.display = "block";
     }
 });
 
-// ABRIR/FECHAR MODAL
+// --- LÓGICA DO MODAL (ABRIR/FECHAR) ---
 const modal = document.getElementById("register-modal");
 document.getElementById("open-register").onclick = () => {
     // Limpar campos ao abrir o modal
@@ -119,7 +171,7 @@ document.getElementById("open-register").onclick = () => {
 };
 document.getElementById("close-register").onclick = () => modal.style.display = "none";
 
-// CADASTRO
+// --- LÓGICA DE CADASTRO ---
 document.getElementById("register-confirm").addEventListener("click", async () => {
     const accessPassword = document.getElementById("access-password").value.trim();
     const login = document.getElementById("new-user").value.trim();
@@ -147,16 +199,15 @@ document.getElementById("register-confirm").addEventListener("click", async () =
             body: JSON.stringify({ login, senha, accessPassword: "otimus32" })
         });
         
-        // MELHORIA: Trata erros de resposta do servidor (4xx, 5xx)
+        // Trata erros de resposta do servidor (4xx, 5xx)
         if (!res.ok) {
             const errorData = await res.json();
             msg.style.color = "red";
-            // Exibe a mensagem de erro específica do backend (ex: "Este login já está em uso.")
             msg.textContent = errorData.message || `Erro ao criar usuário. Status: ${res.status}.`;
             return;
         }
 
-        // Se a resposta for OK (Status 201 Created)
+        // Sucesso (Status 201 Created)
         const data = await res.json();
         msg.style.color = "green";
         msg.textContent = "Usuário criado com sucesso!";
@@ -168,8 +219,8 @@ document.getElementById("register-confirm").addEventListener("click", async () =
             document.getElementById("new-pass").value = "";
         }, 2000);
     } catch (err) {
-        // MANTIDO: Captura erros de rede (API Offline/Inalcançável)
         console.error("Erro de conexão de rede durante o cadastro:", err);
+        // Trata falha na conexão de rede (API Inalcançável)
         msg.style.color = "red";
         msg.textContent = "Erro ao conectar com o servidor. Verifique a URL da API.";
     }
