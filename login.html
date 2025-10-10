@@ -27,6 +27,7 @@
     .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 400px; text-align: center; color: #222; }
     .close-btn { background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
     .confirm-btn { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
+    .access-password-section { margin-bottom: 15px; }
 </style>
 </head>
 <body>
@@ -45,8 +46,15 @@
 <div class="modal" id="register-modal">
     <div class="modal-content">
         <h2>Cadastrar Novo Usuário</h2>
-        <input type="text" id="new-user" placeholder="Usuário">
-        <input type="password" id="new-pass" placeholder="Senha">
+        
+        <!-- Campo para senha de acesso -->
+        <div class="access-password-section">
+            <input type="password" id="access-password" placeholder="Senha de Acesso (otimus32)" required>
+        </div>
+        
+        <!-- Campos para novo usuário -->
+        <input type="text" id="new-user" placeholder="Novo Usuário">
+        <input type="password" id="new-pass" placeholder="Nova Senha">
         <button class="confirm-btn" id="register-confirm">Cadastrar</button>
         <button class="close-btn" id="close-register">Fechar</button>
         <p id="register-msg" style="margin-top:10px;"></p>
@@ -82,14 +90,29 @@ document.getElementById("login-btn").addEventListener("click", async () => {
 
 // ABRIR/FECHAR MODAL
 const modal = document.getElementById("register-modal");
-document.getElementById("open-register").onclick = () => modal.style.display = "flex";
+document.getElementById("open-register").onclick = () => {
+    // Limpar campos ao abrir o modal
+    document.getElementById("access-password").value = "";
+    document.getElementById("new-user").value = "";
+    document.getElementById("new-pass").value = "";
+    document.getElementById("register-msg").textContent = "";
+    modal.style.display = "flex";
+};
 document.getElementById("close-register").onclick = () => modal.style.display = "none";
 
 // CADASTRO
 document.getElementById("register-confirm").addEventListener("click", async () => {
+    const accessPassword = document.getElementById("access-password").value.trim();
     const login = document.getElementById("new-user").value.trim();
     const senha = document.getElementById("new-pass").value.trim();
     const msg = document.getElementById("register-msg");
+
+    // Validar senha de acesso
+    if (accessPassword !== "otimus32") {
+        msg.style.color = "red";
+        msg.textContent = "Senha de acesso incorreta!";
+        return;
+    }
 
     if (!login || !senha) {
         msg.style.color = "red";
@@ -101,13 +124,19 @@ document.getElementById("register-confirm").addEventListener("click", async () =
         const res = await fetch(`${API_BASE}/api/users`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ login, senha })
+            body: JSON.stringify({ login, senha, accessPassword: "otimus32" }) // Envia a senha de acesso para validação no backend
         });
         const data = await res.json();
         if (res.ok) {
             msg.style.color = "green";
             msg.textContent = "Usuário criado com sucesso!";
-            setTimeout(() => modal.style.display = "none", 2000);
+            setTimeout(() => {
+                modal.style.display = "none";
+                // Limpar campos após cadastro bem-sucedido
+                document.getElementById("access-password").value = "";
+                document.getElementById("new-user").value = "";
+                document.getElementById("new-pass").value = "";
+            }, 2000);
         } else {
             msg.style.color = "red";
             msg.textContent = data.message || "Erro ao criar usuário.";
