@@ -25,13 +25,14 @@
     .error { color: #ff4444; margin-top: 10px; display: none; }
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
     .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 400px; text-align: center; color: #222; }
+    /* Estilos dos botões do modal - RESTAURADOS para 100% de largura */
     .close-btn { 
         background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 20px; 
-        margin-top: 10px; cursor: pointer; display: inline-block; width: 48%; margin-left: 2%;
+        margin-top: 10px; cursor: pointer; width: 100%; /* Corrigido */
     }
     .confirm-btn { 
         background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 20px; 
-        margin-top: 10px; cursor: pointer; display: inline-block; width: 48%; margin-right: 2%;
+        margin-top: 10px; cursor: pointer; width: 100%; margin-bottom: 10px; /* Corrigido */
     }
     .access-password-section { margin-bottom: 15px; }
 </style>
@@ -59,30 +60,31 @@
         
                 <input type="text" id="new-user" placeholder="Novo Usuário">
         <input type="password" id="new-pass" placeholder="Nova Senha">
-        <button class="confirm-btn" id="register-confirm">Cadastrar</button>
+                <button class="confirm-btn" id="register-confirm">Cadastrar</button> 
         <button class="close-btn" id="close-register">Fechar</button>
         <p id="register-msg" style="margin-top:10px;"></p>
     </div>
 </div>
 
 <script>
-const API_BASE = "https://base-2-new-new-9xow.vercel.app"; // Removido a barra final
+// Mantido o API_BASE original com a barra para funcionar com o código JS
+const API_BASE = "https://base-2-new-new-9xow.vercel.app/";
 
 // LOGIN
 document.getElementById("login-btn").addEventListener("click", async () => {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const err = document.getElementById("login-error");
-    err.style.display = "none"; // Limpa o erro anterior
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const err = document.getElementById("login-error");
+    err.style.display = "none"; // Limpa o erro ao tentar login
 
-    try {
-        const res = await fetch(`${API_BASE}/api/login`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ username, password })
-        });
+    try {
+        const res = await fetch(`${API_BASE}api/login`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ username, password })
+        });
         
-        // Trata erro de resposta do servidor (ex: status 401)
+        // Se a resposta for um erro 4xx/5xx (servidor respondeu com erro)
         if (!res.ok) {
             const data = await res.json();
             err.textContent = data.message || "Usuário ou senha incorretos.";
@@ -90,19 +92,19 @@ document.getElementById("login-btn").addEventListener("click", async () => {
             return;
         }
 
-        const data = await res.json();
-        if (data.authenticated) {
-            window.location.href = "menu.html";
-        } else {
-            err.textContent = "Usuário ou senha incorretos.";
-            err.style.display = "block";
-        }
-    } catch (e) {
-        console.error(e);
-        // Erro de rede/conexão
-        err.textContent = "Erro ao conectar com o servidor. Verifique a URL da API.";
-        err.style.display = "block";
-    }
+        const data = await res.json();
+        if (data.authenticated) {
+            window.location.href = "menu.html";
+        } else {
+            err.textContent = data.message || "Usuário ou senha incorretos.";
+            err.style.display = "block";
+        }
+    } catch (e) {
+        console.error("Erro de conexão de rede durante o login:", e);
+        // Erro de rede (servidor inalcançável)
+        err.textContent = "Erro ao conectar com o servidor. Verifique a URL da API.";
+        err.style.display = "block";
+    }
 });
 
 // ABRIR/FECHAR MODAL
@@ -139,13 +141,13 @@ document.getElementById("register-confirm").addEventListener("click", async () =
     }
 
     try {
-        const res = await fetch(`${API_BASE}/api/users`, {
+        const res = await fetch(`${API_BASE}api/users`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ login, senha, accessPassword: "otimus32" })
         });
         
-        // NOVO/MELHORADO: Trata erros de resposta do servidor (4xx, 5xx)
+        // MELHORIA: Trata erros de resposta do servidor (4xx, 5xx)
         if (!res.ok) {
             const errorData = await res.json();
             msg.style.color = "red";
@@ -167,7 +169,7 @@ document.getElementById("register-confirm").addEventListener("click", async () =
         }, 2000);
     } catch (err) {
         // MANTIDO: Captura erros de rede (API Offline/Inalcançável)
-        console.error("Erro de conexão de rede:", err);
+        console.error("Erro de conexão de rede durante o cadastro:", err);
         msg.style.color = "red";
         msg.textContent = "Erro ao conectar com o servidor. Verifique a URL da API.";
     }
