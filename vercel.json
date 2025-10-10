@@ -1,20 +1,18 @@
 {
   "rewrites": [
-    // 1. Redireciona a raiz para o login (ou index.html, dependendo do nome do seu login)
+
     {
       "source": "/",
       "destination": "/index.html" 
       // Se sua tela de login se chama 'login.html', use: "/login.html"
     },
     
-    // 2. Garante que todas as chamadas /api/ vão para a função serverless (index.js)
+
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
     },
     
-    // 3. Permite acesso a outros arquivos HTML e estáticos (o que faltava)
-    // Se você tiver outros arquivos como register.html, menu.html, etc., esta regra é crucial
     {
       "source": "/(.*)\\.html",
       "destination": "/$1.html"
@@ -25,3 +23,4 @@
     }
   ]
 }
+
