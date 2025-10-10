@@ -2,105 +2,74 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-// 1. Importar express-session
-const session = require('express-session');
-// Importar o 'path' para lidar com caminhos de arquivos estáticos
-const path = require('path');
 
 const app = express();
 
 // Configurações
-app.use(cors({
-    // Permite que o CORS use cookies/sessions, importante para a autenticação
-    origin: true, 
-    credentials: true 
-}));
+app.use(cors()); 
 app.use(express.json());
 
-// --- Configuração de Sessão ---
-// 2. Configurar express-session
-app.use(session({
-    secret: 'seu_segredo_muito_secreto', // Use uma string forte e secreta aqui
-    resave: false, // Evita salvar a sessão no store se ela não for modificada
-    saveUninitialized: false, // Evita criar sessões para usuários não autenticados
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production', // Use true em produção (HTTPS)
-        maxAge: 1000 * 60 * 60 * 24 // 24 horas
-    }
-}));
-
-
 // --- Variáveis de Ambiente ---
+// **IMPORTANTE:** Mantenha a string de conexão real como Variável de Ambiente no Vercel.
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://davidtottenhamroc_db_user:tottenham0724@cluster0.tdopyuc.mongodb.net/test?retryWrites=true&w=majority";
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3000; 
 
+// Senha pré-definida para cadastro (você pode mudar isso se quiser)
 const PRE_DEFINED_ACCESS_PASSWORD = "otimus32";
 
 // Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
-    .then(() => console.log('Conectado ao MongoDB!'))
-    .catch(err => console.error('Erro de conexão com o MongoDB:', err));
+    .then(() => console.log('Conectado ao MongoDB!'))
+    .catch(err => console.error('Erro de conexão com o MongoDB:', err));
 
 // ------------------------------------
 // --- Schemas (Modelos de Dados) ---
-// (MANTIDOS INALTERADOS)
 // ------------------------------------
 
+// SCHEMA PARA USUÁRIO (LOGIN E SENHA)
 const userSchema = new mongoose.Schema({
-    login: { type: String, required: true, unique: true },
-    senha: { type: String, required: true }
+    login: { type: String, required: true, unique: true },
+    senha: { type: String, required: true }
 });
 
 const aulaSchema = new mongoose.Schema({
-    agente: String,
-    estado: String,
-    tipoRegistro: String,
-    data: String,
-    total: Number,
-    execucao: Number,
-    naoEnviadas: Number,
-    recusadas: Number,
-    processamento: Number,
-    status: String,
-    observacao: String
+    agente: String,
+    estado: String,
+    tipoRegistro: String,
+    data: String,
+    total: Number,
+    execucao: Number,
+    naoEnviadas: Number,
+    recusadas: Number,
+    processamento: Number,
+    status: String,
+    observacao: String
 });
 
 const incidenteSchema = new mongoose.Schema({
-    agente: String,
-    estado: String,
-    data: String,
-    observacao: String
+    agente: String,
+    estado: String,
+    data: String,
+    observacao: String
 });
 
+// SCHEMA PARA MEMÓRIA DO CHATBOT
 const memorySchema = new mongoose.Schema({
-    agente: String,
-    dataHora: { type: Date, default: Date.now },
-    texto: String,
-    estado: String,
-    imagemUrl: String
+    agente: String,
+    dataHora: { type: Date, default: Date.now },
+    texto: String,
+    estado: String,
+    imagemUrl: String
 });
 
-const User = mongoose.model('User', userSchema, 'user'); 
+// ------------------------------------
+// --- Modelos Mongoose ---
+// ------------------------------------
+// O Mongoose cria a collection 'user' (terceiro parâmetro) automaticamente se ela não existir
+const User = mongoose.model('User', userSchema, 'user'); 
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
-const Memory = mongoose.model('Memory', memorySchema); 
-
-// ------------------------------------
-// --- MIDDLEWARE DE AUTENTICAÇÃO ---
-// ------------------------------------
-
-// 4. Criação do middleware de verificação de autenticação
-function checkAuth(req, res, next) {
-    // Verifica se a sessão tem um ID de usuário (ou seja, o usuário logou)
-    if (req.session && req.session.userId) {
-        // Se sim, continua o processamento da rota
-        return next();
-    }
-    // Se não, redireciona para a página de login
-    // Nota: Como o Vercel lida com rotas, você pode precisar ajustar o path.
-    // Usaremos '/login.html' que é o seu ponto de entrada.
-    res.redirect('/login.html');
-}
+const Memory = mongoose.model('Memory', memorySchema); 
 
 // ------------------------------------
 // --- Rotas da API ---
@@ -108,10 +77,10 @@ function checkAuth(req, res, next) {
 
 // Rota para criar um novo usuário - COM VALIDAÇÃO DE SENHA DE ACESSO
 app.post('/api/users', async (req, res) => {
-    // Lógica inalterada...
     try {
         const { login, senha, accessPassword } = req.body;
 
+        // Verifica se a senha de acesso foi fornecida e está correta
         if (!accessPassword || accessPassword !== PRE_DEFINED_ACCESS_PASSWORD) {
             return res.status(403).send({ 
                 message: "Acesso negado. Senha de acesso incorreta ou não fornecida." 
@@ -122,6 +91,7 @@ app.post('/api/users', async (req, res) => {
             return res.status(400).send({ message: "Login e senha são obrigatórios." });
         }
         
+        // Cria o hash da senha
         const hashedPassword = await bcrypt.hash(senha, 10); 
         
         const novoUsuario = new User({
@@ -129,11 +99,14 @@ app.post('/api/users', async (req, res) => {
             senha: hashedPassword
         });
         
+        // Ao chamar .save(), o Mongoose criará a collection 'user' se ela não existir.
         await novoUsuario.save();
         
+        // Remove a senha/hash do objeto de resposta por segurança
         novoUsuario.senha = undefined; 
         res.status(201).send(novoUsuario);
     } catch (error) {
+        // Tratamento de erro de login duplicado (código 11000)
         if (error.code === 11000) {
             return res.status(409).send({ message: "Este login já está em uso.", error: error.message });
         }
@@ -141,10 +114,10 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-
-// Rota para autenticação (MODIFICADA PARA CRIAR SESSÃO)
+// Rota para autenticação (MODIFICADA COM RESTRIÇÃO)
 app.post('/api/login', async (req, res) => {
     try {
+        // Recebe username, password E o novo campo 'target' do frontend
         const { username, password, target } = req.body;
 
         const user = await User.findOne({ login: username });
@@ -153,6 +126,7 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ authenticated: false, message: 'Credenciais inválidas (usuário).' });
         }
         
+        // 1. Verifica a senha no banco de dados
         const isMatch = await bcrypt.compare(password, user.senha);
         
         if (!isMatch) {
@@ -161,9 +135,11 @@ app.post('/api/login', async (req, res) => {
 
         // 2. Lógica de Restrição: Aplicada APENAS se o destino for 'knowledge_manager'
         if (target === 'knowledge_manager') {
-            const allowedUsers = ["hyury.passos", "david", "helio", "renataoliveira"];
+            const allowedUsers = ["hyuri", "david", "helio", "renata"];
             
+            // Verifica se o usuário autenticado está na lista restrita (case-insensitive)
             if (!allowedUsers.includes(username.toLowerCase())) {
+                // Se o usuário autenticado NÃO estiver na lista, nega o acesso
                 return res.status(403).json({ 
                     authenticated: false, 
                     message: 'Acesso negado. Este painel é restrito aos usuários autorizados: Hyuri, David, Helio e Renata.' 
@@ -171,10 +147,7 @@ app.post('/api/login', async (req, res) => {
             }
         }
         
-        // 3. CRIAÇÃO DA SESSÃO: Marca o usuário como logado
-        req.session.userId = user._id; 
-        req.session.username = user.login;
-
+        // Se a senha estiver correta E as restrições forem cumpridas (ou não houver restrição)
         res.json({ authenticated: true, message: 'Login bem-sucedido.' });
 
     } catch (error) {
@@ -183,62 +156,79 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// ------------------------------------
-// --- Rotas Estáticas (Frontend) ---
-// ------------------------------------
-
-// Serve arquivos estáticos (CSS, JS, imagens)
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-// Rota para Login (Permitida sempre)
-app.get('/login.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
-});
-
-// Rota para Cadastro (Permitida sempre)
-app.get('/cadastro_user.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'cadastro_user.html'));
-});
-
-
-// ROTA RESTRITA: /menu.html
-app.get('/menu.html', checkAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'menu.html'));
-});
-
-// ROTA RESTRITA: /knowledge_manager.html
-app.get('/knowledge_manager.html', checkAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'knowledge_manager.html'));
-});
-
-// ROTA DE LOGOUT
-app.post('/api/logout', (req, res) => {
-    if (req.session) {
-        req.session.destroy(err => {
-            if (err) {
-                return res.status(500).send({ message: "Falha ao fazer logout." });
-            }
-            res.send({ message: "Logout bem-sucedido." });
-        });
-    } else {
-        res.send({ message: "Nenhuma sessão ativa." });
+// --- Rotas de Aulas ---
+app.post('/api/aulas', async (req, res) => {
+    try {
+        const novaAula = new Aula(req.body);
+        await novaAula.save();
+        res.status(201).send(novaAula);
+    } catch (error) {
+        res.status(400).send(error);
     }
 });
 
+app.get('/api/aulas', async (req, res) => {
+    try {
+        const aulas = await Aula.find({});
+        res.send(aulas);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
 
-// ------------------------------------
-// --- Rotas de Dados (MANTIDAS) ---
-// As rotas de dados também deveriam ser protegidas pelo checkAuth, 
-// mas não vou alterar sua lógica original aqui para não quebrar o que já funciona.
-// ------------------------------------
-app.post('/api/aulas', async (req, res) => { /* ... */ });
-app.get('/api/aulas', async (req, res) => { /* ... */ });
-// ... (outras rotas de Aula, Incidente, Memory) ...
+// --- Rotas de Incidentes ---
+app.post('/api/incidentes', async (req, res) => {
+    try {
+        const novoIncidente = new Incidente(req.body);
+        await novoIncidente.save();
+        res.status(201).send(novoIncidente);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+});
+
+app.get('/api/incidentes', async (req, res) => {
+    try {
+        const incidentes = await Incidente.find({});
+        res.send(incidentes);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+app.delete('/api/incidentes/:id', async (req, res) => {
+    try {
+        const incidente = await Incidente.findByIdAndDelete(req.params.id);
+        if (!incidente) return res.status(404).send('Incidente não encontrado');
+        res.send(incidente);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+// --- ROTAS PARA MEMÓRIA DO CHATBOT ---
+app.post('/api/memories', async (req, res) => {
+    try {
+        const novaMemoria = new Memory(req.body);
+        await novaMemoria.save();
+        res.status(201).send(novaMemoria);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+});
+
+app.get('/api/memories', async (req, res) => {
+    try {
+        const memories = await Memory.find({}).sort({ dataHora: -1 });
+        res.send(memories);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
 
 // Inicia o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 module.exports = app;
