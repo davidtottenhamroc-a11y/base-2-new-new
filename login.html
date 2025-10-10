@@ -5,270 +5,119 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login - VSoft</title>
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
     body {
-        background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #f4f4f4;
+        background: linear-gradient(135deg, #0d1a2a, #2c3e50);
+        min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #f4f4f4;
     }
     .login-container {
-        max-width: 400px;
-        width: 100%;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        text-align: center;
-        padding: 40px 30px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        max-width: 400px; width: 100%; background: rgba(255,255,255,0.1);
+        border-radius: 15px; text-align: center; padding: 40px 30px;
+        backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
-    .logo {
-        font-size: 48px;
-        font-weight: bold;
-        color: #3498db;
-        margin-bottom: 10px;
-    }
-    h1 {
-        font-size: 28px;
-        margin-bottom: 5px;
-    }
-    .description {
-        font-size: 16px;
-        opacity: 0.8;
-        margin-bottom: 30px;
-    }
-    .form-group {
-        margin-bottom: 20px;
-        text-align: left;
-    }
-    label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-    input[type="text"], input[type="password"] {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 16px;
-        background: rgba(255,255,255,0.85);
-        color: #1f1f1f;
-    }
-    button {
-        width: 100%;
-        padding: 15px;
-        font-size: 18px;
-        border: none;
-        border-radius: 50px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-    .login-btn {
-        background: linear-gradient(135deg, #28a745, #1e7e34);
-        color: white;
-        margin-bottom: 10px;
-    }
-    .login-btn:hover {
-        background: linear-gradient(135deg, #218838, #1e7e34);
-    }
-    .register-btn {
-        background: linear-gradient(135deg, #007bff, #0056b3);
-        color: white;
-    }
-    .register-btn:hover {
-        background: linear-gradient(135deg, #0069d9, #0056b3);
-    }
-    .error-message {
-        margin-top: 15px;
-        color: #dc3545;
-        font-weight: bold;
-        display: none;
-    }
-    /* Estilo do pop-up */
-    .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.6);
-        justify-content: center;
-        align-items: center;
-    }
-    .modal-content {
-        background: white;
-        color: #222;
-        padding: 30px;
-        border-radius: 10px;
-        width: 90%;
-        max-width: 400px;
-        text-align: center;
-    }
-    .close-btn, .register-confirm-btn, .admin-btn {
-        margin-top: 15px;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    .register-confirm-btn {
-        background: #28a745;
-        color: white;
-    }
-    .close-btn {
-        background: #dc3545;
-        color: white;
-    }
-    .admin-btn {
-        background: #007bff;
-        color: white;
-    }
-    .error-popup {
-        color: red;
-        margin-top: 10px;
-    }
+    .logo { font-size: 48px; font-weight: bold; color: #3498db; margin-bottom: 10px; }
+    h1 { font-size: 26px; margin-bottom: 5px; }
+    .description { opacity: .8; margin-bottom: 25px; }
+    input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: none; }
+    button { width: 100%; padding: 12px; font-weight: bold; border-radius: 50px; border: none; cursor: pointer; }
+    .login-btn { background: linear-gradient(135deg, #28a745, #1e7e34); color: white; }
+    .register-btn { background: linear-gradient(135deg, #007bff, #0056b3); color: white; margin-top: 10px; }
+    .error { color: #ff4444; margin-top: 10px; display: none; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 400px; text-align: center; color: #222; }
+    .close-btn { background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
+    .confirm-btn { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
 </style>
 </head>
 <body>
 <div class="login-container">
     <div class="logo">VSoft</div>
     <h1>Acesso ao Painel</h1>
-    <p class="description">Insira suas credenciais para continuar.</p>
+    <p class="description">Insira suas credenciais para continuar</p>
 
-    <form id="login-form">
-        <div class="form-group">
-            <label for="username">Usuário:</label>
-            <input type="text" id="username" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Senha:</label>
-            <input type="password" id="password" required>
-        </div>
-        <button type="submit" class="login-btn">Entrar</button>
-    </form>
-    <button id="open-register" class="register-btn">Cadastrar Usuário</button>
-    <p class="error-message" id="login-error">Usuário ou senha incorretos.</p>
+    <input type="text" id="username" placeholder="Usuário" required>
+    <input type="password" id="password" placeholder="Senha" required>
+    <button class="login-btn" id="login-btn">Entrar</button>
+    <button class="register-btn" id="open-register">Cadastrar Usuário</button>
+    <div class="error" id="login-error">Usuário ou senha incorretos.</div>
 </div>
 
-<!-- Pop-up de senha admin -->
-<div class="modal" id="admin-modal">
-    <div class="modal-content">
-        <h2>Senha de Acesso</h2>
-        <input type="password" id="admin-password" placeholder="Digite a senha otimus32" />
-        <div>
-            <button class="admin-btn" id="confirm-admin">Confirmar</button>
-            <button class="close-btn" onclick="closeAdminModal()">Fechar</button>
-        </div>
-        <p class="error-popup" id="admin-error"></p>
-    </div>
-</div>
-
-<!-- Pop-up de cadastro -->
 <div class="modal" id="register-modal">
     <div class="modal-content">
         <h2>Cadastrar Novo Usuário</h2>
-        <input type="text" id="new-username" placeholder="Usuário" />
-        <input type="password" id="new-password" placeholder="Senha" />
-        <div>
-            <button class="register-confirm-btn" id="register-btn">Cadastrar</button>
-            <button class="close-btn" onclick="closeRegisterModal()">Fechar</button>
-        </div>
-        <p class="error-popup" id="register-error"></p>
+        <input type="text" id="new-user" placeholder="Usuário">
+        <input type="password" id="new-pass" placeholder="Senha">
+        <button class="confirm-btn" id="register-confirm">Cadastrar</button>
+        <button class="close-btn" id="close-register">Fechar</button>
+        <p id="register-msg" style="margin-top:10px;"></p>
     </div>
 </div>
 
 <script>
-    const API_BASE = "https://base-2-new-new-9xow.vercel.app/"; // <-- troque pela URL do seu backend
+const API_BASE = "https://base-2-new-new-9xow.vercel.app/";
 
-    // LOGIN
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorMsg = document.getElementById('login-error');
+// LOGIN
+document.getElementById("login-btn").addEventListener("click", async () => {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const err = document.getElementById("login-error");
 
-        try {
-            const response = await fetch(`${API_BASE}/api/login`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username, password })
-            });
-
-            const data = await response.json();
-            if (response.ok && data.authenticated) {
-                window.location.href = 'menu.html';
-            } else {
-                errorMsg.style.display = 'block';
-            }
-        } catch (err) {
-            console.error(err);
-            errorMsg.style.display = 'block';
-        }
-    });
-
-    // MODAL ADMIN
-    const adminModal = document.getElementById('admin-modal');
-    const registerModal = document.getElementById('register-modal');
-    document.getElementById('open-register').addEventListener('click', () => {
-        adminModal.style.display = 'flex';
-    });
-    document.getElementById('confirm-admin').addEventListener('click', () => {
-        const pass = document.getElementById('admin-password').value;
-        const err = document.getElementById('admin-error');
-        if (pass === 'otimus32') {
-            adminModal.style.display = 'none';
-            registerModal.style.display = 'flex';
-            err.textContent = '';
+    try {
+        const res = await fetch(`${API_BASE}/api/login`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.authenticated) {
+            window.location.href = "menu.html";
         } else {
-            err.textContent = 'Senha incorreta.';
+            err.style.display = "block";
         }
-    });
+    } catch (e) {
+        console.error(e);
+        err.style.display = "block";
+    }
+});
 
-    // CADASTRAR USUÁRIO
-    document.getElementById('register-btn').addEventListener('click', async () => {
-        const login = document.getElementById('new-username').value.trim();
-        const senha = document.getElementById('new-password').value.trim();
-        const err = document.getElementById('register-error');
+// ABRIR/FECHAR MODAL
+const modal = document.getElementById("register-modal");
+document.getElementById("open-register").onclick = () => modal.style.display = "flex";
+document.getElementById("close-register").onclick = () => modal.style.display = "none";
 
-        if (!login || !senha) {
-            err.textContent = 'Preencha todos os campos.';
-            return;
+// CADASTRO
+document.getElementById("register-confirm").addEventListener("click", async () => {
+    const login = document.getElementById("new-user").value.trim();
+    const senha = document.getElementById("new-pass").value.trim();
+    const msg = document.getElementById("register-msg");
+
+    if (!login || !senha) {
+        msg.style.color = "red";
+        msg.textContent = "Preencha todos os campos.";
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/users`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ login, senha })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            msg.style.color = "green";
+            msg.textContent = "Usuário criado com sucesso!";
+            setTimeout(() => modal.style.display = "none", 2000);
+        } else {
+            msg.style.color = "red";
+            msg.textContent = data.message || "Erro ao criar usuário.";
         }
-
-        try {
-            const response = await fetch(`${API_BASE}/api/users`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ login, senha })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                err.style.color = 'green';
-                err.textContent = 'Usuário criado com sucesso!';
-                setTimeout(() => closeRegisterModal(), 1500);
-            } else {
-                err.textContent = data.message || 'Erro ao criar usuário.';
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            err.textContent = 'Erro ao conectar com o servidor.';
-        }
-    });
-
-    // FECHAR MODAIS
-    function closeRegisterModal() { registerModal.style.display = 'none'; }
-    function closeAdminModal() { adminModal.style.display = 'none'; }
+    } catch (err) {
+        console.error(err);
+        msg.style.color = "red";
+        msg.textContent = "Erro ao conectar com o servidor.";
+    }
+});
 </script>
 </body>
 </html>
-
-
