@@ -12,7 +12,7 @@ app.use(express.json());
 
 // --- Variáveis de Ambiente ---
 // A string de conexão do seu Atlas que deve estar configurada na Vercel
-const MONGODB_URI = process.env.MONGODB_URI; 
+const MONGODB_URI = mongodb+srv://davidtottenhamroc_db_user:tottenham0724@cluster0.tdopyuc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0; 
 const PORT = process.env.PORT || 3000; 
 
 // Conexão com o banco de dados MongoDB
@@ -213,3 +213,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
