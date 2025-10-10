@@ -1,24 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bcrypt = require('bcrypt'); // NOVIDADE: Importando o bcrypt para hashing de senhas
+const bcrypt = require('bcrypt');
 
 const app = express();
 
 // Configurações
-// Permite requisições de origens diferentes (CORS)
-app.use(cors()); 
+app.use(cors()); 
 app.use(express.json());
 
 // --- Variáveis de Ambiente ---
-// A string de conexão do seu Atlas que deve estar configurada na Vercel
-const MONGODB_URI = const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://davidtottenhamroc_db_user:tottenham0724@cluster0.tdopyuc.mongodb.net/test?retryWrites=true&w=majority";
-const PORT = process.env.PORT || 3000; 
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://davidtottenhamroc_db_user:tottenham0724@cluster0.tdopyuc.mongodb.net/test?retryWrites=true&w=majority";
+const PORT = process.env.PORT || 3000; 
+
+// Senha pré-definida para cadastro (você pode mudar isso se quiser)
+const PRE_DEFINED_ACCESS_PASSWORD = "otimus32";
 
 // Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
-    .then(() => console.log('Conectado ao MongoDB!'))
-    .catch(err => console.error('Erro de conexão com o MongoDB:', err));
+    .then(() => console.log('Conectado ao MongoDB!'))
+    .catch(err => console.error('Erro de conexão com o MongoDB:', err));
 
 // ------------------------------------
 // --- Schemas (Modelos de Dados) ---
@@ -26,68 +27,74 @@ mongoose.connect(MONGODB_URI)
 
 // SCHEMA PARA USUÁRIO (LOGIN E SENHA)
 const userSchema = new mongoose.Schema({
-    login: { type: String, required: true, unique: true }, // Nome de usuário/Login
-    senha: { type: String, required: true } // Senha (AGORA SERÁ O HASH DA SENHA)
+    login: { type: String, required: true, unique: true },
+    senha: { type: String, required: true }
 });
 
 const aulaSchema = new mongoose.Schema({
-    agente: String,
-    estado: String,
-    tipoRegistro: String,
-    data: String,
-    total: Number,
-    execucao: Number,
-    naoEnviadas: Number,
-    recusadas: Number,
-    processamento: Number,
-    status: String,
-    observacao: String
+    agente: String,
+    estado: String,
+    tipoRegistro: String,
+    data: String,
+    total: Number,
+    execucao: Number,
+    naoEnviadas: Number,
+    recusadas: Number,
+    processamento: Number,
+    status: String,
+    observacao: String
 });
 
 const incidenteSchema = new mongoose.Schema({
-    agente: String,
-    estado: String,
-    data: String,
-    observacao: String
+    agente: String,
+    estado: String,
+    data: String,
+    observacao: String
 });
 
-// SCHEMA PARA MEMÓRIA DO CHATBOT - AGORA COM CAMPO PARA IMAGEM
+// SCHEMA PARA MEMÓRIA DO CHATBOT
 const memorySchema = new mongoose.Schema({
-    agente: String,
-    dataHora: { type: Date, default: Date.now },
-    texto: String, // Usado para armazenar o conteúdo (conteudo) e título
-    estado: String, // Usado para o filtro do estado
-    imagemUrl: String // NOVIDADE: Campo para a URL da imagem
+    agente: String,
+    dataHora: { type: Date, default: Date.now },
+    texto: String,
+    estado: String,
+    imagemUrl: String
 });
 
 // ------------------------------------
 // --- Modelos Mongoose ---
 // ------------------------------------
-// NOME DA COLLECTION FORÇADO PARA 'user' (terceiro argumento)
 const User = mongoose.model('User', userSchema, 'user'); 
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
-const Memory = mongoose.model('Memory', memorySchema); 
+const Memory = mongoose.model('Memory', memorySchema); 
 
 // ------------------------------------
 // --- Rotas da API ---
 // ------------------------------------
 
-// Rota para criar um novo usuário - AGORA COM HASH DE SENHA
+// Rota para criar um novo usuário - AGORA COM VALIDAÇÃO DE SENHA DE ACESSO
 app.post('/api/users', async (req, res) => {
     try {
-        const { login, senha } = req.body;
+        const { login, senha, accessPassword } = req.body;
+
+        // Verifica se a senha de acesso foi fornecida e está correta
+        if (!accessPassword || accessPassword !== PRE_DEFINED_ACCESS_PASSWORD) {
+            return res.status(403).send({ 
+                message: "Acesso negado. Senha de acesso incorreta ou não fornecida." 
+            });
+        }
 
         if (!login || !senha) {
             return res.status(400).send({ message: "Login e senha são obrigatórios." });
         }
         
-        // Cria o hash da senha (10 é o número de 'salt rounds' - nível de segurança)
+        // Cria o hash da senha
         const hashedPassword = await bcrypt.hash(senha, 10); 
         
         const novoUsuario = new User({
             login: login,
-            senha: hashedPassword // Salva o hash da senha
+            senha: hashedPassword
         });
         
         await novoUsuario.save();
@@ -104,28 +111,22 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-
-// Rota para autenticação - AGORA COMPARA HASHES COM BCRYPT
+// Rota para autenticação
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // 1. Procura o usuário APENAS pelo login
         const user = await User.findOne({ login: username });
 
         if (user) {
-            // 2. Compara a senha fornecida (password) com a senha hasheada no banco (user.senha)
             const isMatch = await bcrypt.compare(password, user.senha);
             
             if (isMatch) {
-                // Usuário encontrado e senha correta: Autenticação bem-sucedida
                 res.json({ authenticated: true, message: 'Login bem-sucedido.' });
             } else {
-                // Senha incorreta
                 res.status(401).json({ authenticated: false, message: 'Credenciais inválidas.' });
             }
         } else {
-            // Usuário não encontrado
             res.status(401).json({ authenticated: false, message: 'Credenciais inválidas.' });
         }
     } catch (error) {
@@ -134,84 +135,81 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- Rotas de Aulas ---
+// ... (mantenha o restante das rotas igual)
 
+// --- Rotas de Aulas ---
 app.post('/api/aulas', async (req, res) => {
-    try {
-        const novaAula = new Aula(req.body);
-        await novaAula.save();
-        res.status(201).send(novaAula);
-    } catch (error) {
-        res.status(400).send(error);
-    }
+    try {
+        const novaAula = new Aula(req.body);
+        await novaAula.save();
+        res.status(201).send(novaAula);
+    } catch (error) {
+        res.status(400).send(error);
+    }
 });
 
 app.get('/api/aulas', async (req, res) => {
-    try {
-        const aulas = await Aula.find({});
-        res.send(aulas);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+    try {
+        const aulas = await Aula.find({});
+        res.send(aulas);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 });
 
 // --- Rotas de Incidentes ---
-
 app.post('/api/incidentes', async (req, res) => {
-    try {
-        const novoIncidente = new Incidente(req.body);
-        await novoIncidente.save();
-        res.status(201).send(novoIncidente);
-    } catch (error) {
-        res.status(400).send(error);
-    }
+    try {
+        const novoIncidente = new Incidente(req.body);
+        await novoIncidente.save();
+        res.status(201).send(novoIncidente);
+    } catch (error) {
+        res.status(400).send(error);
+    }
 });
 
 app.get('/api/incidentes', async (req, res) => {
-    try {
-        const incidentes = await Incidente.find({});
-        res.send(incidentes);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+    try {
+        const incidentes = await Incidente.find({});
+        res.send(incidentes);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 });
 
 app.delete('/api/incidentes/:id', async (req, res) => {
-    try {
-        const incidente = await Incidente.findByIdAndDelete(req.params.id);
-        if (!incidente) return res.status(404).send('Incidente não encontrado');
-        res.send(incidente);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+    try {
+        const incidente = await Incidente.findByIdAndDelete(req.params.id);
+        if (!incidente) return res.status(404).send('Incidente não encontrado');
+        res.send(incidente);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 });
 
-// --- ROTAS PARA MEMÓRIA DO CHATBOT (MongoDB) ---
-
+// --- ROTAS PARA MEMÓRIA DO CHATBOT ---
 app.post('/api/memories', async (req, res) => {
-    try {
-        const novaMemoria = new Memory(req.body);
-        await novaMemoria.save();
-        res.status(201).send(novaMemoria);
-    } catch (error) {
-        res.status(400).send(error);
-    }
+    try {
+        const novaMemoria = new Memory(req.body);
+        await novaMemoria.save();
+        res.status(201).send(novaMemoria);
+    } catch (error) {
+        res.status(400).send(error);
+    }
 });
 
 app.get('/api/memories', async (req, res) => {
-    try {
-        const memories = await Memory.find({}).sort({ dataHora: -1 });
-        res.send(memories);
-    } catch (error) {
-        res.status(500).send(error);
-    }
+    try {
+        const memories = await Memory.find({}).sort({ dataHora: -1 });
+        res.send(memories);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 });
 
 // Inicia o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 module.exports = app;
-
-
