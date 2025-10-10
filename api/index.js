@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken'); // NOVO: Importa a biblioteca JWT
 
 const app = express();
 
@@ -10,13 +9,10 @@ const app = express();
 app.use(cors()); 
 app.use(express.json());
 
-// --- Variáveis de Ambiente e Constantes ---
+// --- Variáveis de Ambiente ---
 // **IMPORTANTE:** Mantenha a string de conexão real como Variável de Ambiente no Vercel.
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://davidtottenhamroc_db_user:tottenham0724@cluster0.tdopyuc.mongodb.net/test?retryWrites=true&w=majority";
 const PORT = process.env.PORT || 3000; 
-
-// Chave Secreta para gerar e verificar o JWT. **MUDAR EM PRODUÇÃO!**
-const JWT_SECRET = process.env.JWT_SECRET || 'sua_chave_secreta_muito_forte_aqui_12345'; 
 
 // Senha pré-definida para cadastro (você pode mudar isso se quiser)
 const PRE_DEFINED_ACCESS_PASSWORD = "otimus32";
@@ -76,37 +72,6 @@ const Incidente = mongoose.model('Incidente', incidenteSchema);
 const Memory = mongoose.model('Memory', memorySchema); 
 
 // ------------------------------------
-// --- Middleware de Autenticação JWT ---
-// ------------------------------------
-
-/**
- * Middleware para verificar a validade do Token JWT
- * e garantir que o usuário está logado.
- */
-const verifyToken = (req, res, next) => {
-    // 1. Tenta obter o token do cabeçalho de Autorização (Bearer Token)
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Acesso negado. Token de autenticação ausente ou mal formatado.' });
-    }
-
-    // 2. Extrai o token após 'Bearer '
-    const token = authHeader.split(' ')[1];
-
-    try {
-        // 3. Verifica o token usando a chave secreta
-        const decoded = jwt.verify(token, JWT_SECRET);
-        // Anexa as informações do usuário decodificado à requisição
-        req.user = decoded;
-        next(); // Continua para a próxima função (o handler da rota)
-    } catch (error) {
-        // 4. Se a verificação falhar (token expirado ou inválido)
-        return res.status(401).json({ message: 'Acesso negado. Token inválido ou expirado. Faça login novamente.' });
-    }
-};
-
-// ------------------------------------
 // --- Rotas da API ---
 // ------------------------------------
 
@@ -149,7 +114,7 @@ app.post('/api/users', async (req, res) => {
     }
 });
 
-// Rota para autenticação (MODIFICADA COM RESTRIÇÃO E GERAÇÃO DE TOKEN)
+// Rota para autenticação (MODIFICADA COM RESTRIÇÃO)
 app.post('/api/login', async (req, res) => {
     try {
         // Recebe username, password E o novo campo 'target' do frontend
@@ -158,19 +123,19 @@ app.post('/api/login', async (req, res) => {
         const user = await User.findOne({ login: username });
 
         if (!user) {
-            return res.status(401).json({ authenticated: false, message: 'Credenciais inválidas.' });
+            return res.status(401).json({ authenticated: false, message: 'Credenciais inválidas (usuário).' });
         }
         
         // 1. Verifica a senha no banco de dados
         const isMatch = await bcrypt.compare(password, user.senha);
         
         if (!isMatch) {
-            return res.status(401).json({ authenticated: false, message: 'Credenciais inválidas.' });
+            return res.status(401).json({ authenticated: false, message: 'Credenciais inválidas (senha).' });
         }
 
-        // 2. Lógica de Restrição Específica: Aplicada APENAS se o destino for 'knowledge_manager'
+        // 2. Lógica de Restrição: Aplicada APENAS se o destino for 'knowledge_manager'
         if (target === 'knowledge_manager') {
-            const allowedUsers = ["hyuri.passos", "david", "helio", "renataoliveira"];
+            const allowedUsers = ["hyuri", "david", "helio", "renata"];
             
             // Verifica se o usuário autenticado está na lista restrita (case-insensitive)
             if (!allowedUsers.includes(username.toLowerCase())) {
@@ -181,16 +146,9 @@ app.post('/api/login', async (req, res) => {
                 });
             }
         }
-
-        // 3. Geração do Token JWT (VÁLIDO PARA AMBOS OS TIPOS DE LOGIN)
-        const token = jwt.sign(
-            { id: user._id, login: user.login }, // Payload: informações do usuário
-            JWT_SECRET,                          // Chave secreta
-            { expiresIn: '1h' }                  // Token expira em 1 hora
-        );
         
-        // Se a senha e as restrições estiverem ok, retorna o token.
-        res.json({ authenticated: true, message: 'Login bem-sucedido.', token: token });
+        // Se a senha estiver correta E as restrições forem cumpridas (ou não houver restrição)
+        res.json({ authenticated: true, message: 'Login bem-sucedido.' });
 
     } catch (error) {
         console.error('Erro durante a autenticação:', error);
@@ -198,8 +156,8 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- Rotas de Aulas (AGORA PROTEGIDAS) ---
-app.post('/api/aulas', verifyToken, async (req, res) => {
+// --- Rotas de Aulas ---
+app.post('/api/aulas', async (req, res) => {
     try {
         const novaAula = new Aula(req.body);
         await novaAula.save();
@@ -209,7 +167,7 @@ app.post('/api/aulas', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/aulas', verifyToken, async (req, res) => {
+app.get('/api/aulas', async (req, res) => {
     try {
         const aulas = await Aula.find({});
         res.send(aulas);
@@ -218,8 +176,8 @@ app.get('/api/aulas', verifyToken, async (req, res) => {
     }
 });
 
-// --- Rotas de Incidentes (AGORA PROTEGIDAS) ---
-app.post('/api/incidentes', verifyToken, async (req, res) => {
+// --- Rotas de Incidentes ---
+app.post('/api/incidentes', async (req, res) => {
     try {
         const novoIncidente = new Incidente(req.body);
         await novoIncidente.save();
@@ -229,7 +187,7 @@ app.post('/api/incidentes', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/incidentes', verifyToken, async (req, res) => {
+app.get('/api/incidentes', async (req, res) => {
     try {
         const incidentes = await Incidente.find({});
         res.send(incidentes);
@@ -238,7 +196,7 @@ app.get('/api/incidentes', verifyToken, async (req, res) => {
     }
 });
 
-app.delete('/api/incidentes/:id', verifyToken, async (req, res) => {
+app.delete('/api/incidentes/:id', async (req, res) => {
     try {
         const incidente = await Incidente.findByIdAndDelete(req.params.id);
         if (!incidente) return res.status(404).send('Incidente não encontrado');
@@ -248,8 +206,8 @@ app.delete('/api/incidentes/:id', verifyToken, async (req, res) => {
     }
 });
 
-// --- ROTAS PARA MEMÓRIA DO CHATBOT (AGORA PROTEGIDAS) ---
-app.post('/api/memories', verifyToken, async (req, res) => {
+// --- ROTAS PARA MEMÓRIA DO CHATBOT ---
+app.post('/api/memories', async (req, res) => {
     try {
         const novaMemoria = new Memory(req.body);
         await novaMemoria.save();
@@ -259,7 +217,7 @@ app.post('/api/memories', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/memories', verifyToken, async (req, res) => {
+app.get('/api/memories', async (req, res) => {
     try {
         const memories = await Memory.find({}).sort({ dataHora: -1 });
         res.send(memories);
