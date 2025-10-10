@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Restrito - VSoft</title>
     <style>
-        /* Mantenha o seu CSS (Styles) aqui, omitido por brevidade. */
+        /* CSS para design 'Flat' (achatado) e ajustes */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,7 +13,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            /* Fundo mantido, mas você pode simplificá-lo para um fundo flat se quiser */
+            background: #2c3e50; /* Cor sólida para um look mais flat */
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -24,14 +25,15 @@
         .login-container {
             max-width: 400px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            /* Foco no design "achatado": Cor sólida, sem transparência/blur */
+            background: #34495e; /* Fundo mais escuro e sólido */
+            border-radius: 4px; /* Redução do raio de borda para look mais quadrado/flat */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave, menos dramática */
             text-align: center;
             padding: 40px 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            border: none; /* Remoção da borda */
+            backdrop-filter: none; /* Remoção do efeito de blur (glassmorphism) */
+            -webkit-backdrop-filter: none;
         }
         .logo {
             font-size: 48px;
@@ -60,38 +62,60 @@
         input[type="text"], input[type="password"] {
             width: 100%;
             padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            border-radius: 4px; /* Ajuste para flat design */
+            border: 1px solid #7f8c8d; /* Borda sutil */
             font-size: 16px;
-            background: rgba(255, 255, 255, 0.85);
-            color: #1f1f1f;
+            background: #ecf0f1; /* Fundo claro e sólido */
+            color: #2c3e50;
             transition: border-color 0.3s ease;
         }
         input:focus {
             outline: none;
             border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            box-shadow: none; /* Remoção de box-shadow no foco */
         }
-        button {
+        
+        /* Estilo comum para botões */
+        .btn {
             width: 100%;
             padding: 15px;
             font-size: 18px;
-            background: linear-gradient(135deg, #28a745, #1e7e34);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 4px; /* Ajuste para flat design */
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none; /* Para usar em tags <a> */
+            display: block; /* Para ocupar a largura total */
+            text-align: center;
         }
-        button:hover {
-            background: linear-gradient(135deg, #218838, #1e7e34);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+        /* Estilo do botão Entrar (Verde Flat) */
+        button[type="submit"] {
+            background: #27ae60; /* Cor sólida Flat */
+            margin-bottom: 15px;
+            padding: 15px;
         }
+        button[type="submit"]:hover {
+            background: #2ecc71;
+            transform: none; /* Remoção de transform: translateY */
+            box-shadow: none;
+        }
+
+        /* Estilo do botão Voltar (Azul/Cinzento Flat) */
+        .back-button {
+            background: #3498db; /* Cor de ação secundária Flat */
+        }
+        .back-button:hover {
+            background: #5dade2;
+            transform: none;
+            box-shadow: none;
+        }
+
         .error-message {
             margin-top: 15px;
-            color: #dc3545;
+            color: #e74c3c; /* Cor de erro Flat */
             font-weight: bold;
             display: none; 
         }
@@ -114,8 +138,11 @@
             </div>
             <input type="hidden" id="target" name="target" value="knowledge_manager">
             
-            <button type="submit">Entrar</button>
+            <button type="submit" class="btn">Entrar</button>
         </form>
+        
+        <a href="menu.html" class="btn back-button">Voltar para o Menu</a>
+        
         <p class="error-message" id="error-message">Usuário ou senha incorretos. Tente novamente.</p>
     </div>
 
