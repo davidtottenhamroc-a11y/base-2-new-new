@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - VSoft</title>
+    <title>Login Restrito - VSoft</title>
     <style>
-        /* Seu CSS Existente */
+        /* Mantenha o seu CSS (Styles) aqui, omitido por brevidade. */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -93,7 +93,6 @@
             margin-top: 15px;
             color: #dc3545;
             font-weight: bold;
-            /* Começa oculto */
             display: none; 
         }
     </style>
@@ -101,8 +100,8 @@
 <body>
     <div class="login-container">
         <div class="logo">VSoft</div>
-        <h1>Acesso ao Painel</h1>
-        <p class="description">Insira suas credenciais para continuar.</p>
+        <h1>Acesso ao Painel de Conhecimento</h1>
+        <p class="description">Acesso restrito para administradores.</p>
 
         <form id="login-form">
             <div class="form-group">
@@ -113,36 +112,54 @@
                 <label for="password">Senha:</label>
                 <input type="password" id="password" name="password" required>
             </div>
+            <input type="hidden" id="target" name="target" value="knowledge_manager">
+            
             <button type="submit">Entrar</button>
         </form>
         <p class="error-message" id="error-message">Usuário ou senha incorretos. Tente novamente.</p>
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Pega os valores e remove espaços em branco (trim)
-            const username = document.getElementById('username').value.trim();
+            const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            // Pega o valor do campo oculto (que é 'knowledge_manager')
+            const target = document.getElementById('target').value; 
             const errorMessage = document.getElementById('error-message');
 
-            // Oculta a mensagem de erro antes de uma nova tentativa
             errorMessage.style.display = 'none';
 
-            // --- Lógica de Autenticação Frontend Personalizada (Substituição) ---
+            try {
+                // Requisição para o backend, incluindo o campo 'target'
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password, target }) // Enviando o target
+                });
 
-            // Lista de usuários permitidos (comparação sem distinção de maiúsculas/minúsculas)
-            const allowedUsers = ["hyuri", "david", "helio", "renataoliveira"];
-            
-
-            // Verifica se o nome de usuário está na lista e se a senha corresponde
-            if (allowedUsers.includes(username.toLowerCase()) && password === fixedPassword) {
-                // Autenticação bem-sucedida: Redireciona
-                window.location.href = 'knowledge_manager.html';
-            } else {
-                // Falha na autenticação: Exibe a mensagem de erro
-                errorMessage.textContent = 'Usuário ou senha incorretos. Tente novamente.';
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.authenticated) {
+                        window.location.href = 'knowledge_manager.html';
+                    } else {
+                        // O servidor indicou falha de autenticação ou restrição
+                        errorMessage.textContent = data.message || 'Usuário ou senha incorretos. Tente novamente.';
+                        errorMessage.style.display = 'block';
+                    }
+                } else {
+                    // Trata erros HTTP (ex: 401 Unauthorized)
+                    const errorData = await response.json();
+                    errorMessage.textContent = errorData.message || 'Erro de autenticação. Verifique as credenciais.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                errorMessage.textContent = 'Erro ao conectar com o servidor. Tente novamente mais tarde.';
                 errorMessage.style.display = 'block';
             }
         });
