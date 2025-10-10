@@ -76,7 +76,7 @@
             width: 100%;
             padding: 15px;
             font-size: 18px;
-            /* Cor do botão mudada para ser diferente do login (ex: roxo) */
+            /* Cor do botão ajustada para o roxo da imagem */
             background: linear-gradient(135deg, #9b59b6, #8e44ad); 
             color: white;
             border: none;
@@ -90,17 +90,17 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
+        /* Ajuste para alinhar com o estilo da imagem, adicionando margem ao error-message */
         .message {
             margin-top: 15px;
             font-weight: bold;
-            /* Começa oculto */
             display: none;
         }
         .error-message {
-            color: #dc3545;
+            color: #dc3545; /* Vermelho padrão */
         }
         .success-message {
-            color: #28a745;
+            color: #28a745; /* Verde para sucesso */
         }
         .link-to-login {
             display: block;
@@ -138,7 +138,7 @@
         </form>
         
         <p class="message error-message" id="error-message"></p>
-        <p class="message success-message" id="success-message">Usuário cadastrado com sucesso!</p>
+        <p class="message success-message" id="success-message">Usuário **cadastrado** com sucesso! Você pode fazer login agora.</p>
 
         <a href="index.html" class="link-to-login">Voltar para o Login</a>
     </div>
@@ -149,65 +149,62 @@
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            // Pega o valor do campo "Senha de Acesso"
+            // Captura o valor da Senha de Acesso
             const accessPassword = document.getElementById('access-password').value; 
             
             const errorMessage = document.getElementById('error-message');
             const successMessage = document.getElementById('success-message');
 
-            // Oculta todas as mensagens antes de uma nova tentativa
+            // 1. Oculta mensagens antigas
             errorMessage.style.display = 'none';
             successMessage.style.display = 'none';
 
-            // Desabilita o botão para evitar múltiplos cliques
+            // 2. Desabilita o botão para feedback visual
             const button = document.querySelector('button[type="submit"]');
             button.disabled = true;
-            button.textContent = 'Cadastrando...';
+            button.textContent = 'Aguarde...';
 
             try {
-                // Requisição para a rota de cadastro (/api/users)
+                // 3. Requisição POST para a rota /api/users
                 const response = await fetch('/api/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    // Envia os 3 campos: login, senha do usuário e a senha de acesso (accessPassword)
+                    // O body deve incluir login, senha e accessPassword
                     body: JSON.stringify({ login: username, senha: password, accessPassword: accessPassword })
                 });
                 
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Status 201 Created (ou 200 OK)
+                    // 4. Sucesso: Status 201 Created
                     successMessage.style.display = 'block';
-                    errorMessage.style.display = 'none'; // Apenas para garantir
                     
                     // Limpa os campos após o sucesso
                     document.getElementById('username').value = '';
                     document.getElementById('password').value = '';
                     document.getElementById('access-password').value = '';
                 } else {
-                    // Trata erros como 403 Forbidden (Senha de acesso incorreta), 
-                    // 409 Conflict (Login duplicado) ou 400 Bad Request
+                    // 5. Falha: Trata erros de autenticação (403), duplicidade (409) ou outros
                     let message = data.message || 'Erro desconhecido ao cadastrar usuário.';
                     
-                    // Ajusta a mensagem para o usuário final
                     if (response.status === 403) {
-                         message = 'Senha de Acesso incorreta. Por favor, verifique.';
+                         message = 'Senha de Acesso incorreta. Acesso negado.';
                     } else if (response.status === 409) {
-                         message = 'Este login já está em uso. Escolha outro.';
+                         message = 'Este Login (Usuário) já está em uso.';
                     }
 
                     errorMessage.textContent = message;
                     errorMessage.style.display = 'block';
                 }
             } catch (error) {
-                // Erro de rede ou servidor não está online
+                // 6. Erro de conexão/rede
                 console.error('Erro:', error);
                 errorMessage.textContent = 'Erro de conexão com o servidor. Tente novamente mais tarde.';
                 errorMessage.style.display = 'block';
             } finally {
-                // Habilita o botão novamente
+                // 7. Habilita o botão novamente
                 button.disabled = false;
                 button.textContent = 'Cadastrar';
             }
