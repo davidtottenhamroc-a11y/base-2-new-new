@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Interativa DETRAN-MG (Aulas Remotas)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50; /* Base */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #1f3747;
+            border-bottom: 1px solid #1a2f40;
+            flex-wrap: wrap;
+            padding-left: 20px;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #152d3d;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3498db; /* Azul DETRAN */
+            background: #0d1a2a;
+            color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #0d1a2a;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #1a2f40;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .info-box.danger {
+            background: #3e262a;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .info-box.success {
+            background: #2a3a2d;
+            border-left: 4px solid #28a745;
+        }
+        
+        .info-box.warning {
+            background: #3e3221;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        
+        .info-content {
+            line-height: 1.5;
+            color: #c0c0c0;
+        }
+
+        .endpoint-url {
+            background: #000;
+            color: #3498db;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .doc-section {
+            margin-bottom: 20px;
+        }
+
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .param-table th, .param-table td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .param-table th {
+            background: #1a2f40;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        .param-table tr:nth-child(even) {
+            background: #11202c;
+        }
+
+        .code-block {
+            background: #11202c;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #f4f4f4;
+            overflow-x: auto;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        table.status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table.status-table th, table.status-table td {
+            border: 1px solid #555;
+            padding: 8px;
+            text-align: left;
+        }
+        table.status-table th {
+            background: #1a2f40;
+            color: #ffc107;
+        }
+        
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Documentação Interativa DETRAN-MG (Aulas Remotas)</h1>
+            <p class="description">Web Services de Integração para Aulas Remotas de Legislação de Trânsito (Versão 1.6 - 09/11/2020).</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="acesso">1. Acesso e Autenticação</div>
+            <div class="tab" data-tab="consultas">2. Consulta de Dados (WS 03, 04, 05)</div>
+            <div class="tab" data-tab="gerenciamento">3. Gerenciamento de Aulas (WS 06 a 09)</div>
+            <div class="tab" data-tab="offline">4. Envio Off-line (WS 13, 14)</div>
+            <div class="tab" data-tab="motivos">5. Tabela de Motivos Off-Line</div>
+        </div>
+        
+        <div class="tab-content active" id="acesso">
+            <h2>1. Acesso e Autenticação</h2>
+            <div class="info-box success">
+                <div class="info-title"><i class="fas fa-link"></i> URL de Acesso e Protocolo</div>
+                <div class="info-content">
+                    O serviço é acessado por meio de uma URL fixa com parâmetros variáveis (protocolo **SOAP/WSDL**).
+                    <p><strong>URL de Homologação:</strong></p>
+                    <div class="endpoint-url">http://webservicehomologa.detran.mg.gov.br/habilitacao aulas credenciadas/soap/habilitacao aulas credenciadas eventos/wsdl</div>
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-lock"></i> 1.1. Autenticação</div>
+                <div class="info-box">
+                    <div class="info-content">
+                        A autenticação é realizada através do **cabeçalho da requisição SOAP**, utilizando o método **`autenticar`**. Este método requer um objeto com os atributos **CNPJ** e **chave** (Chave de Acesso).
+                    </div>
+                </div>
+                <div class="doc-section-title">Mensagens de Retorno de Autenticação</div>
+                <table class="status-table">
+                    <tr><th>Código de Retorno</th><th>Mensagem</th><th>Descrição</th></tr>
+                    <tr><td>**991**</td><td>Ocorreu um erro de autenticação.</td><td>Erro na validação de CNPJ/Chave.</td></tr>
+                    <tr><td>**992**</td><td>Serviço indisponível.</td><td>Problema de comunicação/servidor.</td></tr>
+                </table>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-sync-alt"></i> 2. Modalidades de Envio de Aulas</div>
+                <div class="info-box warning">
+                    <div class="info-title">Prazo para Envio Off-line</div>
+                    <div class="info-content">
+                        A Empresa Fornecedora pode optar pelo envio das aulas no formato **On-Line** ou **Off-Line**. O envio **Off-line** deve ocorrer no prazo máximo de **7 dias**.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="consultas">
+            <h2>2. Consulta de Dados Biométricos e Cadastrais</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-fingerprint"></i> 3.1. Consultar Digitais Foto Assinatura (WS 05)</div>
+                <table class="param-table">
+                    <tr><th>Item</th><th>Detalhe</th></tr>
+                    <tr><td>**Parâmetro de Entrada**</td><td>`cpf` do candidato, condutor, instrutor ou diretor.</td></tr>
+                    <tr><td>**Parâmetros de Saída**</td><td>**Assinatura** (JPG), **Foto** (JPG) e **10 digitais** (WSQ) (do Polegar direito ao Mínimo esquerdo).</td></tr>
+                    <tr><td>**Erro Comum**</td><td>Código de Retorno **002**: "Dígito verificador é inválido".</td></tr>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-user-check"></i> 3.2. Consultar Aluno (WS 04)</div>
+                <table class="param-table">
+                    <tr><th>Item</th><th>Detalhe</th></tr>
+                    <tr><td>**Parâmetros de Entrada**</td><td>`Código_CFC`, `Código_curso` e `CPF_Aluno`.</td></tr>
+                    <tr><td>**Sucesso (Apto)**</td><td>Código de Retorno **000** ("Consulta realizada com sucesso"). Indica que o aluno está apto para o curso.</td></tr>
+                    <tr><td>**Restrições Comuns (Erro 001)**</td><td>Pode indicar **CPF inexistente**, candidato com **exame médico vencido**, **prazo de habilitação (1 ano) vencido**, ou **curso incompatível** com a categoria pretendida.</td></tr>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-building"></i> 3.3. Consultar Sala de Aula (WS 03)</div>
+                <div class="info-box">
+                    <div class="info-content">
+                        Este serviço é relevante **somente para aulas presenciais** de legislação.
+                    </div>
+                </div>
+                <table class="param-table">
+                    <tr><th>Item</th><th>Detalhe</th></tr>
+                    <tr><td>**Parâmetro de Entrada**</td><td>`Código_CFC`.</td></tr>
+                    <tr><td>**Parâmetros de Saída**</td><td>`Codigo_sala`, `Numero sala` e `Capacidade_sala`.</td></tr>
+                    <tr><td>**Erro Comum**</td><td>Retorno **001**: Indica que o Código de CFC é inexistente ou que "Nenhuma sala cadastrada" foi encontrada.</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="gerenciamento">
+            <h2>3. Gerenciamento de Aulas (On-line)</h2>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-plus-circle"></i> 4.1. Criar Aula / CFC (WS 06)</div>
+                <ul>
+                    <li>**Propósito:** Iniciar uma aula. Retorna o **`Sequencial_Aula`** (ex: 2020-202-31-8) em caso de sucesso (000).</li>
+                    <li>**Aulas Remotas:** Informe **`Tipo_aula`** igual a **"R"**. O **`Codigo_sala` não deve ser informado**.</li>
+                    <li>**Ausência:** Se instrutor/diretor estiver ausente, informe o **`Motivo ausência`** (descrição livre, até 100 caracteres).</li>
+                    <li>**Conflitos:** O sistema **não permite abrir aulas simultâneas** para o mesmo Instrutor/Diretor. O diretor **não pode ser diretor e instrutor simultaneamente**.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-user-plus"></i> 4.2. Incluir Aluno Aula (WS 07)</div>
+                <ul>
+                    <li>**Restrição de Tempo:** **Não é permitido** a inclusão de alunos **após 10 minutos** da aula iniciada.</li>
+                    <li>**Conflitos (Erro 001):** Pode indicar que o aluno já está presente em uma aula não finalizada, ou que **atingiu o limite de 10 aulas teóricas por dia**.</li>
+                    <li>**Hora de Início:** Se o aluno for incluído tardiamente (dentro do limite de 10 minutos), a hora de início dele será igual à dos demais alunos da aula.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-door-open"></i> 4.3. Informar Abertura Aula (WS 08)</div>
+                <div class="info-box">
+                    <div class="info-content">
+                        Usado para informar o **início efetivo** da aula, devendo ser utilizado quando a aula estiver com Status "Em abertura".
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-door-closed"></i> 4.4. Informar Fechamento Aula (WS 09)</div>
+                <ul>
+                    <li>**Duração da Aula:** O sistema **não verificará o tempo de aula**. A aula será fechada independentemente da duração.</li>
+                    <li>**Fechamento On-Line para Off-Line:** Se for detectado problema (ex: biometria, alunos), a aula pode ser fechada Off-Line.
+                        <br>Para isso, o **`Motivo_Solicitação`** deve ser **"08 - Aulas em suspensão"** (único motivo aceito).
+                        <br>A conclusão final deverá ser enviada posteriormente usando o método **`encerrarAulaOFFLine`**.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="offline">
+            <h2>4. Envio Off-line (Ajuste e Lote)</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-check-circle"></i> 4.5. Encerrar Aula OffLine (WS 13)</div>
+                <ul>
+                    <li>**Uso Exclusivo:** Para finalizar aulas que foram abertas On-Line e fechadas Off-Line com o **`Motivo_Solicitação` "08"**.</li>
+                    <li>**Parâmetros:** Requer o **`Sequencial_Aula`**.</li>
+                    <li>**Ajuste de Saída:** É possível informar o **CPF** e a **`Hora saida`** de alunos específicos para ajuste. Se informar apenas o código da aula, ela será confirmada sem mudanças de horário.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-upload"></i> 4.6. Importar Aulas Offline (WS 14)</div>
+                <ul>
+                    <li>**Limites:** Lote limitado a **50 aulas**. Cada aula limitada a **35 alunos**.</li>
+                    <li>**Biometria Não Existente:** Nos parâmetros do aluno, informe **(0) zero** nos campos **`Dedo_Abertura`** e **`Dedo_Fechamento`**.</li>
+                    <li>**Regra Aluno/Modalidade:**
+                        <ul>
+                            <li>Aulas remotas ("R") **não podem** receber alunos presenciais.</li>
+                            <li>Aulas presenciais ("P") **podem** receber alunos presenciais e remotos.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="motivos">
+            <h2>5. Tabela de Motivos de Aula Off-Line</h2>
+            <div class="info-box warning">
+                <div class="info-title">Uso dos Códigos</div>
+                <div class="info-content">
+                    Estes códigos são utilizados na abertura de aulas Off-Line. O código **08** é exclusivo para o fechamento de aulas abertas On-Line que precisam ser transformadas em Off-Line (WS 09).
+                </div>
+            </div>
+            <table class="status-table">
+                <tr><th>Código</th><th>Descrição</th></tr>
+                <tr><td>**01**</td><td>Sem conexão com a internet.</td></tr>
+                <tr><td>**03**</td><td>Sistema Detran inoperante.</td></tr>
+                <tr><td>**05**</td><td>Digital de aluno não foi validada.</td></tr>
+                <tr><td>**06**</td><td>Reconhecimento Facial não validado.</td></tr>
+                <tr><td>**08**</td><td>**Aula em suspensão** (Exclusivo para aulas abertas online e fechadas OffLine).</td></tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="back-button-container">
+        <a href="menu.html" class="back-button"><i class="fas fa-arrow-left"></i> Voltar para o Menu</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ativa a primeira aba ao carregar
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+</html>
