@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minas Gerais - Base para N2 - VSoft</title>
+    <title>RN - Base para N2 - VSoft</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -40,7 +41,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative; 
+            position: relative; /* Para posicionar o botão voltar */
         }
 
         .back-button {
@@ -80,38 +81,56 @@
         }
 
         main {
-            padding: 40px 20px; /* Mais padding para centralizar */
-            text-align: center;
+            padding: 20px;
         }
 
-        /* Novo estilo para a mensagem de estado vazio */
-        .empty-state {
-            padding: 50px;
-            border: 2px dashed #ccc;
-            border-radius: 15px;
-            background: #fcfcfc;
-            color: #7f8c8d;
-            max-width: 600px;
-            margin: 0 auto;
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        .empty-state i {
-            font-size: 60px;
-            color: #bdc3c7;
-            margin-bottom: 20px;
+        .menu-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .empty-state h2 {
-            font-size: 24px;
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+        }
+
+        .card-icon {
+            font-size: 40px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
             margin-bottom: 10px;
-            color: #34495e;
         }
 
-        .empty-state p {
-            font-size: 16px;
-            line-height: 1.5;
+        .card-description {
+            font-size: 14px;
+            color: #6c757d;
         }
 
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         .logout-button {
             margin-top: 20px;
             padding: 12px 25px;
@@ -124,7 +143,6 @@
             font-weight: bold;
             transition: all 0.3s ease;
             width: 100%;
-            max-width: 1400px;
         }
         .logout-button:hover {
             background: linear-gradient(135deg, #c82333, #a71d24);
@@ -330,19 +348,20 @@
             <a href="menu.html" class="back-button"><i class="fas fa-arrow-left" style="margin-right: 5px;"></i> Voltar ao Menu de Estados</a>
             
             <div class="logo">VSoft</div>
-            <h1 id="estado-titulo">Documentação Específica (MG)</h1>
-            <p class="description" id="estado-descricao">Documentações para o Estado de Minas Gerais</p>
+            <h1>Rio Grande do Norte (RN)</h1>
+            <p class="description">Documentação técnica e guias de suporte de Nível 2 para o estado do RN.</p>
         </header>
 
         <main>
-            <div class="empty-state">
-             <a href="docmg.html" class="menu-card">
-                    <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
+            <div class="menu-grid">
+                <a href="docmg.html" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-share-alt"></i></div>
                     <div>
                         <h2 class="card-title">Documentação Interativa - MG</h2>
                         <p class="card-description">Comparativo visual e detalhado dos Fluxos de Exame para Duas Rodas (2R) e Quatro Rodas (4R).</p>
                     </div>
-            </a>
+                </a>
+            
             </div>
         </main>
         <button class="logout-button" onclick="logout()">Sair</button>
@@ -358,14 +377,13 @@
                 <div id="chat-messages">
                     <div class="message bot-message">
                         Olá! Sou seu assistente de suporte N2. Minha base de conhecimento é totalmente gerenciada pelo <strong>MongoDB</strong>.<br><br>
-                        Use o filtro de estado e escreva sua dúvida. 
+                        Use o filtro de estado e escreva sua dúvida. Por exemplo: <em>"RN veículos"</em> ou escolha o estado no dropdown.
                     </div>
                 </div>
                 <div id="chat-input-container">
                     <select id="estado-filter">
                         <option value="">Todos os estados</option>
-                        <option value="RN">RN</option>
-                        <option value="SE">SE</option>
+                        <option value="RN" selected>RN</option> <option value="SE">SE</option>
                         <option value="MS">MS</option>
                         <option value="DF">DF</option>
                         <option value="PE">PE</option>
@@ -378,7 +396,7 @@
                         <option value="CE">CE</option>
                         <option value="TODOS">TODOS</option>
                     </select>
-                    <input type="text" id="chat-input" placeholder="Ex: 'SLA crítico' ou 'Consulta CFC'">
+                    <input type="text" id="chat-input" placeholder="Ex: 'N2 de RN', 'SLA crítico' ou 'Consulta CFC RN'">
                     <button id="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -393,13 +411,6 @@
         // --- Lógica do Chatbot (Mantida) ---
         let chatMemories = [];
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
-
-        // Mapeamento de Códigos para Nomes Completos
-        const STATE_NAMES = {
-            'RN': 'Rio Grande do Norte', 'SE': 'Sergipe', 'MS': 'Mato Grosso do Sul', 'DF': 'Distrito Federal',
-            'PE': 'Pernambuco', 'PB': 'Paraíba', 'BA': 'Bahia', 'MG': 'Minas Gerais',
-            'GO': 'Goiás', 'MA': 'Maranhão', 'AL': 'Alagoas', 'CE': 'Ceará', 'TODOS': 'Todos os Estados'
-        };
 
         const SYNONYM_MAP = {
             'endpoint': ['api', 'servico', 'url', 'acesso', 'integracao'],
@@ -430,26 +441,6 @@
         let resultsPage = 0;
         const PAGE_SIZE = 3;
         let lastQueryKeywords = [];
-
-        /**
-         * Pega o estado da URL. Ex: menu_estado_vazio.html?state=PE
-         * @returns {string} Código do estado ou 'TODOS' por padrão.
-         */
-        function getUrlState() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const state = (urlParams.get('state') || 'TODOS').toUpperCase();
-            return VALID_STATES.includes(state) ? state : 'TODOS';
-        }
-
-        function updatePageState(stateCode) {
-            const fullName = STATE_NAMES[stateCode] || stateCode;
-            document.getElementById('estado-titulo').textContent = `${fullName} (${stateCode})`;
-            document.getElementById('estado-descricao').textContent = `Não encontramos artigos específicos para ${fullName} no momento.`;
-            document.getElementById('estado-nome-vazio').textContent = fullName;
-            document.getElementById('estado-filter').value = stateCode;
-            document.getElementById('chat-input').placeholder = `Ex: 'N2 de ${stateCode}' ou 'SLA crítico'`;
-        }
-
 
         function logout() {
             localStorage.removeItem('agenteSelecionado');
@@ -551,10 +542,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const currentState = getUrlState();
-            updatePageState(currentState);
             await loadMemoriesFromDatabase();
             document.getElementById('chat-open-btn').style.display = 'block';
+            // Define o estado RN no filtro do chatbot ao carregar a página
+            document.getElementById('estado-filter').value = 'RN';
         });
 
         document.getElementById('chat-input').addEventListener('keypress', function (e) {
@@ -626,8 +617,7 @@
 
             const stateTokens = VALID_STATES.map(s => s.toLowerCase());
             const possibleState = normalized.split(/\s+/).find(w => stateTokens.includes(w));
-            
-            // Prioriza o estado do filtro do dropdown (que é setado via URL/JS)
+            // Prioriza o estado do filtro do dropdown (que é RN por padrão nesta tela)
             const effectiveState = (estadoFilter || (possibleState ? possibleState.toUpperCase() : '')).toUpperCase();
 
             let keywords = normalized.split(/\s+/).filter(w => w.length > 1 && !STOP_WORDS_PT.includes(w));
@@ -636,7 +626,7 @@
             lastQueryKeywords = keywords.slice();
 
             let pool = memoriesIndex;
-            // Filtra o pool para incluir o estado atual (vazio) e TODOS
+            // Filtra o pool para incluir apenas RN e TODOS
             pool = memoriesIndex.filter(m => 
                 (m.estado || '').toUpperCase() === effectiveState || 
                 (m.estado || '').toUpperCase() === 'TODOS'
@@ -755,6 +745,4 @@
         }
     </script>
 </body>
-
 </html>
-
