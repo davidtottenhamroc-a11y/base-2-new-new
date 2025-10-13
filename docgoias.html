@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Interativa DETRAN-GO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #004d40; /* Cor mais institucional para GO */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #1e5c54;
+            border-bottom: 1px solid #004d40;
+            flex-wrap: wrap;
+            padding-left: 20px;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #1a4d45;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #66bb6a; /* Verde claro para destaque */
+            background: #0d1a2a;
+            color: #66bb6a;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #0d1a2a;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #1a2f40;
+            border-left: 4px solid #66bb6a;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .info-box.danger {
+            background: #3e262a;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .info-box.success {
+            background: #2a3a2d;
+            border-left: 4px solid #28a745;
+        }
+        
+        .info-box.warning {
+            background: #3e3221;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        
+        .info-content {
+            line-height: 1.5;
+            color: #c0c0c0;
+        }
+
+        .endpoint-url {
+            background: #000;
+            color: #66bb6a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .documentation {
+            background: #1f3747;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6f42c1;
+        }
+
+        .doc-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .doc-section {
+            margin-bottom: 20px;
+        }
+
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .param-table th, .param-table td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .param-table th {
+            background: #1a2f40;
+            font-weight: 600;
+            color: #66bb6a;
+        }
+
+        .param-table tr:nth-child(even) {
+            background: #11202c;
+        }
+
+        .code-block {
+            background: #11202c;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #f4f4f4;
+            overflow-x: auto;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        table.status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table.status-table th, table.status-table td {
+            border: 1px solid #555;
+            padding: 8px;
+            text-align: left;
+        }
+        table.status-table th {
+            background: #1a2f40;
+            color: #ffc107;
+        }
+        
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Documentação Interativa DETRAN-GO (Telemetria/Web Services)</h1>
+            <p class="description">Documentação de Serviços para Integração do DETRAN-GO com Empresas de Telemetria (Versões 4.5, 5.0, 5.2).</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="regras-gerais">1. Regras Gerais (Web Services)</div>
+            <div class="tab" data-tab="servicos-consulta">2. Serviços de Consulta (GET)</div>
+            <div class="tab" data-tab="servicos-lancamento">3. Serviços de Lançamento (POST)</div>
+            <div class="tab" data-tab="sistema-terceirizado">4. Sistema Terceirizado (Consulta DETRAN)</div>
+            <div class="tab" data-tab="detalhes-operacionais">5. Detalhes Operacionais</div>
+            <div class="tab" data-tab="codigos-retorno">6. Códigos de Retorno Comuns</div>
+            <div class="tab" data-tab="contato">7. Contato</div>
+        </div>
+        
+        <div class="tab-content active" id="regras-gerais">
+            <h2>I. Regras Gerais de Integração (Web Services)</h2>
+            <div class="info-box success">
+                <div class="info-title">Contexto e Objetivo</div>
+                <div class="info-content">
+                    O objetivo principal é descrever os serviços necessários para a integração do DETRAN-GO com empresas que fornecem o serviço de telemetria. Os Manuais de Integração abrangem as versões **4.5 (23/02/2018), 5.0 (10/05/2018) e 5.2 (04/10/2019)**.
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-key"></i> 1. Token de Autorização</div>
+                <div class="info-box">
+                    <div class="info-content">
+                        É **obrigatório** o envio de um **token de autorização** no **header** da requisição para o consumo de qualquer serviço. Este token serve como garantia de que o consumidor é credenciado.
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-network-wired"></i> 2. Métodos HTTP e Parâmetros</div>
+                <table class="param-table">
+                    <tr><th>Método</th><th>Uso</th><th>Envio de Parâmetros</th><th>Corpo da Requisição</th></tr>
+                    <tr><td>**GET**</td><td>Estritamente para **consulta** (somente leitura).</td><td>Como **parâmetros de URL (query params)**.</td><td>Não aplicável.</td></tr>
+                    <tr><td>**POST**</td><td>Realiza algum tipo de **alteração** no modelo de dados do DETRAN (Lançamento).</td><td>Incluídos no **corpo da requisição**.</td><td>Formato **XML**.</td></tr>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-code"></i> 3. Retorno dos Serviços (Formato XML)</div>
+                <div class="info-box">
+                    <div class="info-content">
+                        O tipo de retorno dos serviços é **sempre em XML**. A resposta consiste em um único bloco, e o detalhamento da mensagem, contido entre as tags <code>&lt;mensagem&gt;</code>, sempre será em **português**.
+                    </div>
+                </div>
+                <div class="doc-section-title">Exemplo de Formato XML de Retorno</div>
+                <div class="code-block">
+&lt;response&gt;
+    &lt;codMensagem&gt;100&lt;/codMensagem&gt;
+    &lt;mensagem&gt;DOCUMENTO ENVIADO COM SUCESSO&lt;/mensagem&gt;
+&lt;/response&gt;
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="servicos-consulta">
+            <h2>II. Serviços de Consulta (Método GET)</h2>
+            <div class="info-box warning">
+                <div class="info-title">Atenção</div>
+                <div class="info-content">
+                    Os parâmetros são enviados como **Query Params** na URL. A URL de exemplo é de **Homologação**.
+                </div>
+            </div>
+            <table class="param-table">
+                <tr><th>Serviço</th><th>URL de Exemplo (Homologação)</th><th>Propósito</th></tr>
+                <tr>
+                    <td>**Consulta de CFC**</td>
+                    <td><div class="endpoint-url">/get/cfc/{cnpj}</div></td>
+                    <td>Consulta de Centro de Formação de Condutores. (V5.2 inclui Data Inicial/Final de Credenciamento).</td>
+                </tr>
+                <tr>
+                    <td>**Consulta de Veículos**</td>
+                    <td><div class="endpoint-url">/get/veiculo/{cnpj}/{placa}</div></td>
+                    <td>Consultar veículos do CFC. (V5.2 inclui Situação de Licenciamento e Validade).</td>
+                </tr>
+                <tr>
+                    <td>**Consulta de Candidatos**</td>
+                    <td><div class="endpoint-url">/get/candidato/{cpf}</div></td>
+                    <td>Consulta de candidato por CPF. (V5.0/5.2 inclui cpfInstLadv4Rodas e concluiuSimulador).</td>
+                </tr>
+                <tr>
+                    <td>**Consulta de Instrutores**</td>
+                    <td><div class="endpoint-url">/get/instrutor/{cnpj}/{cpf}</div></td>
+                    <td>Consulta de instrutor. (V5.2 inclui datas de Credenciamento/Associação e Validade CNH).</td>
+                </tr>
+                <tr>
+                    <td>**Consulta Agenda de Aulas Práticas**</td>
+                    <td><div class="endpoint-url">/get/aulapratica/{cnpj}/{data}/{placa}</div></td>
+                    <td>Consulta de aula prática.</td>
+                </tr>
+                <tr>
+                    <td>**Consulta Agenda de Aulas Teóricas**</td>
+                    <td><div class="endpoint-url">/get/aulateorica/{cnpj}/{data}/{sala}</div></td>
+                    <td>Consulta de aula teórica.</td>
+                </tr>
+                <tr>
+                    <td>**Consulta de Salas de Aula**</td>
+                    <td><div class="endpoint-url">/get/sala/{cnpj}/{sala}</div></td>
+                    <td>Consulta de sala de aula teórica.</td>
+                </tr>
+                <tr>
+                    <td>**Consulta Agenda Prática do Candidato**</td>
+                    <td><div class="endpoint-url">/get/agendapratcand/{renach}</div></td>
+                    <td>Consulta todas as aulas práticas do candidato, incluindo as que já possuem rendimento. (V5.2 permite filtrar por tipo 2 ou 4 rodas).</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="tab-content" id="servicos-lancamento">
+            <h2>III. Serviços de Lançamento (Método POST)</h2>
+            <div class="info-box danger">
+                <div class="info-title">Atenção Crítica</div>
+                <div class="info-content">
+                    Estes serviços realizam alterações no modelo de dados. Os parâmetros de envio devem estar no **corpo da requisição** em formato **XML**. O CFC só pode emitir o certificado se todas as aulas tiverem registro de rendimento.
+                </div>
+            </div>
+            <table class="param-table">
+                <tr><th>Serviço</th><th>URL de Exemplo (Homologação)</th><th>Propósito</th></tr>
+                <tr>
+                    <td>**Lançar Rendimento de Aula Prática**</td>
+                    <td><div class="endpoint-url">/post/rendimento/aulapratica</div></td>
+                    <td>Lançar o rendimento da aula prática.</td>
+                </tr>
+                <tr>
+                    <td>**Lançar Rendimento de Aula Teórica**</td>
+                    <td><div class="endpoint-url">/post/rendimento/aulateorica</div></td>
+                    <td>Lançar o rendimento da aula teórica.</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="tab-content" id="sistema-terceirizado">
+            <h2>IV. Consulta de Aula Prática no Sistema Terceirizado (4.10)</h2>
+            <div class="info-box success">
+                <div class="info-title">Regra Inversa (DETRAN consultando o Terceiro)</div>
+                <div class="info-content">
+                    O sistema terceirizado deve **fornecer um serviço** para o DETRAN consultar as aulas realizadas que já tiveram o rendimento lançado (via item 4.8).
+                </div>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-sync-alt"></i> Detalhes da Integração (Terceiro -> DETRAN)</div>
+                <table class="param-table">
+                    <tr><th>Item</th><th>Descrição</th></tr>
+                    <tr><td>**Método**</td><td>**GET**</td></tr>
+                    <tr><td>**Autenticação**</td><td>O sistema terceirizado deve fornecer ao DETRAN uma **chave de autenticação (token) estática**, enviada no **Header** da requisição.</td></tr>
+                    <tr><td>**Parâmetros de Consulta**</td><td>Enviados no **Header**, incluindo `renach`, `listarImagens` (Booleano), `listarCoord` (Booleano) e `data` (opcional, formato DD/MM/YYYY).</td></tr>
+                    <tr><td>**Retorno**</td><td>Deve ser em formato **XML**, incluindo código e descrição de retorno.</td></tr>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">Regra de Crítica do Retorno</div>
+                <div class="info-box warning">
+                    <div class="info-content">
+                        **Códigos diferentes de "000" serão tratados como crítica** pelo DETRAN. O retorno detalhado deve incluir distância GPS/Odômetro, desempenhos, faltas, imagens e coordenadas.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="detalhes-operacionais">
+            <h2>V. Detalhes Operacionais e Dúvidas</h2>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-bolt"></i> Autonomia e Contingência do Coletor</div>
+                <ul>
+                    <li>O Coletor deve operar de forma **autônoma**, sem intervenção humana, exceto para manutenção.</li>
+                    <li>A opção **"Importar Aula Via Arquivo"** existe para casos de **contingência** (ex: falta de conexão no momento da aula).</li>
+                    <li>Aulas lançadas dessa forma são, por padrão, **Aulas em Alerta**.</li>
+                    <li>Essa funcionalidade **não descaracteriza a autonomia** do Coletor.</li>
+                </ul>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-shield-alt"></i> Segurança da Informação</div>
+                <ul>
+                    <li>**Sessões:** As comunicações via API pelo Coletor **não usam o conceito de sessão**.</li>
+                    <li>O usuário e senha são fixos por aparelho e transportados com segurança via protocolo **TLS** em todas as requisições.</li>
+                    <li>**Evolução:** Em uma próxima versão, a identificação usaria as características de **hardware de cada coletor** (usuário e senha seriam removidos).</li>
+                </ul>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-clock"></i> Conformidade de Data e Hora</div>
+                <ul>
+                    <li>A aplicação verifica a conformidade da data e hora do dispositivo com o **servidor de horário oficial** determinado pelo DETRAN-GO.</li>
+                    <li>**Verificação Atual:** Baseada na data da rede de celular, verificando se a opção de data, hora e fuso automáticos está marcada no Android.</li>
+                    <li>O sistema está apto a utilizar um **servidor de data e hora fornecido pelo DETRAN**, caso este seja disponibilizado.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-lock"></i> Bloqueio e Inativação</div>
+                <div class="info-box danger">
+                    <div class="info-title">Campo "Ativo"</div>
+                    <div class="info-content">
+                        A ferramenta que permite ao DETRAN-GO bloquear instrutor, aluno ou CFC é o campo **"Ativo"**. A inativação (instrutor ou aluno) deve ser realizada via este campo. As informações de inativação de CFC (temporária ou permanente) deveriam idealmente vir do DETRAN-GO.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-search-dollar"></i> Auditoria</div>
+                <div class="info-box">
+                    <div class="info-content">
+                        A funcionalidade de auditoria do acesso e das ações de cada usuário no sistema, incluindo o IP utilizado, pode ser identificada através do botão **"Histórico de alterações"** na tela de detalhe de cada cadastro.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="codigos-retorno">
+            <h2>VI. Códigos de Retorno Comuns (DETRAN-GO)</h2>
+            <div class="info-box warning">
+                <div class="info-title">Padrão de Retorno</div>
+                <div class="info-content">
+                    Os serviços de telemetria retornam códigos padronizados no formato XML <code>&lt;codMensagem&gt;</code> para indicar o status da operação.
+                </div>
+            </div>
+            <table class="status-table">
+                <tr><th>Código</th><th>Descrição</th></tr>
+                <tr><td>**100**</td><td>CFC não encontrado para o CNPJ informado.</td></tr>
+                <tr><td>**120**</td><td>Aula Prática não encontrada.</td></tr>
+                <tr><td>**140**</td><td>Nenhum candidato encontrado.</td></tr>
+                <tr><td>**170**</td><td>Rendimento já foi realizado.</td></tr>
+                <tr><td>**175**</td><td>**Rendimento lançado com sucesso.**</td></tr>
+                <tr><td>**198**</td><td>Parâmetro Obrigatório não informado.</td></tr>
+                <tr><td>**199**</td><td>Chave de autenticação inválida.</td></tr>
+                <tr><td>**200**</td><td>Erro de Aplicação. Contatar o suporte.</td></tr>
+                <tr><td>**121/151**</td><td>Aula Prática/Teórica não concluída pelo horário agendado.</td></tr>
+                <tr><td>**141/152**</td><td>Candidato/Matrícula não encontrado na turma informada (códigos relacionados a aulas teóricas).</td></tr>
+            </table>
+        </div>
+
+        <div class="tab-content" id="contato">
+            <h2>VII. Contato (Gerência de Tecnologia da Informação)</h2>
+            <div class="info-box success">
+                <div class="info-title"><i class="fas fa-headset"></i> Suporte e Dúvidas Técnicas</div>
+                <div class="info-content">
+                    Para suporte e dúvidas relacionadas à integração e sistemas:
+                    <ul>
+                        <li>**Email:** <a href="mailto:renachgti@detran.go.gov.br" style="color: #66bb6a;">renachgti@detran.go.gov.br</a></li>
+                        <li>**Telefone:** 62 3272-8026</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="back-button-container">
+        <a href="menu.html" class="back-button"><i class="fas fa-arrow-left"></i> Voltar para o Menu</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ativa a primeira aba ao carregar
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+</html>
