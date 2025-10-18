@@ -1,154 +1,153 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // Usando 'bcryptjs' que é mais comum e leve
 
 const app = express();
 
-// Configurações
-app.use(cors()); 
+// --- Configurações Iniciais ---
+app.use(cors());
 app.use(express.json());
 
-// --- Variáveis de Ambiente ---
-// **IMPORTANTE:** Mantenha a string de conexão real como Variável de Ambiente no Vercel.
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://davidtottenhamroc_db_user:tottenham0724@cluster0.tdopyuc.mongodb.net/test?retryWrites=true&w=majority";
-const PORT = process.env.PORT || 3000; 
+// **CORREÇÃO CRÍTICA DE SEGURANÇA E SINTAXE:** // O fallback da URI foi removido do código para evitar exposição de credenciais.
+// A string de conexão DEVE ser configurada APENAS como variável de ambiente (MONGO_URI) no Vercel.
+const MONGODB_URI = process.env.MONGO_URI; 
 
-// Senha pré-definida para cadastro (você pode mudar isso se quiser)
-const PRE_DEFINED_ACCESS_PASSWORD = "otimus32";
+// --- Schemas do Sistema de Ponto da Zee Imobiliária ---
 
-// Conexão com o banco de dados MongoDB
-mongoose.connect(MONGODB_URI)
-    .then(() => console.log('Conectado ao MongoDB!'))
-    .catch(err => console.error('Erro de conexão com o MongoDB:', err));
+const funcionarioSchema = new mongoose.Schema({
+    nome: { type: String, required: true },
+    email: { type: String, unique: true, sparse: true }, 
+    senha: { type: String }, 
+    cargo: { type: String, required: true },
+    isUser: { type: Boolean, default: false }, 
+    permissao: { 
+        type: String, 
+        enum: ['ponto', 'funcionario', 'admin'], 
+        default: 'ponto' 
+    },
+    createdAt: { type: Date, default: Date.now },
+}, { collection: 'funcionarios' });
 
-// ------------------------------------
-// --- Schemas (Modelos de Dados) ---
-// ------------------------------------
-
-// SCHEMA PARA USUÁRIO (LOGIN E SENHA)
-const userSchema = new mongoose.Schema({
-    login: { type: String, required: true, unique: true },
-    senha: { type: String, required: true }
-});
-
-const aulaSchema = new mongoose.Schema({
-    agente: String,
-    estado: String,
-    tipoRegistro: String,
-    data: String,
-    total: Number,
-    execucao: Number,
-    naoEnviadas: Number,
-    recusadas: Number,
-    processamento: Number,
-    status: String,
-    observacao: String
-});
-
-const incidenteSchema = new mongoose.Schema({
-    agente: String,
-    estado: String,
-    data: String,
-    observacao: String
-});
-
-// SCHEMA PARA MEMÓRIA DO CHATBOT
-const memorySchema = new mongoose.Schema({
-    agente: String,
-    dataHora: { type: Date, default: Date.now },
-    texto: String,
-    estado: String,
-    imagemUrl: String
-});
-
-// ------------------------------------
-// --- Modelos Mongoose ---
-// ------------------------------------
-// O Mongoose cria a collection 'user' (terceiro parâmetro) automaticamente se ela não existir
-const User = mongoose.model('User', userSchema, 'user'); 
-const Aula = mongoose.model('Aula', aulaSchema);
-const Incidente = mongoose.model('Incidente', incidenteSchema);
-const Memory = mongoose.model('Memory', memorySchema); 
-
-// ------------------------------------
-// --- Rotas da API ---
-// ------------------------------------
-
-// Rota para criar um novo usuário - COM VALIDAÇÃO DE SENHA DE ACESSO
-app.post('/api/users', async (req, res) => {
-    try {
-        const { login, senha, accessPassword } = req.body;
-
-        // Verifica se a senha de acesso foi fornecida e está correta
-        if (!accessPassword || accessPassword !== PRE_DEFINED_ACCESS_PASSWORD) {
-            return res.status(403).send({ 
-                message: "Acesso negado. Senha de acesso incorreta ou não fornecida." 
-            });
-        }
-
-        if (!login || !senha) {
-            return res.status(400).send({ message: "Login e senha são obrigatórios." });
-        }
-        
-        // Cria o hash da senha
-        const hashedPassword = await bcrypt.hash(senha, 10); 
-        
-        const novoUsuario = new User({
-            login: login,
-            senha: hashedPassword
-        });
-        
-        // Ao chamar .save(), o Mongoose criará a collection 'user' se ela não existir.
-        await novoUsuario.save();
-        
-        // Remove a senha/hash do objeto de resposta por segurança
-        novoUsuario.senha = undefined; 
-        res.status(201).send(novoUsuario);
-    } catch (error) {
-        // Tratamento de erro de login duplicado (código 11000)
-        if (error.code === 11000) {
-            return res.status(409).send({ message: "Este login já está em uso.", error: error.message });
-        }
-        res.status(400).send({ message: "Erro ao criar usuário.", error: error.message });
+// Pré-save hook para HASHEAR a senha
+funcionarioSchema.pre('save', async function(next) {
+    if (this.isUser && this.isModified('senha') && this.senha) {
+        const salt = await bcrypt.genSalt(10);
+        this.senha = await bcrypt.hash(this.senha, salt);
     }
+    next();
 });
 
-// Rota para autenticação (MODIFICADA COM RESTRIÇÃO)
-app.post('/api/login', async (req, res) => {
+const Funcionario = mongoose.models.Funcionario || mongoose.model('Funcionario', funcionarioSchema);
+
+const pontoSchema = new mongoose.Schema({
+    funcionario: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Funcionario', 
+        required: true 
+    },
+    tipo: { 
+        type: String, 
+        enum: ['checkin', 'pausa', 'retorno', 'checkout'], 
+        required: true 
+    },
+    dataHora: { 
+        type: Date, 
+        default: Date.now,
+        required: true
+    },
+    observacao: { type: String }
+}, { collection: 'pontos' });
+
+const Ponto = mongoose.models.Ponto || mongoose.model('Ponto', pontoSchema);
+
+
+// --- FUNÇÃO DE INICIALIZAÇÃO E CONEXÃO ---
+
+async function createInitialUser() {
     try {
-        // Recebe username, password E o novo campo 'target' do frontend
-        const { username, password, target } = req.body;
+        const adminExists = await Funcionario.findOne({ isUser: true, permissao: 'admin' });
 
-        const user = await User.findOne({ login: username });
-
-        if (!user) {
-            return res.status(401).json({ authenticated: false, message: 'Credenciais inválidas (usuário).' });
-        }
-        
-        // 1. Verifica a senha no banco de dados
-        const isMatch = await bcrypt.compare(password, user.senha);
-        
-        if (!isMatch) {
-            return res.status(401).json({ authenticated: false, message: 'Credenciais inválidas (senha).' });
-        }
-
-        // 2. Lógica de Restrição: Aplicada APENAS se o destino for 'knowledge_manager'
-        if (target === 'knowledge_manager') {
-            const allowedUsers = ["hyuri.passos", "david", "helio", "renataoliveira"];
+        if (!adminExists) {
+            console.log('Criando usuário padrão...');
             
-            // Verifica se o usuário autenticado está na lista restrita (case-insensitive)
-            if (!allowedUsers.includes(username.toLowerCase())) {
-                // Se o usuário autenticado NÃO estiver na lista, nega o acesso
-                return res.status(403).json({ 
-                    authenticated: false, 
-                    message: 'Acesso negado. Este painel é restrito aos usuários autorizados: Hyuri, David, Helio e Renata.' 
-                });
-            }
+            // Credenciais solicitadas para o primeiro acesso
+            const defaultEmail = 'USER@gmail.com'; 
+            const defaultPassword = 'adminotimus32';
+
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(defaultPassword, salt);
+
+            const initialAdmin = new Funcionario({
+                nome: 'Administrador Padrão (USER)',
+                email: defaultEmail,
+                senha: hashedPassword,
+                cargo: 'Administrador do Sistema',
+                isUser: true,
+                permissao: 'admin'
+            });
+
+            await initialAdmin.save();
+            console.log(`Usuário padrão criado com sucesso: ${defaultEmail}`);
+        }
+    } catch (error) {
+        // Ignora erro de duplicidade de email em re-invocações rápidas (código 11000)
+        if (error.code !== 11000) { 
+             console.error('Erro ao tentar criar usuário inicial:', error.message);
+        }
+    }
+}
+
+// Conecta ao MongoDB e inicializa o usuário
+if (!MONGODB_URI) {
+    console.error('ERRO: Variável MONGO_URI não definida.');
+} else {
+    mongoose.connect(MONGODB_URI)
+        .then(() => {
+            console.log('Conexão estabelecida com MongoDB Atlas!');
+            createInitialUser(); 
+        })
+        .catch(err => {
+            console.error('Erro FATAL de conexão com o MongoDB:', err.message);
+        });
+}
+
+
+// ------------------------------------
+// --- Rotas da API Zee Imobiliária ---
+// ------------------------------------
+
+// Rota de Teste
+app.get('/', (req, res) => {
+    res.status(200).send('API de Gestão de Tempo da Zee Imobiliária Rodando.');
+});
+
+
+// Rota para autenticação (Login) - Baseada no seu template, mas usando email e permissão
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, senha } = req.body;
+        
+        // Busca funcionário pelo email e que tenha permissão de login (isUser: true)
+        const funcionario = await Funcionario.findOne({ email, isUser: true });
+
+        if (!funcionario) {
+            return res.status(401).json({ authenticated: false, message: 'Usuário não encontrado ou não tem permissão de acesso.' });
         }
         
-        // Se a senha estiver correta E as restrições forem cumpridas (ou não houver restrição)
-        res.json({ authenticated: true, message: 'Login bem-sucedido.' });
+        const isMatch = await bcrypt.compare(senha, funcionario.senha);
+
+        if (!isMatch) {
+            return res.status(401).json({ authenticated: false, message: 'Email ou senha inválidos.' });
+        }
+
+        // Retorna dados para o Front-end
+        res.json({ 
+            authenticated: true,
+            id: funcionario._id, 
+            nome: funcionario.nome, 
+            permissao: funcionario.permissao 
+        });
 
     } catch (error) {
         console.error('Erro durante a autenticação:', error);
@@ -156,80 +155,84 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- Rotas de Aulas ---
-app.post('/api/aulas', async (req, res) => {
+
+// Rota UNIFICADA de Cadastro (Funcionário Ponto OU Usuário com Acesso)
+app.post('/api/cadastro', async (req, res) => {
+    const { nome, email, senha, cargo, permissao } = req.body;
+    
+    // Define se é um usuário que fará login
+    const isUser = !!email && !!senha; 
+    const finalPermissao = isUser ? (permissao || 'funcionario') : 'ponto';
+
     try {
-        const novaAula = new Aula(req.body);
-        await novaAula.save();
-        res.status(201).send(novaAula);
+        const novoFuncionario = new Funcionario({
+            nome,
+            email: isUser ? email : undefined,
+            senha: isUser ? senha : undefined,
+            cargo,
+            isUser,
+            permissao: finalPermissao
+        });
+
+        await novoFuncionario.save();
+        res.status(201).json({ 
+            message: `${isUser ? 'Usuário' : 'Funcionário Ponto'} cadastrado com sucesso!`, 
+            id: novoFuncionario._id 
+        });
     } catch (error) {
-        res.status(400).send(error);
+        if (error.code === 11000) { 
+            return res.status(400).json({ message: 'O email já está em uso.' });
+        }
+        res.status(400).json({ message: 'Erro ao cadastrar.', details: error.message });
     }
 });
 
-app.get('/api/aulas', async (req, res) => {
+
+// Rota para buscar TODOS os funcionários (para filtro de relatórios)
+app.get('/api/funcionarios-ponto', async (req, res) => {
     try {
-        const aulas = await Aula.find({});
-        res.send(aulas);
+        const funcionarios = await Funcionario.find({}, '_id nome cargo isUser').sort({ nome: 1 });
+        res.send(funcionarios);
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({ message: 'Erro ao buscar lista de funcionários.' });
     }
 });
 
-// --- Rotas de Incidentes ---
-app.post('/api/incidentes', async (req, res) => {
+
+// Rota para Registro de Ponto
+app.post('/api/ponto', async (req, res) => {
+    const { funcionario, tipo, observacao } = req.body;
+    
+    if (!funcionario || !tipo) {
+        return res.status(400).json({ message: 'ID do funcionário e tipo de ponto são obrigatórios.' });
+    }
+    
     try {
-        const novoIncidente = new Incidente(req.body);
-        await novoIncidente.save();
-        res.status(201).send(novoIncidente);
+        const novoRegistro = new Ponto({ funcionario, tipo, observacao, dataHora: new Date() });
+        await novoRegistro.save();
+        res.status(201).json({ message: `Ponto (${tipo}) registrado com sucesso.`, registro: novoRegistro });
     } catch (error) {
-        res.status(400).send(error);
+        res.status(400).json({ message: 'Falha ao registrar o ponto.', details: error.message });
     }
 });
 
-app.get('/api/incidentes', async (req, res) => {
+
+// Rota para buscar Relatório de Pontos
+app.get('/api/relatorio/:funcionarioId', async (req, res) => {
+    const { funcionarioId } = req.params;
+
     try {
-        const incidentes = await Incidente.find({});
-        res.send(incidentes);
+        const query = funcionarioId === 'todos' ? {} : { funcionario: funcionarioId };
+
+        const registros = await Ponto.find(query)
+            .populate('funcionario', 'nome cargo') 
+            .sort({ dataHora: -1 });
+
+        res.send(registros);
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({ message: 'Erro ao buscar relatórios de ponto.' });
     }
 });
 
-app.delete('/api/incidentes/:id', async (req, res) => {
-    try {
-        const incidente = await Incidente.findByIdAndDelete(req.params.id);
-        if (!incidente) return res.status(404).send('Incidente não encontrado');
-        res.send(incidente);
-    } catch (error) {
-        res.status(500).send(error);
-    }
-});
-
-// --- ROTAS PARA MEMÓRIA DO CHATBOT ---
-app.post('/api/memories', async (req, res) => {
-    try {
-        const novaMemoria = new Memory(req.body);
-        await novaMemoria.save();
-        res.status(201).send(novaMemoria);
-    } catch (error) {
-        res.status(400).send(error);
-    }
-});
-
-app.get('/api/memories', async (req, res) => {
-    try {
-        const memories = await Memory.find({}).sort({ dataHora: -1 });
-        res.send(memories);
-    } catch (error) {
-        res.status(500).send(error);
-    }
-});
-
-// Inicia o servidor
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
 
 module.exports = app;
-
