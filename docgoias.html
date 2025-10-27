@@ -510,6 +510,13 @@
                 document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
+        // VERIFICAÇÃO DE LOGIN
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado');
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
+
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html'; // Redireciona
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             // Ativa a primeira aba ao carregar
@@ -520,4 +527,5 @@
         });
     </script>
 </body>
+
 </html>
