@@ -158,7 +158,13 @@
     <script>
         // ⚠️ ATENÇÃO: Confirme que esta é a URL do seu projeto Vercel
         const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';  
+        // VERIFICAÇÃO DE LOGIN
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado');
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
 
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html'; // Redireciona
+        }
         function showStatus(message, type) {
             const statusDiv = document.getElementById('status-message');
             statusDiv.className = `status-message ${type}`;
