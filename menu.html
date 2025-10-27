@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base para N2 - VSoft</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        // Obtém o estado de login do localStorage
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado'); 
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
+
+        // Se o login ou a flag não estiverem presentes/válidos, redireciona para a página de login
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -98,10 +109,10 @@
         }
 
         .card-icon img {
-            width: 50px;          /* tamanho da imagem */
-            height: 50px;         /* ajuste conforme o layout */
-            object-fit: cover;    /* evita distorção */
-            border-radius: 12px;  /* arredonda as bordas (opcional) */
+            width: 50px;       /* tamanho da imagem */
+            height: 50px;      /* ajuste conforme o layout */
+            object-fit: cover; /* evita distorção */
+            border-radius: 12px; /* arredonda as bordas (opcional) */
         }
         
         .card-title {
@@ -521,9 +532,12 @@
         const PAGE_SIZE = 3;
         let lastQueryKeywords = [];
 
+        // FUNÇÃO LOGOUT ATUALIZADA para remover a flag de login
         function logout() {
             localStorage.removeItem('agenteSelecionado');
             localStorage.removeItem('estadoSelecionado');
+            localStorage.removeItem('agenteLogado');      // Limpa a credencial
+            localStorage.removeItem('isLoggedIn');        // Limpa a flag de logado
             window.location.href = 'login.html';
         }
 
@@ -623,6 +637,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Garante que o botão de chat só aparece após o carregamento da base
             await loadMemoriesFromDatabase();
             document.getElementById('chat-open-btn').style.display = 'block';
         });
@@ -825,9 +840,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
