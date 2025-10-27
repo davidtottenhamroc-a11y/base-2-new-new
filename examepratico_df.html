@@ -678,6 +678,13 @@
             element.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
+        // VERIFICAÇÃO DE LOGIN
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado');
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
+
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html'; // Redireciona
+        }
 
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
@@ -706,3 +713,4 @@
     </script>
 </body>
 </html>
+
