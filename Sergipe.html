@@ -758,6 +758,14 @@
                 document.querySelectorAll('.documentation').forEach(doc => doc.style.display = 'none');
             });
         });
+
+        // VERIFICAÇÃO DE LOGIN
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado');
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
+
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html'; // Redireciona
+        }
         
         // Função para mostrar/ocultar documentação
         function mostrarDocumentacao(tipo) {
@@ -1021,3 +1029,4 @@
 </body>
 
 </html>
+
