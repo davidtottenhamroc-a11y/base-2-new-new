@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - VSoft</title>
+    <title>Login - VSoft N2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Seu CSS Existente */
+        /* Seu CSS Existente (Mantenho a sua estética) */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -93,8 +94,27 @@
             margin-top: 15px;
             color: #dc3545;
             font-weight: bold;
-            /* Começa oculto */
             display: none; 
+        }
+
+        /* Novo estilo para o seletor de acesso */
+        .access-selection {
+            text-align: left;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+        }
+        .access-selection label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .access-selection input[type="radio"] {
+            margin-right: 10px;
+            /* Estilos para o rádio button se necessário */
         }
     </style>
 </head>
@@ -103,6 +123,17 @@
         <div class="logo">VSoft</div>
         <h1>Acesso ao Painel</h1>
         <p class="description">Insira suas credenciais para continuar.</p>
+
+        <div class="access-selection">
+            <label>
+                <input type="radio" name="target" value="default" checked>
+                Acesso Padrão (Entrar no Menu)
+            </label>
+            <label>
+                <input type="radio" name="target" value="knowledge_manager">
+                Gerenciar Base de Conhecimento (Acesso Restrito)
+            </label>
+        </div>
 
         <form id="login-form">
             <div class="form-group">
@@ -113,57 +144,77 @@
                 <label for="password">Senha:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Entrar</button>
+            <button type="submit" id="login-button">Entrar</button>
         </form>
-        <p class="error-message" id="error-message">Usuário ou senha incorretos. Tente novamente.</p>
+        <p class="error-message" id="error-message"></p>
+        
+        <div style="margin-top: 15px; font-size: 14px; opacity: 0.8;">
+            Não tem conta? <a href="cadastro_user.html" style="color: #3498db; text-decoration: none; font-weight: bold;">Cadastre-se aqui</a>.
+        </div>
     </div>
 
     <script>
+        // Use a URL completa do seu backend Vercel
+        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app'; 
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const username = document.getElementById('username').value;
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
+            const target = document.querySelector('input[name="target"]:checked').value;
+            
             const errorMessage = document.getElementById('error-message');
+            const loginButton = document.getElementById('login-button');
 
-            // Oculta a mensagem de erro antes de uma nova tentativa
+            // Oculta a mensagem de erro e desabilita o botão
             errorMessage.style.display = 'none';
+            loginButton.disabled = true;
+            loginButton.textContent = 'Verificando...';
 
             try {
-                // Requisição para o backend, onde o banco de dados será consultado
-                const response = await fetch('/api/login', {
+                // Requisição para o backend, incluindo o campo 'target'
+                const response = await fetch(`${BACKEND_URL}/api/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password, target }) // Envia o target para a rota
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
+                const data = await response.json();
+                
+                if (response.ok && data.authenticated) {
+                    // 1. Armazena o estado de login no localStorage para persistência
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('agenteLogado', username);
                     
-                    // O servidor deve retornar { authenticated: true } se o login for OK
-                    if (data.authenticated) {
+                    errorMessage.textContent = 'Login bem-sucedido! Redirecionando...';
+                    errorMessage.style.display = 'block';
+                    errorMessage.style.color = '#2ecc71'; // Cor verde para sucesso
+
+                    setTimeout(() => {
                         window.location.href = 'menu.html';
-                    } else {
-                        // O servidor indicou falha de autenticação
-                        errorMessage.textContent = 'Usuário ou senha incorretos. Tente novamente.';
-                        errorMessage.style.display = 'block';
-                    }
+                    }, 500);
                 } else {
-                    // Trata outros erros HTTP (ex: 401 Unauthorized, 404 Not Found)
-                    errorMessage.textContent = 'Erro de autenticação. Verifique as credenciais.';
+                    // O servidor retornou 401, 403, ou { authenticated: false }
+                    const message = data.message || 'Erro de autenticação desconhecido. Credenciais inválidas.';
+                    errorMessage.textContent = message;
+                    errorMessage.style.color = '#dc3545'; // Cor vermelha para erro
                     errorMessage.style.display = 'block';
                 }
             } catch (error) {
-                // Erro de rede ou servidor não está online
-                console.error('Erro:', error);
-                errorMessage.textContent = 'Erro ao conectar com o servidor. Tente novamente mais tarde.';
+                // Erro de rede ou servidor
+                console.error('Erro de conexão:', error);
+                errorMessage.textContent = 'Erro ao conectar com o servidor. Verifique a URL do backend.';
+                errorMessage.style.color = '#dc3545';
                 errorMessage.style.display = 'block';
+            } finally {
+                // Restaura o botão em caso de erro
+                loginButton.disabled = false;
+                loginButton.textContent = 'Entrar';
             }
         });
     </script>
 </body>
-
 </html>
-
