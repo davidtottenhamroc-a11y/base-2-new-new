@@ -819,6 +819,13 @@ CNPJ|PLACA|HORARIO|CPF_INSTRUTOR|CPF_CANDIDATO|LATITUDE|LONGITUDE|CATEGORIA
                 document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
+        // VERIFICAÇÃO DE LOGIN
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado');
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
+
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html'; // Redireciona
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const firstTab = document.querySelector('.tab');
@@ -828,4 +835,5 @@ CNPJ|PLACA|HORARIO|CPF_INSTRUTOR|CPF_CANDIDATO|LATITUDE|LONGITUDE|CATEGORIA
         });
     </script>
 </body>
+
 </html>
