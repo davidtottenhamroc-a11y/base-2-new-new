@@ -387,6 +387,13 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
 
     <script>
+        // VERIFICAÇÃO DE LOGIN
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado');
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
+
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html'; // Redireciona
+        }
         // --- Lógica do Chatbot (Mantida) ---
         let chatMemories = [];
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
@@ -752,4 +759,5 @@
         }
     </script>
 </body>
+
 </html>
