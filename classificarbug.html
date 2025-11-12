@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Classificação e Priorização de Bugs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos Gerais */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #e31f41; /* Cor de Alerta/Urgência para Bugs */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #a81c36;
+            border-bottom: 1px solid #7a1528;
+            flex-wrap: wrap;
+            padding-left: 20px;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #7a1528;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #ffc107; /* Amarelo/Aviso para destaque */
+            background: #0d1a2a;
+            color: #ffc107;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #0d1a2a;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #1a2f40;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .info-box.danger {
+            background: #3e262a;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .info-box.success {
+            background: #2a3a2d;
+            border-left: 4px solid #28a745;
+        }
+        
+        .info-box.warning {
+            background: #3e3221;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        
+        .info-content {
+            line-height: 1.5;
+            color: #c0c0c0;
+        }
+        
+        .doc-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #1a2f40;
+            border-left: 3px solid #007bff;
+        }
+
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .param-table th, .param-table td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .param-table th {
+            background: #0d1a2a;
+            font-weight: 600;
+            color: #ffc107;
+        }
+
+        .param-table tr:nth-child(even) {
+            background: #11202c;
+        }
+        
+        .param-table .priority-col {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .p0 { background-color: #dc3545 !important; color: white !important; }
+        .p1 { background-color: #ffc107 !important; color: #333 !important; }
+        .p2 { background-color: #007bff !important; color: white !important; }
+        .p3 { background-color: #28a745 !important; color: white !important; }
+        
+        .code-block {
+            background: #11202c;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #f4f4f4;
+            overflow-x: auto;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+            margin-left: 10px;
+        }
+        
+        li {
+            margin-bottom: 5px;
+            color: #c0c0c0;
+        }
+        
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🐞 Guia de Classificação e Priorização de Bugs</h1>
+            <p class="description">Padronização da identificação, classificação e priorização de bugs para garantir consistência e foco na resolução de problemas críticos.</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="objetivo"><i class="fas fa-bullseye"></i> Objetivo</div>
+            <div class="tab" data-tab="criticidade"><i class="fas fa-fire"></i> Criticidade</div>
+            <div class="tab" data-tab="preenchimento"><i class="fas fa-file-alt"></i> Preenchimento do Card</div>
+            <div class="tab" data-tab="fluxo-resumido"><i class="fas fa-exchange-alt"></i> Fluxo Resumido</div>
+            <div class="tab" data-tab="regras-extras"><i class="fas fa-exclamation-triangle"></i> Regras Extras</div>
+        </div>
+        
+        <div class="tab-content active" id="objetivo">
+            <h2>🎯 Objetivo do Documento</h2>
+            <div class="info-box success">
+                <div class="info-title">Propósito Central</div>
+                <div class="info-content">
+                    Este documento visa **padronizar** a identificação, classificação e priorização de bugs, garantindo uma abordagem **objetiva e consistente** na triagem e resolução de problemas.
+                    <br><br>
+                    Busca-se assegurar que falhas com maior impacto no negócio, nos usuários e na operação sejam tratadas com a **urgência adequada**, enquanto erros menos críticos são organizados e resolvidos conforme a disponibilidade da equipe.
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-section-title">Benefícios Chave</div>
+                <ul>
+                    <li>Garantir que a **urgência** do tratamento esteja alinhada ao **impacto** no negócio.</li>
+                    <li>Melhorar a **eficiência** do processo de manutenção e evolução da plataforma.</li>
+                    <li>Facilitar a **comunicação** entre times técnicos e de produto através de documentação clara.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="criticidade">
+            <h2>🔥 Classificação de Criticidade dos Bugs</h2>
+            <div class="info-box warning">
+                <div class="info-title">Definição de Criticidade</div>
+                <div class="info-content">
+                    A criticidade representa o **nível de impacto e urgência** que o bug traz para o sistema, usuários e negócio. Essa avaliação é fundamental para decisões objetivas de priorização.
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-skull-crossbones"></i> 🚨 Crítico (P0) — Impacto máximo, interrupção completa</div>
+                <ul>
+                    <li>**Descrição:** Impede completamente o uso do sistema ou de funcionalidades **essenciais** para a operação. Ocorre em produção e não possui solução alternativa viável.</li>
+                    <li>**Impacto:** Bloqueia processos chave, podendo causar perdas financeiras, impacto regulatório ou insatisfação grave do usuário.</li>
+                    <li>**Exemplo:** O instrutor não consegue registrar presença em nenhuma aula, bloqueando o progresso do aluno.</li>
+                    <li>**Ação Recomendada:** **Correção Imediata (obrigatória na sprint atual).** Testes iniciais realizados pelo **DEV**. Deve ser feito **Cherry-pick** para produção/regressiva.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-exclamation-circle"></i> ⚠️ Alta (P1) — Impacto significativo com possibilidade de contorno</div>
+                <ul>
+                    <li>**Descrição:** Impacto significativo em funcionalidades importantes, mas com **contorno ou solução manual temporária**. Não bloqueia totalmente o uso.</li>
+                    <li>**Impacto:** Causa retrabalho, risco de erro humano e frustração. Pode agravar-se se não tratado rapidamente.</li>
+                    <li>**Exemplo:** Aluno consegue agendar aulas teóricas em horários já ocupados, forçando o suporte a reagendar manualmente.</li>
+                    <li>**Ação Recomendada:** **Priorizado na sprint atual (o quanto antes).** Testes realizados pelo **QA**. O DEV faz Cherry-pick para produção/regressiva após avaliação do PO (pode aguardar versão regressiva próxima).</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-info-circle"></i> 🟡 Média (P2) — Impacto moderado, sem bloqueio imediato</div>
+                <ul>
+                    <li>**Descrição:** Afeta a experiência do usuário ou funcionalidades secundárias. Não bloqueia o uso ou processos essenciais.</li>
+                    <li>**Impacto:** Causa confusão, pequenas inconsistências ou atrasos. Envolve fluxos usados com menor frequência.</li>
+                    <li>**Exemplo:** Relatório de presença apresenta horário com fuso incorreto (ex: UTC ao invés do horário local).</li>
+                    <li>**Ação Recomendada:** **Planejar para a próxima sprint.** Testes realizados pelo **QA**. Segue o fluxo padrão de geração de versão.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-low-vision"></i> 🟢 Baixa (P3) — Impacto baixo</div>
+                <ul>
+                    <li>**Descrição:** Erros visuais, textuais, pequenos detalhes de interface ou inconsistências que não impactam o funcionamento do sistema.</li>
+                    <li>**Impacto:** Melhora a qualidade e percepção, mas não é urgente. Não há prejuízo para o negócio.</li>
+                    <li>**Exemplo:** Ícone de agendamento desalinhado na tela de aulas práticas ou erro de acentuação em mensagens.</li>
+                    <li>**Ação Recomendada:** **Incluir no backlog de manutenção** e corrigir conforme disponibilidade. Testes realizados pelo **QA**. Segue o fluxo padrão de geração de versão.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="preenchimento">
+            <h2>📝 Como Preencher um Card de Bug</h2>
+            <div class="info-box success">
+                <div class="info-title">Estrutura Essencial</div>
+                <div class="info-content">
+                    O card deve ser preenchido de forma **clara, objetiva e estruturada** para facilitar a reprodução e o entendimento do problema pelo time de desenvolvimento.
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-map-marker-alt"></i> Detalhes do Card</div>
+                <ul>
+                    <li>**Caminho na interface:** Descreva claramente onde o problema ocorre. <br>Ex: `Menu > Aulas > Aula Teórica`</li>
+                    <li>**Evidências do problema:** Anexe prints, vídeos, logs ou qualquer dado que ajude na reprodução. <br>Ex: `Vídeo da falha no momento da marcação de presença.`</li>
+                    <li>**Causa raiz (se conhecida):** Preenchida pelo **DEV** após a correção. <br>Ex: `API retorna erro 500 porque o campo presenca não é atualizado.`</li>
+                </ul>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-bug"></i> Reporte do Problema (Estrutura *Dado-Quando-Então*)</div>
+                <div class="info-box warning">
+                    <div class="info-content">
+                        Responda: **Como deveria funcionar? O que está errado? Qual o impacto?**
+                    </div>
+                </div>
+                <div class="code-block">
+Funcionalidade: [Defina qual funcionalidade está com problema]
+Dado: [Contexto inicial do sistema ou do usuário]
+Quando: [Ação realizada]
+Então: [Comportamento inesperado]
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-brain"></i> Justificativa da Criticidade</div>
+                <div class="info-content">
+                    Responda às seguintes perguntas para embasar a classificação de P0, P1, P2 ou P3:
+                    <ul>
+                        <li>**Qual é o impacto do bug?** O que ele afeta no sistema, usuários ou negócio?</li>
+                        <li>**Existe algum contorno?** (Sim/Não e qual?)</li>
+                        <li>**O problema é pós publicação?** (Funcionava antes e parou depois de atualização?)</li>
+                        <li>**Qual é a criticidade?** Por que? (Baseie-se nas respostas acima).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="fluxo-resumido">
+            <h2>🔄 Fluxo de Priorização Resumido</h2>
+
+            <table class="param-table">
+                <thead>
+                    <tr><th>Criticidade</th><th>🏁 Sprint</th><th>🧪 Testes Funcionais</th><th>🚀 Publicação</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="priority-col p0">🔴 Crítico (P0)</td>
+                        <td>Sprint atual (urgente)</td>
+                        <td>**DEV**</td>
+                        <td>**Cherry-pick** para produção e regressiva. PO solicita publicação imediata.</td>
+                    </tr>
+                    <tr>
+                        <td class="priority-col p1">🟠 Alta (P1)</td>
+                        <td>Sprint atual</td>
+                        <td>**QA** realiza o teste e avisa ao DEV.</td>
+                        <td>DEV faz o **Cherry-pick** para produção e regressiva e avisa ao PO. Se houver versão regressiva próxima, é recomendável aguardar.</td>
+                    </tr>
+                    <tr>
+                        <td class="priority-col p2">🟡 Média (P2)</td>
+                        <td>Próxima sprint</td>
+                        <td>**QA**</td>
+                        <td>Segue fluxo padrão de publicação (com a próxima versão).</td>
+                    </tr>
+                    <tr>
+                        <td class="priority-col p3">🟢 Baixa (P3)</td>
+                        <td>Conforme disponibilidade</td>
+                        <td>**QA**</td>
+                        <td>Segue fluxo padrão de publicação (com a próxima versão de manutenção).</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-content" id="regras-extras">
+            <h2><i class="fas fa-exclamation-triangle"></i> Regras Extras e Validação</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-user-shield"></i> ✅ Responsável pela Validação do Card</div>
+                <div class="info-box success">
+                    <div class="info-title">Responsável: Product Owner (PO)</div>
+                    <div class="info-content">
+                        A validação final dos cards de bug antes da priorização é de responsabilidade do **Product Owner (PO)** ou de alguém por ele indicado, que possua conhecimento do produto para triagem.
+                    </div>
+                </div>
+                <ul>
+                    <li>Verificar se o card está **completo e claro** (caminho, descrição, evidências e justificativa).</li>
+                    <li>**Validar ou ajustar a criticidade** com base no impacto e contexto do negócio.</li>
+                    <li>Atribuir a **tag oficial de criticidade** (P0, P1, P2, P3).</li>
+                    <li>Organizar o card no board conforme prioridade e capacidade do time.</li>
+                </ul>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-undo-alt"></i> 🔍 Bugs Encontrados em Testes Regressivos</div>
+                <div class="info-box warning">
+                    <div class="info-title">Regra para Bugs Regressivos (QA/DEV)</div>
+                    <div class="info-content">
+                        Problemas identificados durante a fase de testes regressivos (impactando funcionalidades já existentes) seguem um tratamento específico para evitar atrasos na liberação da versão.
+                    </div>
+                </div>
+                <ul>
+                    <li>Ao abrir o card, o responsável deve incluir a tag **"Bug regressivo"**.</li>
+                    <li>O PO deve analisar o bug **imediatamente** para avaliar se é impeditivo para a liberação da versão.</li>
+                    <li>Se for impeditivo para funcionalidades essenciais, o PO deve classificá-lo preferencialmente como **Alta (P1)**.</li>
+                    <li>Se não for impeditivo, o PO segue o fluxo normal de priorização (P2/P3), conforme a criticidade e capacidade.</li>
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="back-button-container">
+        <a href="menu.html" class="back-button"><i class="fas fa-arrow-left"></i> Voltar para o Menu</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to the clicked tab and its content
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Activation of the first tab on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+
+</html>
