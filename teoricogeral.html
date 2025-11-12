@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações Teóricas - Painel Super Prático</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos Gerais (Copied from original model) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1a2a 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #007bff; /* Cor institucional: Azul */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #0056b3;
+            border-bottom: 1px solid #004d40;
+            flex-wrap: wrap;
+            padding-left: 20px;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #004494;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #17a2b8; /* Ciano para destaque */
+            background: #0d1a2a;
+            color: #17a2b8;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #0d1a2a;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-box {
+            background: #1a2f40;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .info-box.danger {
+            background: #3e262a;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .info-box.success {
+            background: #2a3a2d;
+            border-left: 4px solid #28a745;
+        }
+        
+        .info-box.warning {
+            background: #3e3221;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        
+        .info-content {
+            line-height: 1.5;
+            color: #c0c0c0;
+        }
+
+        .endpoint-url {
+            background: #000;
+            color: #17a2b8;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .documentation {
+            background: #1f3747;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6c757d;
+        }
+
+        .doc-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        .doc-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #1a2f40;
+            border-left: 3px solid #28a745; /* Cor para seções internas */
+        }
+        
+        .doc-section-full {
+            margin-bottom: 20px;
+        }
+
+        .doc-section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .param-table th, .param-table td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .param-table th {
+            background: #0d1a2a;
+            font-weight: 600;
+            color: #17a2b8;
+        }
+
+        .param-table tr:nth-child(even) {
+            background: #11202c;
+        }
+        
+        .param-table .value-col {
+            font-weight: bold;
+            color: #6c757d;
+        }
+        
+        .param-table .app-col {
+             font-style: italic;
+             color: #ffc107;
+        }
+        
+        .value-type {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #11202c;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #f4f4f4;
+            overflow-x: auto;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+            margin-left: 10px;
+        }
+        
+        li {
+            margin-bottom: 5px;
+            color: #c0c0c0;
+        }
+        
+        table.status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        table.status-table th, table.status-table td {
+            border: 1px solid #555;
+            padding: 8px;
+            text-align: left;
+        }
+        table.status-table th {
+            background: #1a2f40;
+            color: #ffc107;
+        }
+        
+        .back-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            padding: 12px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #1e2b38;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>⚙️ Configurações Teóricas - Painel Super Prático</h1>
+            <p class="description">Este documento detalha as configurações teóricas disponíveis no painel do Super Prático, organizadas por funcionalidade.</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="agendamento"><i class="fas fa-calendar-alt"></i> Agendamento</div>
+            <div class="tab" data-tab="alertas"><i class="fas fa-bell"></i> Alertas</div>
+            <div class="tab" data-tab="armazenamento-tempo"><i class="fas fa-database"></i> Armazenamento/Tempo</div>
+            <div class="tab" data-tab="captura-conclusao"><i class="fas fa-camera"></i> Captura/Conclusão</div>
+            <div class="tab" data-tab="importacao-biometria"><i class="fas fa-users-cog"></i> Importação/Biometria</div>
+            <div class="tab" data-tab="liveness-match"><i class="fas fa-robot"></i> Liveness/Match</div>
+            <div class="tab" data-tab="processamento-geral"><i class="fas fa-cogs"></i> Processamento Geral</div>
+            <div class="tab" data-tab="super-aula-tolerancia"><i class="fas fa-chalkboard-teacher"></i> Super Aula/Tolerância</div>
+            <div class="tab" data-tab="validacao-aleatoria"><i class="fas fa-random"></i> Validação Aleatória</div>
+        </div>
+        
+        <div class="tab-content active" id="agendamento">
+            <h2>📅 Agendamento Teórico</h2>
+            <div class="info-box success">
+                <div class="info-title">Visão Geral</div>
+                <div class="info-content">
+                    Configurações que gerenciam a criação, descarte, capacidade e regras de intervalo para agendamentos de aulas teóricas, tanto presenciais quanto virtuais.
+                </div>
+            </div>
+
+            <div class="doc-section-full">
+                <div class="doc-section-title"><i class="fas fa-list-alt"></i> Parâmetros de Agendamento</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Tempo máximo passado para descarte de agendamentos</td><td class="value-col"><span class="value-type">int</span> (1-240)</td><td>Tempo em meses para manter agendamentos teóricos antes do descarte.</td><td class="app-col">Teorico.Geral.DescartaAgendamentosTeoricosAntigos</td></tr>
+                        <tr><td>Capacidade máxima para agendamento de aula virtual</td><td class="value-col"><span class="value-type">int</span></td><td>Capacidade máxima de sala de agendamentos teóricos virtuais. Se sem valor, usa a capacidade cadastrada na sala.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Limiar agrupamento agendamento teórico</td><td class="value-col"><span class="value-type">int</span> (10-30)</td><td>Valor em minutos que determina o tempo máximo de intervalo entre aulas para que as aulas ainda sejam consideradas uma turma.</td><td class="app-col">Painel Super Prático API</td></tr>
+                        <tr><td>Agendamento com intervalo obrigatório</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Define se é necessário intervalo de 10 minutos entre blocos de 150 minutos de aula.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Ativar descarte de agendamentos antigos?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o job de descarte de agendamentos antigos será habilitado.</td><td class="app-col">Teorico.Geral.DescartaAgendamentosTeoricosAntigos</td></tr>
+                        <tr><td>Duração máxima de agendamento de aula sem intervalo</td><td class="value-col"><span class="value-type">int</span> (1-10)</td><td>Determina a quantidade máxima de agendamentos seguidos sem intervalo.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Utiliza agendamento teórico manual?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se será possível realizar agendamentos manuais no Painel do Super Prático.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Inserir aluno em aula em andamento?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se será possível inserir candidatos em agendamentos que já iniciaram e ainda estão em andamento.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Permitir agendamento com múltiplas disciplinas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se uma turma de agendamentos poderá ter múltiplas disciplinas em suas aulas.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Quantidade de aulas por agrupamento - (0 Ilimitado)</td><td class="value-col"><span class="value-type">int</span> (0-15)</td><td>Determina a quantidade máxima de aulas em um agrupamento de aula teórica (0 = ilimitado).</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Permitir criar agendamento teórico do tipo reciclagem?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se é permitido criar agendamentos com tipo do curso Reciclagem.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Permitir criar agendamento teórico do tipo Atualização?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se é permitido criar agendamentos com tipo do curso Atualização.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Utilizará o rabbit para salvar aulas teóricas do agendamento?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se utilizará o rabbit para salvar aulas teóricas do agendamento.</td><td class="app-col">Painel Super Prático</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section-full">
+                <div class="doc-section-title"><i class="fas fa-clock"></i> Limite de Horários de Aulas (Restrição por Dia/Hora)</div>
+                <div class="info-box warning">
+                    <div class="info-title">Restrição de Criação</div>
+                    <div class="info-content">
+                        Esta configuração é aplicada no agendamento teórico do Painel Super Prático e determina o limite de criação de agendamentos em horários de dias da semana.
+                    </div>
+                </div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Dia da semana</th><th>Hora Início</th><th>Hora Fim</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Dia da semana a cadastrar a restrição</td><td>Início do horário permitido para criar agendamento</td><td>Fim do horário de permissão de criar agendamentos</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="alertas">
+            <h2>📢 Alertas</h2>
+            <div class="info-box danger">
+                <div class="info-title">Regras de Fraude</div>
+                <div class="info-content">
+                    Define regras para liberação e geração automática de alertas de fraude (biométrica, liveness, match) em aulas virtuais, presenciais e exames.
+                </div>
+            </div>
+
+            <div class="doc-section-full">
+                <div class="doc-section-title"><i class="fas fa-shield-alt"></i> Parâmetros de Alertas e Liberação Automática</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Liberar fraude validação biométrica automaticamente em uma aula virtual?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se os alertas de fraude em aula virtual serão liberados automaticamente.</td><td class="app-col">Teorico.Geral.ProcessamentoAlertasAulasVirtuais</td></tr>
+                        <tr><td>Liberar fraude validação biométrica automaticamente em uma aula presencial?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se os alertas de fraude em aula presencial serão liberados automaticamente.</td><td class="app-col">Teorico.Geral.ProcessarAlertasAulasPresenciais</td></tr>
+                        <tr><td>Liberar e aprovar backoffice ao gerar alertas de liveness de Exames?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Liberação e aprovação automática de backoffice ao gerar alertas de liveness de Exames.</td><td class="app-col">Detran.DetranMS.ProcessingFrequenciaExameMedicoAlertaFraude, .</td></tr>
+                        <tr><td>Liberar e aprovar backoffice ao liberar alertas de aulas teóricas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se os backoffices serão aprovados automaticamente ao liberar alertas em aulas teóricas.</td><td class="app-col">Painel Super Prático API Tratamento de Alertas</td></tr>
+                        <tr><td>Aprovar backoffice ao liberar alertas de Exames?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Liberar backoffice automaticamente ao liberar alertas de Exames.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Liberar fraude em Match de aula teórica presencial?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se os alertas de Match em aulas teóricas presenciais serão liberados automaticamente após a criação.</td><td class="app-col">Teorico.Geral.ProcessarAlertasAulasPresenciais</td></tr>
+                        <tr><td>Gerar alerta de fraude para o instrutor na aula presencial?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Habilita ou não a geração de alerta de fraude para o instrutor na aula presencial.</td><td class="app-col">Teorico.Geral.ProcessarAlertasAulasPresenciais</td></tr>
+                        <tr><td>Gerar alerta de fraude para o instrutor na aula virtual?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Habilita ou não a geração de alerta de fraude para o instrutor na aula virtual.</td><td class="app-col">Super Aula</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="armazenamento-tempo">
+            <h2>📦 Armazenamento e ⏱️ Configurações de Tempo</h2>
+            <div class="info-box">
+                <div class="info-title">Armazenamento</div>
+                <div class="info-content">
+                    Define a política de armazenamento de imagens biométricas (validadas, não validadas, com/sem compressão) para aulas presenciais e virtuais.
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-save"></i> Armazenamento (Aulas Teóricas Presenciais)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Salva Imagens validadas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Deve salvar ou não as imagens de dedo ou face quando houver matching no validador biométrico.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Salva Imagens não validadas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Deve salvar ou não as imagens de dedo ou face quando não houver matching no validador biométrico.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Salva imagens validadas sem compressão</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se as imagens serão salvas sem compressão.</td><td class="app-col">Validador Biométrico</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-laptop-code"></i> Armazenamento (Aulas Teóricas Virtuais)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Salva Imagens não validadas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Deve salvar ou não as imagens de face quando não houver matching no Super Aula.</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>Salva imagens validadas sem compressão</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se as imagens serão salvas sem compressão.</td><td class="app-col">Super Aula</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-stopwatch"></i> Configurações de Tempo (Aula Teórica)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Tempo limite em dias para aguardar biometria</td><td class="value-col">3 dias</td><td>Prazo para coleta de biometria após a aula.</td><td class="app-col">Server Teorico.CE.VerificarAulasAgendamentosEnviados</td></tr>
+                        <tr><td>Tempo de espera da imagem em aula aceita</td><td class="value-col">1 segundo</td><td>Tempo de envio de imagem de aula teórica quando aceita.</td><td class="app-col">API</td></tr>
+                        <tr><td>Tempo de espera da imagem em aula não aceita</td><td class="value-col">1 segundo</td><td>Tempo de envio de imagem de aula teórica quando não aceita.</td><td class="app-col">API</td></tr>
+                        <tr><td>Tempo de espera da imagem em aula em espera</td><td class="value-col">60 segundos</td><td>Tempo de envio de imagem de aula teórica quando está aguardando (em espera).</td><td class="app-col">API</td></tr>
+                        <tr><td>Prazo máximo em horas para envio da lista de presença aulas teóricas ao Detran, ignorando candidatos com alerta</td><td class="value-col">0 horas</td><td>Se for > 0, bloqueia envio após o prazo. Valor 0 desativa a restrição.</td><td class="app-col">Server Envio de aulas teóricas virtuais</td></tr>
+                        <tr><td>Quantidade de dias a Mapear aulas teóricas CE</td><td class="value-col">2 dias</td><td>Quantidade de dias a consultar se as aulas teóricas de CE estão confirmadas no Detran.</td><td class="app-col">Server Teorico.CE.MapearRendimentosEnviados</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-sync-alt"></i> Política de Reenvio e Envio de Aula Teórica</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Qtd Reenvio</td><td class="value-col"><span class="value-type">int</span></td><td>Quantidade de tentativas para reenvio de aula. Se 0, não tentará reenviar.</td><td class="app-col">Server em jobs de envio de aula</td></tr>
+                        <tr><td>Bloqueia envio de rendimento teórico se aula possui alerta?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Bloqueia envio de aulas teóricas com alertas.</td><td class="app-col">Server Envio de aulas teóricas presenciais ou virtual</td></tr>
+                        <tr><td>Sincronização de aula teórica presencial</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se as aulas teóricas presenciais serão sincronizadas nos jobs de Sincronização de agendamento.</td><td class="app-col">Vários jobs de importação, como Teorico.GO.ImportarAgendamentosPresente e Painel RN: Importar grade manual</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="captura-conclusao">
+            <h2>📷 Captura de Imagem e ✅ Conclusão de Curso</h2>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-video"></i> Captura de Imagem (CamService) - Horários de Operação</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor</th><th>Descrição</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Hora Início Captura</td><td class="value-col">06:30</td><td>Início do período de captura automática (formato HH:MM).</td></tr>
+                        <tr><td>Hora Fim Captura</td><td class="value-col">22:30</td><td>Fim do período de captura. Fora deste intervalo, o sistema não registra imagens.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-hourglass-half"></i> Intervalos de Captura (em segundos)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Ambiente</th><th>Valor (segundos)</th><th>Equivalente</th><th>Descrição</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Tempo captura sala de aula</td><td class="app-col">Sala de Aula</td><td class="value-col">420</td><td>7 minutos</td><td>Intervalo entre as capturas de imagem em sala do tipo Aula.</td></tr>
+                        <tr><td>Tempo captura sala simulador</td><td class="app-col">Sala Simulador</td><td class="value-col">240</td><td>4 minutos</td><td>Intervalo entre as capturas de imagem em sala de simulador.</td></tr>
+                        <tr><td>Tempo captura sala de validação</td><td class="app-col">Sala de Validação</td><td class="value-col">120</td><td>2 minutos</td><td>Intervalo entre as capturas de imagem em sala do tipo Validação.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-graduation-cap"></i> Requisitos de Conclusão de Curso</div>
+                <div class="info-box success">
+                    <div class="info-title">Regra por Disciplina</div>
+                    <div class="info-content">
+                        A conclusão do curso é determinada por uma tabela de requisitos que define a quantidade mínima de aulas obrigatórias por disciplina, conforme o tipo de curso. A configuração de quantidade por disciplina de curso não pode ser duplicada.
+                    </div>
+                </div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Tipo de processo</th><th>Disciplina</th><th>Quantidade de Aulas</th><th>Descrição</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><span class="value-type">Valor Inicial, Adicao, Renovacao, Reciclagem, ACC, Mudanca, Transferencia, Especializado, AtualizacaoInstrutores, FormacaoInstrutores</span></td><td><span class="value-type">DirecaoDefensiva, PrimeirosSocorros, MeioAmbiente, Legislacao, Mecanica, RelacionamentoInterpessoal, .</span></td><td class="value-col"><span class="value-type">int</span> (1-50)</td><td>Quantidade mínima de aulas necessárias da disciplina no curso.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-percent"></i> Porcentagens de Conclusão Mínima</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Configuração</th><th>Descrição</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Porcentagem mínima de Conclusão de Curso - Atualização de Instrutores</td><td class="value-col"><span class="value-type">int</span> (0-100)</td><td>Porcentagem mínima para conclusão do curso de atualização de instrutores.</td></tr>
+                        <tr><td>Porcentagem mínima de Conclusão de Curso - Formação de Instrutores</td><td class="value-col"><span class="value-type">int</span> (0-100)</td><td>Porcentagem mínima para conclusão do curso de formação de instrutores.</td></tr>
+                        <tr><td>Porcentagem mínima de Conclusão de Curso - Formação de Condutores</td><td class="value-col"><span class="value-type">int</span> (0-100)</td><td>Porcentagem mínima para conclusão do curso de formação de condutores.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="importacao-biometria">
+            <h2>📥 Importação de Candidato e 🔐 Integração Biométrica</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-search-plus"></i> Exames Detran Mato Grosso do Sul (MS)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Quantidade tentativas validação face</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Quantidade de tentativas obrigatórias de validação de face no validador de exames.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Quantidade tentativas validação digital</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Quantidade de tentativas obrigatórias de validação de digital no validador de exames.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Permitir Importação Manual no Validador Exames Clínicos sem Agendamento Detran</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se a importação de candidato via API pode criar agendamentos quando não encontrar dados de agendamento no Detran.</td><td class="app-col">API</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-file-import"></i> Configurações Gerais de Importação</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Captura biométrica é obrigatória?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Captura Biométrica é obrigatória para importação de candidato.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Permitir importar candidatos reciclagem?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se é permitido importar candidatos com o Tipo de Curso de Reciclagem.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Permitir importar candidatos atualização?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se é permitido importar candidatos com o Tipo de Curso de Atualização.</td><td class="app-col">Painel Super Prático</td></tr>
+                        <tr><td>Habilitar importação de instrutor para curso de formação e atualização?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se a importação de instrutores para curso de formação e atualização será habilitada no painel super prático.</td><td class="app-col">Painel Super Prático</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-rabbit"></i> Importação Automática (Rabbit)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Ativar importação teórica automática pelo Rabbit</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se a importação automática de processos via Rabbit será habilitada.</td><td class="app-col">Server</td></tr>
+                        <tr><td>CNPJs CFC para importação teórica automatizada no Rabbit</td><td class="value-col"><span class="value-type">string</span></td><td>Cadastro de CNPJs dos CFCs que terão a importação teórica automatizada pelo Rabbit (separado por vírgula). Se não houver valor, será disponibilizado para todos os CFCs.</td><td class="app-col">Server</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-fingerprint"></i> Integração Biométrica (Presencial e Virtual)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Configuração</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" style="background-color:#0d1a2a; color:#17a2b8; font-weight:bold;">Aulas Teóricas Presenciais</td></tr>
+                        <tr><td>Tipo Integração Biométrica</td><td class="value-col">BioPassId, Valid</td><td>Tipo de integração biométrica para validação em aulas presenciais.</td><td class="app-col">Validador Biométrico</td></tr>
+                        
+                        <tr><td colspan="4" style="background-color:#0d1a2a; color:#17a2b8; font-weight:bold;">Aulas Teóricas Virtuais</td></tr>
+                        <tr><td>Obrigatoriedade integração Aula Virtual</td><td class="value-col">Nenhuma, Obrigatorio</td><td>Obrigatoriedade de integração da Aula Virtual com o Detran.</td><td class="app-col">Super Aula.</td></tr>
+                        <tr><td>Momento integração Aula Virtual</td><td class="value-col">Nenhum, EntradaSaida, AleatoriaEntradaSaida, Login</td><td>Momento em que a integração deve ser aplicada.</td><td class="app-col">Super Aula.</td></tr>
+                        <tr><td>Tentativas integração Aula Virtual</td><td class="value-col"><span class="value-type">int</span> (0-10)</td><td>Quantidade de tentativas de integração da Aula Virtual com o Detran.</td><td class="app-col">Super Aula.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="liveness-match">
+            <h2>🤖 Liveness e 🤝 Match</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-face-id"></i> Liveness (Configurações Gerais)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Versão liveness</td><td class="value-col">ResultSpoofing (Liveness V1), ResultLiveness (Liveness V2)</td><td>Versão do liveness a ser usada.</td><td class="app-col">Super Aula, API de Validação On-line Externa Teórica, .</td></tr>
+                        <tr><td>Nível de Severidade Liveness</td><td class="value-col">Soft, Regular, Hard</td><td>Define o modo de configuração do Liveness que será usado.</td><td class="app-col">Super Aula, Api de Validação On-line Externa Teórica, .</td></tr>
+                        <tr><td>Gerar alerta de fraude por crítica de imagem</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Ativa ou desativa a geração de alerta de fraude quando o Liveness apontar problema com a qualidade ou composição da foto.</td><td class="app-col">Vários processos de frequência e alertas</td></tr>
+                        <tr><td>Executar Liveness para biometria de aula teórica presencial</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Ativa ou desativa a geração de alerta de fraude em frequências de aula teórica presencial.</td><td class="app-col">Teorico.Geral.ProcessarAlertasAulasPresenciais</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-user-check"></i> Liveness por Pessoa e Momento de Validação (Super Aula)</div>
+                <div class="info-box warning">
+                    <div class="info-title">Regra Única por Momento</div>
+                    <div class="info-content">
+                        Determina a configuração de Liveness por tipo de pessoa em cada momento de validação. A configuração não pode ser aplicada mais de uma vez para um momento de validação de uma pessoa.
+                    </div>
+                </div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>TipoPessoa</th><th>MomentoValidacao</th><th>QtdeTentatidaValidacao</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><span class="value-type">None, Candidato, Instrutor</span></td><td><span class="value-type">None, Login, Abertura, ValidacaoAleatoria, Encerramento</span></td><td class="value-col"><span class="value-type">int</span></td></tr>
+                        <tr><td colspan="3"><strong>Descrição:</strong> Quantidade de tentativas de validação para o momento e a pessoa determinada.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-id-card"></i> Match (Biometria)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Executar Match para biometria de aula teórica presencial</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Ativa ou desativa a verificação do Match de frequências de aulas teóricas presenciais que não tiveram Match localmente.</td><td class="app-col">Teorico.Geral.ProcessarAlertasAulasPresenciais</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="processamento-geral">
+            <h2>⏳ Processamento de Aulas Teóricas e 📹 Imagens de Sala</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-check-square"></i> Ativação de Tarefas de Processamento (Jobs)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Ativar conferência de capacidade de sala teórica?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o job de processamento para analisar a capacidade de sala teórica será executado.</td><td class="app-col">Teorico.Geral.CapacidadeDeSala</td></tr>
+                        <tr><td>Ativar conferência de carga horária teórica diária de candidato?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o job de processamento para analisar se a carga horária teórica individual do candidato excede o limite será executado.</td><td class="app-col">Teorico.Geral.LimiteDiarioAulasCandidato</td></tr>
+                        <tr><td>Ativar agrupamento de aulas teóricas em turmas no stream?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o job de agrupar aulas teóricas será executado.</td><td class="app-col">Teorico.Geral.AgruparAulasTeoricas</td></tr>
+                        <tr><td>Ativar análise de frequências de aulas teóricas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o job de análise de frequências de aulas teóricas será executado.</td><td class="app-col">Teorico.Geral.AgruparAulasTeoricas</td></tr>
+                        <tr><td>Ativar análise de validações aleatórias?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o job de análise de percentual mínimo de validações aleatórias será executado.</td><td class="app-col">Teorico.Geral.PercentualValidacoesAleatorias</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-user-check"></i> Validações Opcionais Configuráveis (Teorico.Geral.VincularFrequencias)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Configuração</th><th>Descrição</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>VALIDAR IMAGEM DA FREQUÊNCIA DO CANDIDATO</td><td class="value-col">Presencial, Virtual, Curso Especial</td><td>Verifica se o candidato foi convocado e fez a validação aleatória.</td></tr>
+                        <tr><td>VALIDAR FREQUÊNCIA ALEATÓRIA INSTRUTOR</td><td class="value-col">Presencial, Virtual, Curso Especial</td><td>Verifica se o instrutor foi convocado e fez a validação aleatória.</td></tr>
+                        <tr><td>VALIDAR IMAGEM DA FREQUÊNCIA DO CANDIDATO</td><td class="value-col">Presencial, Virtual, Curso Especial</td><td>Valida se existe imagem associada à frequência.</td></tr>
+                        <tr><td>VALIDAR IMAGEM DA FREQUÊNCIA DO INSTRUTOR</td><td class="value-col">Presencial, Virtual, Curso Especial</td><td>Valida se existe imagem associada à frequência.</td></tr>
+                        <tr><td>VALIDAR TEMPO DE CONECTIVIDADE DO CANDIDATO</td><td class="value-col">Presencial, Virtual, Curso Especial</td><td>Verifica tempo de conexão do candidato na aula virtual.</td></tr>
+                        <tr><td>VALIDAR PRESENÇA DE FREQUÊNCIA DO INSTRUTOR</td><td class="value-col">Presencial, Virtual, Curso Especial</td><td>Valida se existe frequência do instrutor.</td></tr>
+                        <tr><td>VALIDAR SE O PROCESSO DO CANDIDATO ESTÁ IMPORTADO E ATIVO</td><td class="value-col">Presencial, Virtual</td><td>Verifica se o processo está importado e ativo no Centro de formação da aula teórica.</td></tr>
+                        <tr><td>Verificar registro de biometria de candidato antes do instrutor?</td><td class="value-col">Presencial, Virtual, Curso Especial</td><td>Verifica se candidato validou antes do instrutor.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-video"></i> Processamento Imagens de Sala (Geral e DF)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" style="background-color:#0d1a2a; color:#17a2b8; font-weight:bold;">Processamento Geral</td></tr>
+                        <tr><td>Lotação Máxima da Sala</td><td class="value-col"><span class="value-type">Int</span></td><td>Gera alerta quando mais de 35 pessoas são detectadas nas imagens.</td><td class="app-col">Server Teorico.Geral.ImageProcessingVerify</td></tr>
+                        <tr><td>Alerta de Câmera Desligada</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Deve gerar alerta se o monitoramento de câmeras for desligado.</td><td class="app-col">Server Teorico.Geral.ImageProcessingVerify</td></tr>
+                        <tr><td>Tempo de espera para chegada de imagens do CSA</td><td class="value-col">Horas</td><td>Período máximo para recebimento de imagens do sistema CSA após o fim da aula.</td><td class="app-col">Server Teorico.Geral.AtualizarAlertasAulasPendentes</td></tr>
+                        <tr><td>Deve ser realizada média de faces encontradas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se a quantidade de faces encontradas será por média ou por maior valor.</td><td class="app-col">Teorico.Geral.ImageProcessingVerify</td></tr>
+                        <tr><td>Dispensar Quantidade mínima de fotos em aula teórica presencial</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Dispensa a quantidade mínima de fotos de sala por aula presencial.</td><td class="app-col">Teorico.Geral.ImageProcessingVerify, .</td></tr>
+
+                        <tr><td colspan="4" style="background-color:#0d1a2a; color:#17a2b8; font-weight:bold;">Distrito Federal (DF)</td></tr>
+                        <tr><td>Ativar verificação de discrepância entre faces informadas e encontradas?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se será verificada a discrepância entre faces informadas e encontradas.</td><td class="app-col">Teorico.DF.VerificarImagensSala</td></tr>
+                        <tr><td>Discrepância máxima entre faces informadas e faces encontradas</td><td class="value-col"><span class="value-type">int</span></td><td>Discrepância máxima entre as faces encontradas pelo BioPass e as faces informadas pela credenciada.</td><td class="app-col">Teorico.DF.VerificarImagensSala</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="super-aula-tolerancia">
+            <h2>💻 Super Aula e 🕒 Tolerâncias</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-tools"></i> Super Aula (Configurações Gerais)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Ativar visualização de diretor de ensino</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Ativa a visualização do diretor de ensino, permitindo o acompanhamento de monitoramento online pelo painel.</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>Número de tentativas de validação para permitir aula virtual</td><td class="value-col"><span class="value-type">int</span> (0-10)</td><td>Quantidade máxima de tentativas de validação na aula virtual. Após exceder, a validação deve ser registrada.</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>Permitir aluno ouvinte?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Permite que usuários do Perfil Aluno Ouvinte acessem o Monitoramento Online de Aulas Virtuais.</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>Porcentagem de minutos do aluno sem conectividade na aula virtual</td><td class="value-col"><span class="value-type">int</span> (0-100)%</td><td>Determina a porcentagem de conectividade mínima obrigatória na aula virtual.</td><td class="app-col">Exibição no painel, Jobs Envio aula virtual</td></tr>
+                        <tr><td>Exige cadastro biométrico para primeiro acesso?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se é obrigatório o cadastro biométrico. Se false, a primeira foto do candidato será cadastrada no registro do usuário.</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>Permite Aluno sair antes do fim da Aula Virtual</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o candidato pode sair da sala virtual antes do fim agendado.</td><td class="app-col">Super Aula</td>
+                        <tr><td>Permitir Candidato assistir aulas sem biometria de importação?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Permite que um candidato assista Aula Teórica Virtual sem informação biométrica proveniente do Detran (Foto de importação).</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>Habilitar auto-captura da face nas validações da Aula Virtual?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Habilita o uso da funcionalidade de captura automática no momento das validações e no login.</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>TEMPO (SEGUNDOS) DE ESPERA PELA AUTO-CAPTURA DA FACE NAS VALIDAÇÕES DA AULA VIRTUAL:</td><td class="value-col"><span class="value-type">int</span></td><td>Tempo em segundos que a captura automática fica ativa antes de ser substituída pela captura manual.</td><td class="app-col">Super Aula</td></tr>
+                        <tr><td>Permite entrada em aula virtual sem pagamento?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se candidatos podem acessar o Super Aula sem pagamento.</td><td class="app-col">Super Aula</td></tr>
+                        </tbody>
+                </table>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-door-open"></i> Tolerâncias de Entrada e Saída de Aula (Minutos)</div>
+                <div class="info-box success">
+                    <div class="info-title">Regra por Tipo de Aula</div>
+                    <div class="info-content">
+                        Define a tolerância (em minutos) permitida para a entrada e saída de alunos e instrutores antes e depois do horário agendado.
+                    </div>
+                </div>
+
+                <div class="doc-section-title"><i class="fas fa-building"></i> Aulas Teóricas Presenciais (Validador Biométrico)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Tolerância</th><th>Aluno (<span class="value-type">int</span> Minutos)</th><th>Instrutor (<span class="value-type">int</span> Minutos)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Antes início aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                        <tr><td>Depois início aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                        <tr><td>Antes fim aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                        <tr><td>Depois fim aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="doc-section-title"><i class="fas fa-video"></i> Aulas Teóricas Virtuais (Super Aula)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Tolerância</th><th>Aluno (<span class="value-type">int</span> Minutos)</th><th>Instrutor (<span class="value-type">int</span> Minutos)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Antes do início da aula</td><td class="value-col"><span class="value-type">int</span> (0-30)</td><td class="value-col"><span class="value-type">int</span> (0-30)</td></tr>
+                        <tr><td>Depois do início da aula</td><td class="value-col"><span class="value-type">int</span> (0-150)</td><td class="value-col"><span class="value-type">int</span> (0-150)</td></tr>
+                        <tr><td>Antes do fim da aula</td><td class="value-col"><span class="value-type">int</span> (0-30)</td><td class="value-col"><span class="value-type">int</span> (0-30)</td></tr>
+                        <tr><td>Depois do fim da aula</td><td class="value-col"><span class="value-type">int</span> (0-30)</td><td class="value-col"><span class="value-type">int</span> (0-30)</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="doc-section-title"><i class="fas fa-briefcase"></i> Curso Especializado (Validador Biométrico)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Tolerância</th><th>Aluno (<span class="value-type">int</span> Minutos)</th><th>Instrutor (<span class="value-type">int</span> Minutos)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Antes início aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                        <tr><td>Depois início aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                        <tr><td>Antes fim aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                        <tr><td>Depois fim aula</td><td class="value-col">int</td><td class="value-col">int</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="validacao-aleatoria">
+            <h2>🔀 Validação Aleatória e 👆🏻 Validador Biométrico</h2>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-location-arrow"></i> Validação Aleatória (Presencial)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Medida</th><th>Descrição</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Minutos após início da aula para validação aleatória</td><td class="value-col"><span class="value-type">int</span> Minutos</td><td>Tempo em minutos após início da aula para início da chamada de validação aleatória.</td></tr>
+                        <tr><td>Quantidade de alunos para efetuar a validação aleatória</td><td class="value-col"><span class="value-type">int</span> Porcentagem (0-100)</td><td>Porcentagem de alunos a realizar validação aleatória.</td></tr>
+                        <tr><td>Tempo limite para validação teórica</td><td class="value-col"><span class="value-type">int</span> Minutos</td><td>Tempo em minutos para realização da validação biométrica.</td></tr>
+                        <tr><td>Efetuar validação teórica aleatória durante a aula</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se a validação aleatória será feita durante a aula.</td></tr>
+                        <tr><td>Efetuar validação aleatória no intervalo da aula</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se a validação aleatória será feita durante o intervalo da aula.</td></tr>
+                        <tr><td>Convoca candidato de reposição para validação aleatória?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se os candidatos de reposição serão convocados.</td></tr>
+                        <tr><td>Pessoas para validação aleatória</td><td class="value-col">Candidatos, Instrutor, Ambos</td><td>Determina quem deverá ser convocado.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-tv"></i> Validação Aleatória (Virtual)</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Medida</th><th>Descrição</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Quantidade de validações aleatória dos alunos</td><td class="value-col"><span class="value-type">int</span></td><td>Determina a quantidade de chamadas para validação aleatória por aluno.</td></tr>
+                        <tr><td>Quantidade de alunos para efetuar a validação aleatória</td><td class="value-col"><span class="value-type">int</span> Porcentagem (0-100)</td><td>Porcentagem de alunos a realizar validação aleatória em aula teórica virtual.</td></tr>
+                        <tr><td>Tempo limite para validação aleatória em minutos aluno</td><td class="value-col"><span class="value-type">int</span> Minutos</td><td>Tempo para realização de validação aleatória por aluno.</td></tr>
+                        <tr><td>Quantidade de validações aleatórias do instrutor</td><td class="value-col"><span class="value-type">int</span></td><td>Determina quantas validações aleatórias um instrutor deve fazer.</td></tr>
+                        <tr><td>Tempo Limite para a validação aleatória em minutos instrutor</td><td class="value-col"><span class="value-type">int</span> Minutos</td><td>Tempo para realização de validação aleatória por instrutor.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="doc-section">
+                <div class="doc-section-title"><i class="fas fa-lock-open"></i> Configurações do Validador Biométrico</div>
+                <table class="param-table">
+                    <thead>
+                        <tr><th>Parâmetro</th><th>Valor/Tipo</th><th>Descrição</th><th>Aplicação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Limiar para validação por impressão digital</td><td class="value-col">EER, FAR_1000, FAR_10000, FAR_ZERO</td><td>Determina o limiar para validação por impressão digital.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Tipo validação teórica permitida</td><td class="value-col">Ambos, ImpressaoDigital, Face</td><td>Tipo de validação permitida no validador Biométrico.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Exige monitoramento por imagens para abrir aula no Validador Biométrico?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Configuração para exigir ou não o monitoramento das câmeras na abertura da aula.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Utilizar validações por digital e face?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Determina se o validador usa validações por Digital e face.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Não permite registrar biometria no validador fora da tolerância?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Não permite registrar validações de candidatos fora da tolerância.</td><td class="app-col">Validador Biométrico</td></tr>
+                        <tr><td>Utilizar validação de abertura/fechamento online?</td><td class="value-col"><span class="value-type">{{true/false}}</span></td><td>Utilizar validação de abertura e fechamento online.</td><td class="app-col">Validador Biométrico</td></tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="back-button-container">
+        <a href="menu.html" class="back-button"><i class="fas fa-arrow-left"></i> Voltar para o Menu</a>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to the clicked tab and its content
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Simulating the original login check for demonstration purposes
+        // In a real environment, you'd need the actual login system.
+        // For this static HTML, I will comment out the redirect logic but keep the DOMContentLoaded for the first tab activation.
+        
+        /*
+        // VERIFICAÇÃO DE LOGIN (Comentado para rodar o exemplo estático)
+        const AGENTE_LOGADO = localStorage.getItem('agenteLogado');
+        const IS_LOGGED_IN = localStorage.getItem('isLoggedIn');
+
+        if (AGENTE_LOGADO === null || IS_LOGGED_IN !== 'true') {
+            window.location.href = 'login.html'; // Redireciona
+        }
+        */
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ativa a primeira aba ao carregar
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+
+</html>
