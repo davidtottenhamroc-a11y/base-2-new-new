@@ -239,16 +239,6 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
             return res.status(400).send({ message: "Este item é apenas conteúdo de texto e não um arquivo para download." });
         }
         
-        // Em um sistema real com S3 ou Cloudinary:
-        // 1. Você buscaria a URL de download seguro aqui.
-        // 2. Você redirecionaria o usuário para essa URL:
-        //    return res.redirect(documento.urlDoArquivoSalvoNoS3);
-
-        // *** Como estamos em um ambiente serverless sem arquivo salvo: ***
-        
-        // Simula o download enviando um arquivo de texto simples
-        // com o nome original e o tipo MIME do arquivo que deveria ter sido salvo.
-        
         const fileContent = `
         --------------------------------------------------------
         SIMULAÇÃO DE DOWNLOAD
@@ -354,6 +344,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
