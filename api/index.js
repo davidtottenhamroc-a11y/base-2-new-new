@@ -76,7 +76,7 @@ const documentacaoSchema = new mongoose.Schema({
     nomeArquivo: { type: String }, // Nome original do arquivo (se for upload)
     mimeType: { type: String }, // Tipo MIME do arquivo (se for upload)
     agente: { type: String },
-    dataCadastro: { type: Date, default: Date.now }
+    dataCadastro: { type: Date, default: Date.now },
     downloadURL: { type: String }
 });
 
@@ -353,6 +353,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
