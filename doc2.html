@@ -132,6 +132,20 @@
         const MODAL_TITLE = document.getElementById('modal-title');
         const MODAL_VIEWER = document.getElementById('modal-content-viewer');
         const MODAL_DOWNLOAD_BTN = document.getElementById('modal-download-btn');
+        
+        // Variável global para armazenar a URL do Blob temporário
+        let blobUrl = null;
+
+        // Função auxiliar para converter Base64 para ArrayBuffer
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
 
         function showMessage(message, type = 'success') {
             MESSAGE_BOX.textContent = message;
@@ -148,13 +162,18 @@
         // --- Funções do Modal ---
         
         window.closeModal = function() {
+            // Revoga a URL do Blob para liberar memória (CRÍTICO)
+            if (blobUrl) {
+                URL.revokeObjectURL(blobUrl);
+                blobUrl = null;
+            }
             CONTENT_MODAL.classList.add('hidden');
             CONTENT_MODAL.classList.remove('flex');
-            MODAL_VIEWER.innerHTML = ''; // Limpa para economizar memória
+            MODAL_VIEWER.innerHTML = ''; 
         }
 
         window.viewDocument = async function(itemId) {
-            // Prepara o modal
+            // ... (Prepara o modal - Conteúdo mantido)
             MODAL_TITLE.innerText = 'Carregando...';
             MODAL_VIEWER.innerHTML = `
                 <div class="flex flex-col h-full items-center justify-center bg-dark-blue-bg space-y-4">
@@ -176,8 +195,6 @@
                 console.log("Dados recebidos para visualização:", item); 
 
                 MODAL_TITLE.innerText = item.titulo;
-                
-                // Configura o botão de download do modal para apontar para este arquivo
                 MODAL_DOWNLOAD_BTN.onclick = () => downloadFile(itemId);
                 
                 // Renderiza baseado no tipo
@@ -188,23 +205,25 @@
                             <pre class="whitespace-pre-wrap font-mono text-sm text-gray-200 bg-black/30 p-6 rounded-lg border border-gray-700 shadow-inner">${item.content || item.texto}</pre>
                         </div>
                     `;
-                } else if (item.content) {
-                    // --- CORREÇÃO DE DEBUGGING: Verifica se o conteúdo binário existe ---
-                    if (!item.content) {
-                        throw new Error("O servidor não retornou o conteúdo do arquivo (Base64 data is null).");
-                    }
-                    // Para PDF e HTML (usando data URL no iframe)
-                    const dataUrl = `data:${item.mimeType};base64,${item.content}`;
+                } else if (item.content && item.mimeType) {
+                    // --- LÓGICA DE BLOB PARA PDF/HTML (CORREÇÃO DE TELA BRANCA) ---
                     
-                    if (item.tipoConteudo === 'PDF') {
-                        // PDF precisa de um fundo claro para ser visível
-                        MODAL_VIEWER.innerHTML = `<iframe src="${dataUrl}" class="w-full h-full border-none bg-gray-200"></iframe>`;
-                    } else {
-                        // HTML ou outro arquivo binário que o navegador pode renderizar
-                        MODAL_VIEWER.innerHTML = `<iframe src="${dataUrl}" class="w-full h-full border-none bg-white"></iframe>`;
-                    }
+                    // 1. Converte Base64 para ArrayBuffer
+                    const arrayBuffer = base64ToArrayBuffer(item.content);
+                    
+                    // 2. Cria o Blob e a URL de Objeto (mais eficiente que Data URL)
+                    const blob = new Blob([arrayBuffer], { type: item.mimeType });
+                    blobUrl = URL.createObjectURL(blob); 
+                    
+                    // 3. Usa a URL do Blob no iframe
+                    MODAL_VIEWER.innerHTML = `
+                        <iframe src="${blobUrl}" 
+                                class="w-full h-full border-none 
+                                ${item.tipoConteudo === 'PDF' ? 'bg-gray-200' : 'bg-white'}">
+                        </iframe>`;
+
                 } else {
-                    throw new Error("Conteúdo vazio ou inválido.");
+                    throw new Error("O servidor não retornou dados de conteúdo válidos (Base64 data is null).");
                 }
 
             } catch (error) {
@@ -215,8 +234,7 @@
                         <i class="fas fa-exclamation-triangle text-5xl mb-4"></i>
                         <h3 class="text-xl font-bold">Não foi possível visualizar</h3>
                         <p class="mt-2 text-sm">${error.message}</p>
-                        <p class="text-sm text-gray-500 mt-4">Verifique se o seu servidor (backend) está retornando o campo 'content' no formato Base64 para este ID.</p>
-                        <p class="text-sm text-gray-500 mt-2">Tente usar o botão "Baixar Original" para confirmar a integridade do arquivo.</p>
+                        <p class="text-sm text-gray-500 mt-4">Tente usar o botão "Baixar Original" para confirmar a integridade do arquivo.</p>
                     </div>`;
             }
         }
