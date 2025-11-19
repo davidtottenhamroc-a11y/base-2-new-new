@@ -1,283 +1,339 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Novo Item | Base de Conhecimento</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'dark-blue-bg': '#0a192f', /* Mais escuro */
-                        'card-bg': '#112240', /* Cartão mais claro */
-                        'primary-blue': '#64ffda', /* Cor de destaque (neon/aqua) */
-                        'primary-dark': '#4c7cff', /* Azul original para hover */
-                        'input-bg': '#172a45', /* Cor de fundo do input */
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-        }
-        #content-textarea {
-            min-height: 250px; /* Um pouco menor, mais adequado */
-            resize: vertical;
-        }
-        /* Efeito de brilho/neon para o botão */
-        .neon-shadow {
-            box-shadow: 0 0 5px rgba(100, 255, 218, 0.5), 0 0 10px rgba(100, 255, 218, 0.3);
-            transition: all 0.3s ease;
-        }
-        .neon-shadow:hover {
-            box-shadow: 0 0 10px rgba(100, 255, 218, 0.7), 0 0 20px rgba(100, 255, 218, 0.5);
-        }
-        /* Estilização específica para o input de arquivo */
-        #file-upload::file-selector-button {
-            background-color: #64ffda; /* Cor de destaque */
-            color: #0a192f;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        #file-upload::file-selector-button:hover {
-            background-color: #4cffc7;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Novo Item | Base de Conhecimento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-blue-bg': '#0a192f', /* Mais escuro */
+                        'card-bg': '#112240', /* Cartão mais claro */
+                        'primary-blue': '#64ffda', /* Cor de destaque (neon/aqua) */
+                        'primary-dark': '#4c7cff', /* Azul original para hover */
+                        'input-bg': '#172a45', /* Cor de fundo do input */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        #content-textarea {
+            min-height: 250px; 
+            resize: vertical;
+        }
+        .neon-shadow {
+            box-shadow: 0 0 5px rgba(100, 255, 218, 0.5), 0 0 10px rgba(100, 255, 218, 0.3);
+            transition: all 0.3s ease;
+        }
+        .neon-shadow:hover {
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.7), 0 0 20px rgba(100, 255, 218, 0.5);
+        }
+        #file-upload::file-selector-button {
+            background-color: #64ffda; 
+            color: #0a192f;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #file-upload::file-selector-button:hover {
+            background-color: #4cffc7;
+        }
+    </style>
 </head>
 
 <body class="bg-dark-blue-bg text-gray-300 flex items-center justify-center p-4 md:p-8">
 
-    <div class="w-full max-w-4xl bg-card-bg shadow-2xl p-6 md:p-10 rounded-xl space-y-8 border border-primary-blue/20">
-        
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-primary-blue/50 pb-4">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-white flex items-center mb-4 sm:mb-0">
-                <i class="fas fa-plus-circle text-primary-blue mr-3"></i> 
-                Cadastro de Novo Item
-            </h1>
-            <a href="doc2.html" class="py-2 px-4 text-primary-blue border border-primary-blue hover:bg-primary-blue/10 font-semibold rounded-lg transition duration-300 flex items-center">
-                <i class="fas fa-list-ul mr-2"></i>
-                Ver Lista de Itens
-            </a>
-        </header>
+    <div class="w-full max-w-4xl bg-card-bg shadow-2xl p-6 md:p-10 rounded-xl space-y-8 border border-primary-blue/20">
+        
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-primary-blue/50 pb-4">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white flex items-center mb-4 sm:mb-0">
+                <i class="fas fa-plus-circle text-primary-blue mr-3"></i> 
+                Cadastro de Novo Item
+            </h1>
+            <a href="lista.html" class="py-2 px-4 text-primary-blue border border-primary-blue hover:bg-primary-blue/10 font-semibold rounded-lg transition duration-300 flex items-center">
+                <i class="fas fa-list-ul mr-2"></i>
+                Ver Lista de Itens
+            </a>
+        </header>
 
-        <form id="knowledgeForm" class="space-y-6">
+        <form id="knowledgeForm" class="space-y-6">
 
-            <div>
-                <label for="titulo" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
-                    <i class="fas fa-file-signature mr-2"></i>Título do Artigo/Arquivo:
-                </label>
-                <input type="text" id="titulo" name="titulo" required
-                        class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 placeholder-gray-500 text-white">
-            </div>
+            <!-- Título do Arquivo/Artigo -->
+            <div>
+                <label for="titulo" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
+                    <i class="fas fa-file-signature mr-2"></i>Título do Artigo/Arquivo:
+                </label>
+                <input type="text" id="titulo" name="titulo" required
+                        class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 placeholder-gray-500 text-white">
+            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Seleção de Estado -->
+                <div>
+                    <label for="estado" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
+                        <i class="fas fa-globe-americas mr-2"></i>Estado de Origem:
+                    </label>
+                    <select id="estado" name="estado" required
+                             class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 text-white custom-select appearance-none">
+                        <option value="" class="bg-input-bg">-- Selecione o Estado --</option>
+                        <option value="RN" class="bg-input-bg">RN</option>
+                        <option value="SE" class="bg-input-bg">SE</option>
+                        <option value="MS" class="bg-input-bg">MS</option>
+                        <option value="DF" class="bg-input-bg">DF</option>
+                        <option value="PE" class="bg-input-bg">PE</option>
+                        <option value="PB" class="bg-input-bg">PB</option>
+                        <option value="BA" class="bg-input-bg">BA</option>
+                        <option value="MG" class="bg-input-bg">MG</option>
+                        <option value="GO" class="bg-input-bg">GO</option>
+                        <option value="MA" class="bg-input-bg">MA</option>
+                        <option value="AL" class="bg-input-bg">AL</option>
+                        <option value="EXAME CE" class="bg-input-bg">EXAME CE</option>
+                        <option value="EXAME MA" class="bg-input-bg">EXAME MA</option>
+                        <option value="EXAME PB" class="bg-input-bg">EXAME PB</option>
+                        <option value="EXAME PE" class="bg-input-bg">EXAME PE</option>
+                        <option value="EXAME DF" class="bg-input-bg">EXAME DF</option>
+                    </select>
+                </div>
+                
+                <!-- Seleção de Subpasta (NOVO) -->
                 <div>
-                    <label for="estado" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
-                        <i class="fas fa-globe-americas mr-2"></i>Estado de Origem:
-                    </label>
-                    <select id="estado" name="estado" required
-                             class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 text-white custom-select appearance-none">
-                        <option value="" class="bg-input-bg">-- Selecione o Estado --</option>
-                        <option value="RN" class="bg-input-bg">RN</option>
-                        <option value="SE" class="bg-input-bg">SE</option>
-                        <option value="MS" class="bg-input-bg">MS</option>
-                        <option value="DF" class="bg-input-bg">DF</option>
-                        <option value="PE" class="bg-input-bg">PE</option>
-                        <option value="PB" class="bg-input-bg">PB</option>
-                        <option value="BA" class="bg-input-bg">BA</option>
-                        <option value="MG" class="bg-input-bg">MG</option>
-                        <option value="GO" class="bg-input-bg">GO</option>
-                        <option value="MA" class="bg-input-bg">MA</option>
-                        <option value="AL" class="bg-input-bg">AL</option>
-                        <option value="EXAME CE" class="bg-input-bg">EXAME CE</option>
-                        <option value="EXAME MA" class="bg-input-bg">EXAME MA</option>
-                        <option value="EXAME PB" class="bg-input-bg">EXAME PB</option>
-                        <option value="EXAME PE" class="bg-input-bg">EXAME PE</option>
-                        <option value="EXAME DF" class="bg-input-bg">EXAME DF</option>
-                    </select>
-                </div>
+                    <label for="subpasta" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
+                        <i class="fas fa-folder mr-2"></i>Subpasta de Organização:
+                    </label>
+                    <select id="subpasta" name="subpasta" required onchange="checkCustomSubfolder()"
+                             class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 text-white custom-select appearance-none">
+                        <option value="" class="bg-input-bg">-- Selecione ou Adicione --</option>
+                        <option value="Query" class="bg-input-bg">Query</option>
+                        <option value="Documentacao Operacional" class="bg-input-bg">Documentação Operacional</option>
+                        <option value="FAQ" class="bg-input-bg">FAQ</option>
+                        <option value="custom" class="bg-input-bg">Outro / Adicionar Novo...</option>
+                    </select>
+                </div>
 
-                <div>
-                    <label for="content-type" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
-                        <i class="fas fa-cogs mr-2"></i>Tipo de Conteúdo:
-                    </label>
-                    <select id="content-type" name="tipoConteudo" required onchange="toggleContentInput()"
-                             class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 text-white custom-select appearance-none">
-                        <option value="TEXTO" class="bg-input-bg">Texto (Estilo Word)</option>
-                        <option value="PDF" class="bg-input-bg">Arquivo PDF</option>
-                        <option value="HTML" class="bg-input-bg">Arquivo HTML</option>
-                    </select>
-                </div>
-            </div>
 
-            <div id="content-area" class="border p-4 rounded-lg border-gray-600/30">
-                <p class="text-sm text-gray-500 mb-4 font-bold">Entrada de Dados:</p>
+                <!-- Tipo de Conteúdo (Seleção) -->
+                <div>
+                    <label for="content-type" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
+                        <i class="fas fa-cogs mr-2"></i>Tipo de Conteúdo:
+                    </label>
+                    <select id="content-type" name="tipoConteudo" required onchange="toggleContentInput()"
+                             class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 text-white custom-select appearance-none">
+                        <option value="TEXTO" class="bg-input-bg">Texto (Para Download .txt)</option>
+                        <option value="PDF" class="bg-input-bg">Arquivo PDF</option>
+                        <option value="HTML" class="bg-input-bg">Arquivo HTML</option>
+                    </select>
+                </div>
+            </div>
 
-                <div id="text-input-wrapper">
-                    <label for="content-textarea" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
-                        <i class="fas fa-pencil-alt mr-2"></i>Conteúdo do Artigo (Estilo Word):
-                    </label>
-                    <textarea id="content-textarea" name="texto"
-                              class="w-full p-4 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 placeholder-gray-500 text-white"></textarea>
-                </div>
+            <!-- Input Personalizado da Subpasta (NOVO) -->
+            <div id="custom-subfolder-wrapper" class="hidden">
+                <label for="custom-subfolder" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
+                    <i class="fas fa-edit mr-2"></i>Nome da Nova Subpasta:
+                </label>
+                <input type="text" id="custom-subfolder" placeholder="Ex: Procedimentos de Backup"
+                        class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 placeholder-gray-500 text-white">
+            </div>
 
-                <div id="file-input-wrapper" class="hidden">
-                    <label for="file-upload" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
-                        <i class="fas fa-upload mr-2"></i>Selecione o Arquivo (PDF ou HTML):
-                    </label>
-                    <input type="file" id="file-upload" name="file" accept=".pdf,.html"
-                           class="w-full text-sm text-gray-400 p-2 rounded-lg bg-input-bg transition duration-200">
-                    <p class="mt-2 text-xs text-primary-blue/80 font-medium">
-                        <i class="fas fa-exclamation-triangle mr-1"></i> O arquivo será enviado para a pasta 'uploads/' do seu servidor Node.js.
-                    </p>
-                </div>
-            </div>
+
+            <!-- Área de Entrada de Conteúdo (Alternável) -->
+            <div id="content-area" class="border p-4 rounded-lg border-gray-600/30">
+                <p class="text-sm text-gray-500 mb-4 font-bold">Entrada de Dados:</p>
+
+                <!-- 1. Textarea (Visível por padrão) -->
+                <div id="text-input-wrapper">
+                    <label for="content-textarea" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-pencil-alt mr-2"></i>Conteúdo do Artigo (Será salvo como arquivo .txt):
+                    </label>
+                    <textarea id="content-textarea" name="texto"
+                              class="w-full p-4 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 placeholder-gray-500 text-white"></textarea>
+                </div>
+
+                <!-- 2. File Input (Escondido por padrão) -->
+                <div id="file-input-wrapper" class="hidden">
+                    <label for="file-upload" class="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                        <i class="fas fa-upload mr-2"></i>Selecione o Arquivo (PDF ou HTML):
+                    </label>
+                    <input type="file" id="file-upload" name="file" accept=".pdf,.html"
+                           class="w-full text-sm text-gray-400 p-2 rounded-lg bg-input-bg transition duration-200">
+                    <p class="mt-2 text-xs text-primary-blue/80 font-medium">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> O arquivo será salvo diretamente no MongoDB (limite de 16MB).
+                    </p>
+                </div>
+            </div>
+            
+            <div id="messageBox" class="p-3 text-center rounded-lg hidden font-semibold text-sm border-2" role="alert"></div>
+
+            <button type="submit" id="submitButton"
+                    class="w-full py-4 bg-primary-blue/90 text-dark-blue-bg font-extrabold rounded-lg transition duration-300 neon-shadow hover:bg-primary-blue">
+                <i class="fas fa-save mr-2"></i> Salvar Item de Conhecimento
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const API_ENDPOINT = '/api/documentacao';
+        const MESSAGE_BOX = document.getElementById('messageBox');
+        const SUBMIT_BUTTON = document.getElementById('submitButton');
+        const FORM = document.getElementById('knowledgeForm');
+        const CUSTOM_SUBFOLDER_WRAPPER = document.getElementById('custom-subfolder-wrapper');
+        const CUSTOM_SUBFOLDER_INPUT = document.getElementById('custom-subfolder');
+
+        // Função para mostrar/esconder o input de subpasta personalizada
+        function checkCustomSubfolder() {
+            const subpastaSelect = document.getElementById('subpasta').value;
+            if (subpastaSelect === 'custom') {
+                CUSTOM_SUBFOLDER_WRAPPER.classList.remove('hidden');
+                CUSTOM_SUBFOLDER_INPUT.setAttribute('required', 'required');
+            } else {
+                CUSTOM_SUBFOLDER_WRAPPER.classList.add('hidden');
+                CUSTOM_SUBFOLDER_INPUT.removeAttribute('required');
+                CUSTOM_SUBFOLDER_INPUT.value = ''; // Limpa o valor se sair
+            }
+        }
+        window.checkCustomSubfolder = checkCustomSubfolder; // Torna acessível no HTML
+
+        // Função para alternar entre textarea e file input
+        function toggleContentInput() {
+            const contentType = document.getElementById('content-type').value;
+            const textWrapper = document.getElementById('text-input-wrapper');
+            const fileWrapper = document.getElementById('file-input-wrapper');
+            const textArea = document.getElementById('content-textarea');
+            const fileInput = document.getElementById('file-upload');
+
+            if (contentType === 'TEXTO') {
+                textWrapper.classList.remove('hidden');
+                fileWrapper.classList.add('hidden');
+                textArea.setAttribute('required', 'required');
+                fileInput.removeAttribute('required');
+                fileInput.value = ''; 
+            } else {
+                textWrapper.classList.add('hidden');
+                fileWrapper.classList.remove('hidden');
+                textArea.removeAttribute('required');
+                textArea.value = ''; 
+                fileInput.setAttribute('required', 'required');
+            }
+        }
+
+        // Função para exibir mensagens na caixa de feedback
+        function showMessage(message, type = 'success') {
+            MESSAGE_BOX.textContent = message;
+            MESSAGE_BOX.classList.remove('hidden', 'bg-red-500/10', 'bg-green-500/10', 'text-red-400', 'text-primary-blue', 'border-red-500', 'border-primary-blue');
+            
+            if (type === 'success') {
+                MESSAGE_BOX.classList.add('bg-primary-blue/10', 'text-primary-blue', 'border', 'border-primary-blue');
+            } else if (type === 'error') {
+                MESSAGE_BOX.classList.add('bg-red-500/10', 'text-red-400', 'border', 'border-red-500');
+            }
+        }
+
+        // Lógica de submissão do formulário
+        FORM.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            SUBMIT_BUTTON.disabled = true;
+            SUBMIT_BUTTON.textContent = 'Salvando...';
+            SUBMIT_BUTTON.classList.add('opacity-70', 'cursor-not-allowed');
+            MESSAGE_BOX.classList.add('hidden');
+
+            const tipoConteudo = document.getElementById('content-type').value;
             
-            <div id="messageBox" class="p-3 text-center rounded-lg hidden font-semibold text-sm border-2" role="alert"></div>
-
-            <button type="submit" id="submitButton"
-                    class="w-full py-4 bg-primary-blue/90 text-dark-blue-bg font-extrabold rounded-lg transition duration-300 neon-shadow hover:bg-primary-blue">
-                <i class="fas fa-save mr-2"></i> Salvar Item de Conhecimento
-            </button>
-        </form>
-    </div>
-
-<script>
-    const API_ENDPOINT = '/api/documentacao';
-    const MESSAGE_BOX = document.getElementById('messageBox');
-    const SUBMIT_BUTTON = document.getElementById('submitButton');
-    const FORM = document.getElementById('knowledgeForm');
-
-    // Função para alternar entre textarea e file input (MANTIDA IGUAL)
-    function toggleContentInput() {
-        const contentType = document.getElementById('content-type').value;
-        const textWrapper = document.getElementById('text-input-wrapper');
-        const fileWrapper = document.getElementById('file-input-wrapper');
-        const textArea = document.getElementById('content-textarea');
-        const fileInput = document.getElementById('file-upload');
-
-        if (contentType === 'TEXTO') {
-            textWrapper.classList.remove('hidden');
-            fileWrapper.classList.add('hidden');
-            textArea.setAttribute('required', 'required');
-            fileInput.removeAttribute('required');
-            fileInput.value = ''; 
-        } else {
-            textWrapper.classList.add('hidden');
-            fileWrapper.classList.remove('hidden');
-            textArea.removeAttribute('required');
-            textArea.value = ''; 
-            fileInput.setAttribute('required', 'required');
-        }
-    }
-
-    // Função para exibir mensagens na caixa de feedback (MANTIDA IGUAL)
-    function showMessage(message, type = 'success') {
-        MESSAGE_BOX.textContent = message;
-        MESSAGE_BOX.classList.remove('hidden', 'bg-red-500/10', 'bg-green-500/10', 'text-red-400', 'text-primary-blue', 'border-red-500', 'border-primary-blue');
-        
-        if (type === 'success') {
-            MESSAGE_BOX.classList.add('bg-primary-blue/10', 'text-primary-blue', 'border-primary-blue');
-        } else if (type === 'error') {
-            MESSAGE_BOX.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500');
-        }
-    }
-
-    // Lógica de submissão do formulário
-    FORM.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        SUBMIT_BUTTON.disabled = true;
-        SUBMIT_BUTTON.textContent = 'Salvando...';
-        SUBMIT_BUTTON.classList.add('opacity-70', 'cursor-not-allowed');
-        MESSAGE_BOX.classList.add('hidden');
-
-        const tipoConteudo = document.getElementById('content-type').value;
-
-        let bodyContent;
-        let headers = {};
-
-        if (tipoConteudo === 'TEXTO') {
-            // Para TEXTO, enviamos JSON
-            bodyContent = JSON.stringify({
-                titulo: FORM.titulo.value,
-                estado: FORM.estado.value,
-                tipoConteudo: tipoConteudo,
-                texto: FORM.texto.value,
-                agente: 'Sistema Web (Cadastro)', 
-            });
-            headers['Content-Type'] = 'application/json';
-        } else {
-            // === BLOCO CORRIGIDO PARA UPLOAD DE ARQUIVO (PDF/HTML) ===
-            const formData = new FormData();
-            const fileInput = document.getElementById('file-upload');
-
-            // 1. ANEXAR CAMPOS DE TEXTO (NECESSÁRIOS PARA VALIDAÇÃO DO BACKEND)
-            formData.append('titulo', FORM.titulo.value);
-            formData.append('estado', FORM.estado.value);
-            formData.append('tipoConteudo', tipoConteudo);
-            formData.append('agente', 'Sistema Web (Cadastro)');
-
-            // 2. ANEXAR O ARQUIVO (usando o nome 'file' que o Multer espera)
-            if (fileInput.files.length > 0) {
-                // Anexa o primeiro arquivo selecionado, usando 'file' como nome do campo
-                formData.append('file', fileInput.files[0]);
-            } else {
-                 // Esta verificação deve ser redundante se o 'required' do input funcionar,
-                 // mas é uma boa prática de segurança.
-                 showMessage('Selecione um arquivo PDF ou HTML.', 'error');
-                 SUBMIT_BUTTON.disabled = false;
-                 SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
-                 SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
-                 return; 
+            // Determina o valor final da subpasta
+            let finalSubpasta = document.getElementById('subpasta').value;
+            if (finalSubpasta === 'custom') {
+                finalSubpasta = CUSTOM_SUBFOLDER_INPUT.value.trim();
+                if (!finalSubpasta) {
+                    showMessage('O nome da nova subpasta é obrigatório.', 'error');
+                    SUBMIT_BUTTON.disabled = false;
+                    SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
+                    SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
+                    return;
+                }
             }
 
-            bodyContent = formData;
-            // Headers ficam vazios, o navegador cuida de Content-Type: multipart/form-data
-        }
 
-        try {
-            const response = await fetch(API_ENDPOINT, {
-                method: 'POST',
-                headers: headers,
-                body: bodyContent
-            });
+            let bodyContent;
+            let headers = {};
 
-            if (response.ok) {
-                const data = await response.json();
-                showMessage(`Item salvo com sucesso! ID: ${data._id}`, 'success');
-                FORM.reset(); // Limpa o formulário
-                toggleContentInput(); // Reseta a exibição para TEXTO
-            } else {
-                const errorData = await response.json();
-                showMessage(`Erro ao salvar: ${errorData.message || response.statusText}`, 'error');
-            }
-        } catch (error) {
-            console.error('Erro de rede:', error);
-            showMessage('Erro de conexão com o servidor. Verifique se o backend está rodando.', 'error');
-        } finally {
-            SUBMIT_BUTTON.disabled = false;
-            SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
-            SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
-        }
-    });
+            if (tipoConteudo === 'TEXTO') {
+                // Para TEXTO, enviamos JSON
+                bodyContent = JSON.stringify({
+                    titulo: FORM.titulo.value,
+                    estado: FORM.estado.value,
+                    subpasta: finalSubpasta, // <-- ADICIONADO SUBPASTA
+                    tipoConteudo: tipoConteudo,
+                    texto: FORM.texto.value,
+                    agente: 'Sistema Web (Cadastro)', 
+                });
+                headers['Content-Type'] = 'application/json';
+            } else {
+                // PARA ARQUIVO (PDF/HTML), usamos FormData
+                const formData = new FormData();
+                const fileInput = document.getElementById('file-upload');
 
-    // Inicializa o estado do formulário
-    window.onload = toggleContentInput;
+                // 1. ANEXAR CAMPOS DE TEXTO
+                formData.append('titulo', FORM.titulo.value);
+                formData.append('estado', FORM.estado.value);
+                formData.append('subpasta', finalSubpasta); // <-- ADICIONADO SUBPASTA
+                formData.append('tipoConteudo', tipoConteudo);
+                formData.append('agente', 'Sistema Web (Cadastro)');
+                
+                // 2. ANEXAR O ARQUIVO
+                if (fileInput.files.length > 0) {
+                    formData.append('file', fileInput.files[0]);
+                }
 
-</script>
+                bodyContent = formData;
+            }
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: headers,
+                    body: bodyContent
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage(`Item salvo com sucesso! ID: ${data._id}`, 'success');
+                    FORM.reset(); // Limpa o formulário
+                    toggleContentInput(); // Reseta a exibição para TEXTO
+                    checkCustomSubfolder(); // Reseta o input customizado
+                } else {
+                    const errorData = await response.json();
+                    showMessage(`Erro ao salvar: ${errorData.message || response.statusText}`, 'error');
+                }
+            } catch (error) {
+                console.error('Erro de rede:', error);
+                showMessage('Erro de conexão com o servidor. Verifique se o backend está rodando.', 'error');
+            } finally {
+                SUBMIT_BUTTON.disabled = false;
+                SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
+                SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        });
+
+        // Inicializa o estado do formulário
+        window.onload = () => {
+            toggleContentInput();
+            checkCustomSubfolder();
+        };
+
+    </script>
 </body>
 </html>
