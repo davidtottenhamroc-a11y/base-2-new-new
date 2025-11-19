@@ -225,7 +225,58 @@ app.delete('/api/incidentes/:id', async (req, res) => {
 // ----------------------------------------------------
 // --- ROTAS PARA DOCUMENTAÇÃO (documentacao) ---
 // ----------------------------------------------------
+app.get('/api/documentacao/download/:id', async (req, res) => {
+    try {
+        const docId = req.params.id;
+        const documento = await Documentacao.findById(docId);
 
+        if (!documento) {
+            return res.status(404).send({ message: "Documento não encontrado." });
+        }
+
+        // Verifica se o item é um arquivo e não apenas texto
+        if (documento.tipoConteudo === 'TEXTO') {
+            return res.status(400).send({ message: "Este item é apenas conteúdo de texto e não um arquivo para download." });
+        }
+        
+        // Em um sistema real com S3 ou Cloudinary:
+        // 1. Você buscaria a URL de download seguro aqui.
+        // 2. Você redirecionaria o usuário para essa URL:
+        //    return res.redirect(documento.urlDoArquivoSalvoNoS3);
+
+        // *** Como estamos em um ambiente serverless sem arquivo salvo: ***
+        
+        // Simula o download enviando um arquivo de texto simples
+        // com o nome original e o tipo MIME do arquivo que deveria ter sido salvo.
+        
+        const fileContent = `
+        --------------------------------------------------------
+        SIMULAÇÃO DE DOWNLOAD
+        --------------------------------------------------------
+        O arquivo original "${documento.nomeArquivo}" (Tipo: ${documento.mimeType}) 
+        foi recebido e seus metadados foram salvos no MongoDB.
+        
+        AVISO: O conteúdo binário do arquivo não foi armazenado no servidor Vercel. 
+        Para downloads reais, o servidor precisaria recuperar este arquivo 
+        de um serviço de armazenamento externo (como AWS S3, Cloudinary, etc.) 
+        antes de enviá-lo de volta ao usuário.
+        --------------------------------------------------------
+        Título: ${documento.titulo}
+        Estado: ${documento.estado}
+        ID: ${documento._id}
+        `;
+        
+        // Define os headers para simular o download
+        res.setHeader('Content-disposition', `attachment; filename="DOWNLOAD_SIMULADO_${documento.nomeArquivo || 'documento.txt'}"`);
+        res.setHeader('Content-type', 'text/plain');
+
+        res.send(fileContent);
+
+    } catch (error) {
+        console.error('Erro ao processar download:', error);
+        res.status(500).send({ message: "Erro interno do servidor ao tentar o download.", error: error.message });
+    }
+});
 // POST: Cadastro de Novo Documento (usa 'upload.single('file')' para lidar com uploads)
 app.post('/api/documentacao', upload.single('file'), async (req, res) => {
     try {
@@ -303,6 +354,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
