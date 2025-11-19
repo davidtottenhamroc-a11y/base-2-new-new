@@ -66,7 +66,7 @@
                 <button onclick="loadKnowledgeItems()" class="py-2 px-4 text-sm border border-gray-500 hover:bg-gray-700 text-gray-300 font-semibold rounded-lg transition duration-300">
                     <i class="fas fa-sync-alt mr-2"></i> Atualizar
                 </button>
-                <a href="menudoc.html" class="py-2 px-4 bg-primary-blue hover:bg-emerald-400 text-dark-blue-bg font-bold rounded-lg transition duration-300 flex items-center shadow-lg shadow-primary-blue/20">
+                <a href="cadastro.html" class="py-2 px-4 bg-primary-blue hover:bg-emerald-400 text-dark-blue-bg font-bold rounded-lg transition duration-300 flex items-center shadow-lg shadow-primary-blue/20">
                     <i class="fas fa-plus-circle mr-2"></i> Novo Item
                 </a>
             </div>
@@ -236,8 +236,25 @@
                 }
             }
         }
+        
+        // Função auxiliar para agrupar por dois níveis (Estado e Subpasta)
+        function groupItems(items) {
+            return items.reduce((acc, item) => {
+                const state = item.estado || 'Geral';
+                const subpasta = item.subpasta || 'Não Classificado';
+                
+                if (!acc[state]) {
+                    acc[state] = {};
+                }
+                if (!acc[state][subpasta]) {
+                    acc[state][subpasta] = [];
+                }
+                acc[state][subpasta].push(item);
+                return acc;
+            }, {});
+        }
 
-        // --- Carregamento e Agrupamento ---
+        // --- Carregamento e Renderização Principal ---
 
         async function loadKnowledgeItems() {
             ITEMS_LIST_CONTAINER.innerHTML = `
@@ -261,18 +278,15 @@
 
                 ITEMS_LIST_CONTAINER.innerHTML = ''; 
 
-                // 1. Agrupar por ESTADO
-                const byState = items.reduce((acc, item) => {
-                    const st = item.estado || 'Geral';
-                    if (!acc[st]) acc[st] = [];
-                    acc[st].push(item);
-                    return acc;
-                }, {});
-
+                // 1. Agrupamento em dois níveis
+                const groupedItems = groupItems(items);
+                
                 // Ordenar Estados
-                Object.keys(byState).sort().forEach(state => {
+                Object.keys(groupedItems).sort().forEach(state => {
                     const stateId = `state-${state.replace(/\s+/g, '-')}`;
-                    const stateItems = byState[state];
+                    const subfolders = groupedItems[state];
+                    const totalStateItems = Object.values(subfolders).flat().length;
+
 
                     // Container do Estado
                     const stateDiv = document.createElement('div');
@@ -288,7 +302,7 @@
                                 <span class="font-bold text-lg text-white">${state}</span>
                             </div>
                             <span class="bg-primary-blue/10 text-primary-blue text-xs font-bold px-2 py-1 rounded-full border border-primary-blue/20">
-                                ${stateItems.length} docs
+                                ${totalStateItems} docs
                             </span>
                         </button>
                     `;
@@ -298,18 +312,10 @@
                     stateContent.id = `content-${stateId}`;
                     stateContent.className = "hidden bg-[#0f172a] p-2 space-y-2 border-t border-gray-700";
 
-                    // 2. Agrupar por SUBPASTA dentro do Estado
-                    const bySubfolder = stateItems.reduce((acc, item) => {
-                        const sub = item.subpasta || 'Geral';
-                        if (!acc[sub]) acc[sub] = [];
-                        acc[sub].push(item);
-                        return acc;
-                    }, {});
-
-                    // Ordenar e Criar Subpastas
-                    Object.keys(bySubfolder).sort().forEach(sub => {
+                    // 2. Renderizar Subpastas
+                    Object.keys(subfolders).sort().forEach(sub => {
                         const subId = `${stateId}-${sub.replace(/\s+/g, '-')}`;
-                        const subItems = bySubfolder[sub];
+                        const subItems = subfolders[sub];
 
                         const subDiv = document.createElement('div');
                         subDiv.className = "bg-card-bg rounded border border-gray-700/50 folder-closed";
@@ -392,4 +398,3 @@
     </script>
 </body>
 </html>
-
