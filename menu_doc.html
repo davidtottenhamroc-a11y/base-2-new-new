@@ -155,114 +155,129 @@
         </form>
     </div>
 
-    <script>
-        const API_ENDPOINT = '/api/documentacao';
-        const MESSAGE_BOX = document.getElementById('messageBox');
-        const SUBMIT_BUTTON = document.getElementById('submitButton');
-        const FORM = document.getElementById('knowledgeForm');
+<script>
+    const API_ENDPOINT = '/api/documentacao';
+    const MESSAGE_BOX = document.getElementById('messageBox');
+    const SUBMIT_BUTTON = document.getElementById('submitButton');
+    const FORM = document.getElementById('knowledgeForm');
 
-        // Função para alternar entre textarea e file input
-        function toggleContentInput() {
-            const contentType = document.getElementById('content-type').value;
-            const textWrapper = document.getElementById('text-input-wrapper');
-            const fileWrapper = document.getElementById('file-input-wrapper');
-            const textArea = document.getElementById('content-textarea');
+    // Função para alternar entre textarea e file input (MANTIDA IGUAL)
+    function toggleContentInput() {
+        const contentType = document.getElementById('content-type').value;
+        const textWrapper = document.getElementById('text-input-wrapper');
+        const fileWrapper = document.getElementById('file-input-wrapper');
+        const textArea = document.getElementById('content-textarea');
+        const fileInput = document.getElementById('file-upload');
+
+        if (contentType === 'TEXTO') {
+            textWrapper.classList.remove('hidden');
+            fileWrapper.classList.add('hidden');
+            textArea.setAttribute('required', 'required');
+            fileInput.removeAttribute('required');
+            fileInput.value = ''; 
+        } else {
+            textWrapper.classList.add('hidden');
+            fileWrapper.classList.remove('hidden');
+            textArea.removeAttribute('required');
+            textArea.value = ''; 
+            fileInput.setAttribute('required', 'required');
+        }
+    }
+
+    // Função para exibir mensagens na caixa de feedback (MANTIDA IGUAL)
+    function showMessage(message, type = 'success') {
+        MESSAGE_BOX.textContent = message;
+        MESSAGE_BOX.classList.remove('hidden', 'bg-red-500/10', 'bg-green-500/10', 'text-red-400', 'text-primary-blue', 'border-red-500', 'border-primary-blue');
+        
+        if (type === 'success') {
+            MESSAGE_BOX.classList.add('bg-primary-blue/10', 'text-primary-blue', 'border-primary-blue');
+        } else if (type === 'error') {
+            MESSAGE_BOX.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500');
+        }
+    }
+
+    // Lógica de submissão do formulário
+    FORM.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        SUBMIT_BUTTON.disabled = true;
+        SUBMIT_BUTTON.textContent = 'Salvando...';
+        SUBMIT_BUTTON.classList.add('opacity-70', 'cursor-not-allowed');
+        MESSAGE_BOX.classList.add('hidden');
+
+        const tipoConteudo = document.getElementById('content-type').value;
+
+        let bodyContent;
+        let headers = {};
+
+        if (tipoConteudo === 'TEXTO') {
+            // Para TEXTO, enviamos JSON
+            bodyContent = JSON.stringify({
+                titulo: FORM.titulo.value,
+                estado: FORM.estado.value,
+                tipoConteudo: tipoConteudo,
+                texto: FORM.texto.value,
+                agente: 'Sistema Web (Cadastro)', 
+            });
+            headers['Content-Type'] = 'application/json';
+        } else {
+            // === BLOCO CORRIGIDO PARA UPLOAD DE ARQUIVO (PDF/HTML) ===
+            const formData = new FormData();
             const fileInput = document.getElementById('file-upload');
 
-            if (contentType === 'TEXTO') {
-                textWrapper.classList.remove('hidden');
-                fileWrapper.classList.add('hidden');
-                textArea.setAttribute('required', 'required');
-                fileInput.removeAttribute('required');
-                fileInput.value = ''; // Limpa a seleção de arquivo
+            // 1. ANEXAR CAMPOS DE TEXTO (NECESSÁRIOS PARA VALIDAÇÃO DO BACKEND)
+            formData.append('titulo', FORM.titulo.value);
+            formData.append('estado', FORM.estado.value);
+            formData.append('tipoConteudo', tipoConteudo);
+            formData.append('agente', 'Sistema Web (Cadastro)');
+
+            // 2. ANEXAR O ARQUIVO (usando o nome 'file' que o Multer espera)
+            if (fileInput.files.length > 0) {
+                // Anexa o primeiro arquivo selecionado, usando 'file' como nome do campo
+                formData.append('file', fileInput.files[0]);
             } else {
-                textWrapper.classList.add('hidden');
-                fileWrapper.classList.remove('hidden');
-                textArea.removeAttribute('required');
-                textArea.value = ''; // Limpa o conteúdo do texto
-                fileInput.setAttribute('required', 'required');
+                 // Esta verificação deve ser redundante se o 'required' do input funcionar,
+                 // mas é uma boa prática de segurança.
+                 showMessage('Selecione um arquivo PDF ou HTML.', 'error');
+                 SUBMIT_BUTTON.disabled = false;
+                 SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
+                 SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
+                 return; 
             }
+
+            bodyContent = formData;
+            // Headers ficam vazios, o navegador cuida de Content-Type: multipart/form-data
         }
 
-        // Função para exibir mensagens na caixa de feedback
-        function showMessage(message, type = 'success') {
-            MESSAGE_BOX.textContent = message;
-            // Limpa todas as classes de estado
-            MESSAGE_BOX.classList.remove('hidden', 'bg-red-500/10', 'bg-green-500/10', 'text-red-400', 'text-primary-blue', 'border-red-500', 'border-primary-blue');
-            
-            if (type === 'success') {
-                MESSAGE_BOX.classList.add('bg-primary-blue/10', 'text-primary-blue', 'border-primary-blue');
-            } else if (type === 'error') {
-                MESSAGE_BOX.classList.add('bg-red-500/10', 'text-red-400', 'border-red-500');
-            }
-        }
+        try {
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: headers,
+                body: bodyContent
+            });
 
-        // Lógica de submissão do formulário
-        FORM.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            SUBMIT_BUTTON.disabled = true;
-            SUBMIT_BUTTON.textContent = 'Salvando...';
-            SUBMIT_BUTTON.classList.add('opacity-70', 'cursor-not-allowed');
-            MESSAGE_BOX.classList.add('hidden');
-
-            const tipoConteudo = document.getElementById('content-type').value;
-
-            let bodyContent;
-            let headers = {};
-
-            if (tipoConteudo === 'TEXTO') {
-                // Para TEXTO, enviamos JSON
-                bodyContent = JSON.stringify({
-                    titulo: FORM.titulo.value,
-                    estado: FORM.estado.value,
-                    tipoConteudo: tipoConteudo,
-                    texto: FORM.texto.value,
-                    agente: 'Sistema Web (Cadastro)', 
-                });
-                headers['Content-Type'] = 'application/json';
+            if (response.ok) {
+                const data = await response.json();
+                showMessage(`Item salvo com sucesso! ID: ${data._id}`, 'success');
+                FORM.reset(); // Limpa o formulário
+                toggleContentInput(); // Reseta a exibição para TEXTO
             } else {
-                // Para Arquivo (PDF/HTML), usamos FormData
-                const formData = new FormData(FORM);
-                // Adiciona os campos de metadados ao FormData
-                formData.append('agente', 'Sistema Web (Cadastro)');
-                formData.append('titulo', FORM.titulo.value);
-                formData.append('estado', FORM.estado.value);
-                formData.append('tipoConteudo', tipoConteudo);
-                
-                // CRÍTICO: Não defina o header 'Content-Type' para FormData em FormData, o navegador faz isso automaticamente
-                bodyContent = formData;
+                const errorData = await response.json();
+                showMessage(`Erro ao salvar: ${errorData.message || response.statusText}`, 'error');
             }
+        } catch (error) {
+            console.error('Erro de rede:', error);
+            showMessage('Erro de conexão com o servidor. Verifique se o backend está rodando.', 'error');
+        } finally {
+            SUBMIT_BUTTON.disabled = false;
+            SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
+            SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    });
 
-            try {
-                const response = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    headers: headers,
-                    body: bodyContent
-                });
+    // Inicializa o estado do formulário
+    window.onload = toggleContentInput;
 
-                if (response.ok) {
-                    const data = await response.json();
-                    showMessage(`Item salvo com sucesso! ID: ${data._id}`, 'success');
-                    FORM.reset(); // Limpa o formulário
-                    toggleContentInput(); // Reseta a exibição para TEXTO
-                } else {
-                    const errorData = await response.json();
-                    showMessage(`Erro ao salvar: ${errorData.message || response.statusText}`, 'error');
-                }
-            } catch (error) {
-                console.error('Erro de rede:', error);
-                showMessage('Erro de conexão com o servidor. Verifique se o backend está rodando.', 'error');
-            } finally {
-                SUBMIT_BUTTON.disabled = false;
-                SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
-                SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
-        });
-
-        // Inicializa o estado do formulário
-        window.onload = toggleContentInput;
-
-    </script>
+</script>
 </body>
 </html>
