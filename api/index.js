@@ -280,6 +280,7 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
     try {
         const { titulo, estado, tipoConteudo, texto, agente } = req.body;
 
+        // 1. Validação de Campos Essenciais
         if (!titulo || !estado || !tipoConteudo) {
             return res.status(400).send({ message: "Título, Estado e Tipo de Conteúdo são obrigatórios." });
         }
@@ -288,34 +289,44 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
             titulo,
             estado,
             tipoConteudo,
-            agente: agente || 'Sistema Web (Cadastro)'
+            agente: agente || 'Sistema Web (Cadastro)',
         };
 
         if (tipoConteudo === 'TEXTO') {
+            // Se for TEXTO, salva o conteúdo no campo 'texto'
             dataToSave.texto = texto;
         } else if (tipoConteudo === 'PDF' || tipoConteudo === 'HTML') {
-          if (!req.file) {
-          return res.status(400).send({ message: "Arquivo obrigatório para o tipo de conteúdo selecionado." });
-        }
+            
+            // 2. Validação de Arquivo
+            if (!req.file) {
+                return res.status(400).send({ message: "Arquivo obrigatório para o tipo de conteúdo selecionado." });
+            }
 
-         // ARMAZENANDO O BUFFER DO ARQUIVO NO MONGO:
-         dataToSave.nomeArquivo = req.file.originalname;
-         dataToSave.mimeType = req.file.mimetype;
-         dataToSave.texto = `Arquivo: ${req.file.originalname}. Conteúdo armazenado no MongoDB.`;
-         dataToSave.fileData = req.file.buffer; // <--- SALVA O CONTEÚDO BINÁRIO AQUI!
-         dataToSave.fileSize = req.file.size; // <--- SALVA O TAMANHO
+            // 3. Salvando o Buffer Binário e Metadados
+            dataToSave.nomeArquivo = req.file.originalname;
+            dataToSave.mimeType = req.file.mimetype;
+            dataToSave.texto = `Arquivo: ${req.file.originalname}. Conteúdo binário armazenado no MongoDB.`;
+            dataToSave.fileData = req.file.buffer; // <--- SALVA O CONTEÚDO BINÁRIO
+            dataToSave.fileSize = req.file.size;   // <--- SALVA O TAMANHO
         }
 
         const novoDocumento = new Documentacao(dataToSave);
         await novoDocumento.save();
 
+        // Remove o buffer da resposta para evitar sobrecarga de rede
+        novoDocumento.fileData = undefined; 
+
         res.status(201).send({ message: "Documento salvo com sucesso.", _id: novoDocumento._id, ...novoDocumento.toObject() });
 
     } catch (error) {
         console.error('Erro ao salvar documento:', error);
+        // Erro 16MB do MongoDB: Se o arquivo for muito grande, o Mongo falha aqui.
+        if (error.code === 10334 || error.name === 'MongoError' && error.message.includes('Document size')) {
+             return res.status(400).send({ message: "Erro: O arquivo é muito grande. O limite é de 16MB (ou menos, dependendo do documento).", error: error.message });
+        }
         res.status(400).send({ message: "Erro ao salvar documento.", error: error.message });
     }
-};
+});
 
 // GET: Buscar Todos os Documentos
 app.get('/api/documentacao', async (req, res) => {
@@ -326,7 +337,7 @@ app.get('/api/documentacao', async (req, res) => {
         console.error('Erro ao buscar documentos:', error);
         res.status(500).send({ message: "Erro ao buscar documentos.", error: error.message });
     }
-});
+})};
 
 // --- ROTAS PARA MEMÓRIA DO CHATBOT ---
 app.post('/api/memories', async (req, res) => {
@@ -354,6 +365,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
