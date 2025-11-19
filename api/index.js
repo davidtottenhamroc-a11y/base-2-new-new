@@ -9,6 +9,20 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB
 });
+const documentacaoSchema = new mongoose.Schema({
+    titulo: { type: String, required: true },
+    estado: { type: String, required: true },
+    tipoConteudo: { type: String, enum: ['TEXTO', 'PDF', 'HTML'], required: true },
+    texto: { type: String }, 
+    nomeArquivo: { type: String },
+    mimeType: { type: String },
+    agente: { type: String },
+    dataCadastro: { type: Date, default: Date.now },
+    
+    // CAMPOS NOVOS PARA ARMAZENAR O ARQUIVO BINÁRIO:
+    fileData: { type: Buffer }, // Armazena o conteúdo binário real do arquivo
+    fileSize: { type: Number }  // Tamanho do arquivo
+});
 // Configurações
 app.use(cors()); 
 app.use(express.json());
@@ -226,50 +240,35 @@ app.delete('/api/incidentes/:id', async (req, res) => {
 // ----------------------------------------------------
 // --- ROTAS PARA DOCUMENTAÇÃO (documentacao) ---
 // ----------------------------------------------------
+// app.js (GET /api/documentacao/download/:id) - ROTA FINAL
+
 app.get('/api/documentacao/download/:id', async (req, res) => {
     try {
         const docId = req.params.id;
-        const documento = await Documentacao.findById(docId);
+        // Selecionamos o documento E o conteúdo binário (fileData)
+        const documento = await Documentacao.findById(docId).select('+fileData'); 
 
         if (!documento) {
             return res.status(404).send({ message: "Documento não encontrado." });
         }
-
         
-    
-        if (documento.downloadURL) {
-
-            console.log(`Redirecionando download para: ${documento.downloadURL}`);
-            return res.redirect(documento.downloadURL);
-            
-        } else {
-    
-            if (documento.tipoConteudo === 'TEXTO') {
-                return res.status(400).send({ message: "Este item é apenas conteúdo de texto e não um arquivo para download." });
-            }
-
-            const fileContent = `
-            -----------------------------------------------------------------
-            SIMULAÇÃO DE DOWNLOAD (FALHA NO ARMAZENAMENTO REAL)
-            -----------------------------------------------------------------
-            O arquivo original "${documento.nomeArquivo}" não foi encontrado em um 
-            serviço de armazenamento externo (Cloudinary/S3).
-            
-            Solução: O campo 'downloadURL' deve ser preenchido durante o upload POST.
-            -----------------------------------------------------------------
-            Título: ${documento.titulo}
-            Estado: ${documento.estado}
-            ID: ${documento._id}
-            `;
-            
-            // Define o nome do arquivo com extensão .txt para evitar erro de PDF
-            const safeTitle = documento.titulo.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
-            const fileName = `SIMULACAO_FALHA_${safeTitle}_${documento._id}.txt`;
-
-            res.setHeader('Content-disposition', `attachment; filename="${fileName}"`);
-            res.setHeader('Content-type', 'text/plain');
-            return res.send(fileContent);
+        if (!documento.fileData || documento.tipoConteudo === 'TEXTO') {
+            return res.status(400).send({ message: "Este item não possui um arquivo binário anexado para download." });
         }
+
+        // 🛑 ENVIO DO ARQUIVO BINÁRIO DIRETO DO MONGO 🛑
+        
+        // 1. Define o cabeçalho Content-Disposition para forçar o download com o nome original
+        res.setHeader('Content-disposition', `attachment; filename="${documento.nomeArquivo}"`);
+        
+        // 2. Define o tipo de conteúdo (MIME Type) para o navegador saber o que é
+        res.setHeader('Content-type', documento.mimeType);
+        
+        // 3. Define o tamanho do arquivo
+        res.setHeader('Content-Length', documento.fileSize);
+        
+        // 4. Envia o buffer (dados binários)
+        res.send(documento.fileData);
 
     } catch (error) {
         console.error('Erro ao processar download:', error);
@@ -295,14 +294,16 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
         if (tipoConteudo === 'TEXTO') {
             dataToSave.texto = texto;
         } else if (tipoConteudo === 'PDF' || tipoConteudo === 'HTML') {
-            if (!req.file) {
-                return res.status(400).send({ message: "Arquivo obrigatório para o tipo de conteúdo selecionado." });
-            }
+          if (!req.file) {
+          return res.status(400).send({ message: "Arquivo obrigatório para o tipo de conteúdo selecionado." });
+        }
 
-            // Salva apenas metadados do arquivo
-            dataToSave.nomeArquivo = req.file.originalname;
-            dataToSave.mimeType = req.file.mimetype;
-            dataToSave.texto = `Arquivo: ${req.file.originalname}. Metadados salvos.`;
+         // ARMAZENANDO O BUFFER DO ARQUIVO NO MONGO:
+         dataToSave.nomeArquivo = req.file.originalname;
+         dataToSave.mimeType = req.file.mimetype;
+         dataToSave.texto = `Arquivo: ${req.file.originalname}. Conteúdo armazenado no MongoDB.`;
+         dataToSave.fileData = req.file.buffer; // <--- SALVA O CONTEÚDO BINÁRIO AQUI!
+         dataToSave.fileSize = req.file.size; // <--- SALVA O TAMANHO
         }
 
         const novoDocumento = new Documentacao(dataToSave);
@@ -314,7 +315,7 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
         console.error('Erro ao salvar documento:', error);
         res.status(400).send({ message: "Erro ao salvar documento.", error: error.message });
     }
-});
+};
 
 // GET: Buscar Todos os Documentos
 app.get('/api/documentacao', async (req, res) => {
@@ -353,6 +354,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
