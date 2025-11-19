@@ -239,7 +239,26 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
         };
 
         if (tipoConteudo === 'TEXTO') {
+            // =========================================================
+            // === ALTERAÇÃO: CONVERTER TEXTO EM BUFFER PARA DOWNLOAD ===
+            // =========================================================
+            if (!texto) {
+                 return res.status(400).send({ message: "O conteúdo do texto é obrigatório." });
+            }
             dataToSave.texto = texto;
+            
+            // Cria um Buffer a partir da string de texto
+            const textBuffer = Buffer.from(texto, 'utf8');
+            
+            dataToSave.fileData = textBuffer; 
+            dataToSave.fileSize = textBuffer.length;
+            
+            // Define o nome e MIME type para que o download funcione como um arquivo .txt
+            const safeTitle = titulo.substring(0, 50).replace(/[^a-zA-Z0-9\s]/g, '_').trim();
+            dataToSave.nomeArquivo = `${safeTitle || 'documento_texto'}.txt`; 
+            dataToSave.mimeType = 'text/plain'; 
+            // =========================================================
+
         } else if (tipoConteudo === 'PDF' || tipoConteudo === 'HTML') {
             
             // 2. Validação de Arquivo
@@ -285,8 +304,10 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
             return res.status(404).send({ message: "Documento não encontrado." });
         }
         
-        // Valida se o documento tem o conteúdo binário anexado
-        if (!documento.fileData || documento.tipoConteudo === 'TEXTO') {
+        // =========================================================
+        // === ALTERAÇÃO: AGORA PERMITE O DOWNLOAD DE TEXTO/BUFFER ===
+        // =========================================================
+        if (!documento.fileData) { // Apenas checa se o Buffer existe
             return res.status(400).send({ message: "Este item não possui um arquivo binário anexado para download." });
         }
 
@@ -318,7 +339,7 @@ app.get('/api/documentacao', async (req, res) => {
 });
 
 
-// --- ROTAS PARA MEMÓRIA DO CHATBOT ---
+// --- Rotas de Aulas, Incidentes e Memories (sem alterações) ---
 app.post('/api/memories', async (req, res) => {
     try {
         const novaMemoria = new Memory(req.body);
@@ -337,6 +358,58 @@ app.get('/api/memories', async (req, res) => {
         res.status(500).send(error);
     }
 });
+
+app.post('/api/aulas', async (req, res) => {
+    try {
+        const novaAula = new Aula(req.body);
+        await novaAula.save();
+        res.status(201).send(novaAula);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+});
+
+app.get('/api/aulas', async (req, res) => {
+    try {
+        const aulas = await Aula.find({});
+        res.send(aulas);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+app.post('/api/incidentes', async (req, res) => {
+    try {
+        const novoIncidente = new Incidente(req.body);
+        await novoIncidente.save();
+        res.status(201).send(novoIncidente);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+});
+
+app.get('/api/incidentes', async (req, res) => {
+    try {
+        const incidentes = await Incidente.find({});
+        res.send(incidentes);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+app.delete('/api/incidentes/:id', async (req, res) => {
+    try {
+        const incidente = await Incidente.findByIdAndDelete(req.params.id);
+        if (!incidente) return res.status(404).send('Incidente não encontrado');
+        res.send(incidente);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+// ----------------------------------------------------
+// --- FIM DAS ROTAS ---
+// ----------------------------------------------------
+
 
 // Inicia o servidor
 app.listen(PORT, () => {
