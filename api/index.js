@@ -61,6 +61,17 @@ const memorySchema = new mongoose.Schema({
     estado: String,
     imagemUrl: String
 });
+// NOVO SCHEMA PARA CADASTRO DE DOCUMENTAÇÃO
+const documentacaoSchema = new mongoose.Schema({
+    titulo: { type: String, required: true },
+    estado: { type: String, required: true },
+    tipoConteudo: { type: String, enum: ['TEXTO', 'PDF', 'HTML'], required: true }, // TEXTO, PDF, HTML
+    texto: { type: String }, // Conteúdo de texto OU metadados do arquivo
+    nomeArquivo: { type: String }, // Nome original do arquivo (se for upload)
+    mimeType: { type: String }, // Tipo MIME do arquivo (se for upload)
+    agente: { type: String },
+    dataCadastro: { type: Date, default: Date.now }
+});
 
 // ------------------------------------
 // --- Modelos Mongoose ---
@@ -286,4 +297,5 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
