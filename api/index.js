@@ -225,11 +225,12 @@ app.delete('/api/incidentes/:id', async (req, res) => {
 // POST: Cadastro de Novo Documento (Salvando o Buffer no Mongo)
 app.post('/api/documentacao', upload.single('file'), async (req, res) => {
     try {
-        const { titulo, estado, tipoConteudo, texto, agente } = req.body;
+        // 1. EXTRAÇÃO: 'subpasta' é adicionada à desestruturação
+        const { titulo, estado, tipoConteudo, texto, agente, subpasta } = req.body;
 
-        // 1. Validação de Campos Essenciais
-        if (!titulo || !estado || !tipoConteudo) {
-            return res.status(400).send({ message: "Título, Estado e Tipo de Conteúdo são obrigatórios." });
+        // 2. VALIDAÇÃO: Verifica Título, Estado, Tipo de Conteúdo e Subpasta
+        if (!titulo || !estado || !tipoConteudo || !subpasta) {
+            return res.status(400).send({ message: "Título, Estado, Tipo de Conteúdo e Subpasta são obrigatórios." });
         }
 
         let dataToSave = {
@@ -237,54 +238,53 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
             estado,
             tipoConteudo,
             agente: agente || 'Sistema Web (Cadastro)',
+            subpasta, // <--- CAMPO NOVO SALVO AQUI
         };
 
         if (tipoConteudo === 'TEXTO') {
-            // =========================================================
-            // === ALTERAÇÃO: CONVERTER TEXTO EM BUFFER PARA DOWNLOAD ===
-            // =========================================================
+            
             if (!texto) {
                  return res.status(400).send({ message: "O conteúdo do texto é obrigatório." });
             }
             dataToSave.texto = texto;
             
-            // Cria um Buffer a partir da string de texto
+            // Cria Buffer a partir do texto
             const textBuffer = Buffer.from(texto, 'utf8');
             
             dataToSave.fileData = textBuffer; 
             dataToSave.fileSize = textBuffer.length;
             
-            // Define o nome e MIME type para que o download funcione como um arquivo .txt
+            // Define nome e MIME type para que o download funcione como .txt
             const safeTitle = titulo.substring(0, 50).replace(/[^a-zA-Z0-9\s]/g, '_').trim();
             dataToSave.nomeArquivo = `${safeTitle || 'documento_texto'}.txt`; 
             dataToSave.mimeType = 'text/plain'; 
-            // =========================================================
 
         } else if (tipoConteudo === 'PDF' || tipoConteudo === 'HTML') {
             
-            // 2. Validação de Arquivo
+            // Se for upload de arquivo
             if (!req.file) {
                 return res.status(400).send({ message: "Arquivo obrigatório para o tipo de conteúdo selecionado." });
             }
 
-            // 3. Salvando o Buffer Binário e Metadados
+            // Salvando o Buffer Binário e Metadados do arquivo
             dataToSave.nomeArquivo = req.file.originalname;
             dataToSave.mimeType = req.file.mimetype;
             dataToSave.texto = `Arquivo: ${req.file.originalname}. Conteúdo binário armazenado no MongoDB.`;
-            dataToSave.fileData = req.file.buffer; // <--- SALVA O CONTEÚDO BINÁRIO
-            dataToSave.fileSize = req.file.size;   // <--- SALVA O TAMANHO
+            dataToSave.fileData = req.file.buffer; 
+            dataToSave.fileSize = req.file.size;   
         }
 
         const novoDocumento = new Documentacao(dataToSave);
         await novoDocumento.save();
 
-        // Exclui o buffer da resposta para evitar sobrecarga de rede
+        // Remove o buffer da resposta para evitar sobrecarga de rede
         novoDocumento.fileData = undefined; 
 
         res.status(201).send({ message: "Documento salvo com sucesso.", _id: novoDocumento._id, ...novoDocumento.toObject() });
 
     } catch (error) {
         console.error('Erro ao salvar documento:', error);
+        // Trata erro de limite de tamanho do documento MongoDB (16MB)
         if (error.code === 10334 || error.name === 'MongoError' && error.message.includes('Document size')) {
              return res.status(400).send({ message: "Erro: O arquivo é muito grande. O limite de documento do MongoDB é 16MB.", error: error.message });
         }
@@ -330,9 +330,14 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
 // GET: Buscar Todos os Documentos (Excluindo o Buffer)
 app.get('/api/documentacao', async (req, res) => {
     try {
-        // Excluímos o fileData nas buscas de listagem para otimizar a rede
-        const documentos = await Documentacao.find({}).select('-fileData').sort({ dataCadastro: -1 });
+        // Buscamos o documento, excluindo explicitamente o campo 'fileData' 
+        // para não sobrecarregar a rede e a memória do servidor/cliente.
+        const documentos = await Documentacao.find({})
+            .select('-fileData') 
+            .sort({ dataCadastro: -1 });
+            
         res.send(documentos);
+        
     } catch (error) {
         console.error('Erro ao buscar documentos:', error);
         res.status(500).send({ message: "Erro ao buscar documentos.", error: error.message });
@@ -418,4 +423,5 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
