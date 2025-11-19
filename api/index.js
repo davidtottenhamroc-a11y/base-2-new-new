@@ -77,6 +77,7 @@ const documentacaoSchema = new mongoose.Schema({
     mimeType: { type: String }, // Tipo MIME do arquivo (se for upload)
     agente: { type: String },
     dataCadastro: { type: Date, default: Date.now }
+    downloadURL: { type: String }
 });
 
 // ------------------------------------
@@ -234,36 +235,41 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
             return res.status(404).send({ message: "Documento não encontrado." });
         }
 
-        // Verifica se o item é um arquivo e não apenas texto
-        if (documento.tipoConteudo === 'TEXTO') {
-            return res.status(400).send({ message: "Este item é apenas conteúdo de texto e não um arquivo para download." });
+        
+    
+        if (documento.downloadURL) {
+
+            console.log(`Redirecionando download para: ${documento.downloadURL}`);
+            return res.redirect(documento.downloadURL);
+            
+        } else {
+    
+            if (documento.tipoConteudo === 'TEXTO') {
+                return res.status(400).send({ message: "Este item é apenas conteúdo de texto e não um arquivo para download." });
+            }
+
+            const fileContent = `
+            -----------------------------------------------------------------
+            SIMULAÇÃO DE DOWNLOAD (FALHA NO ARMAZENAMENTO REAL)
+            -----------------------------------------------------------------
+            O arquivo original "${documento.nomeArquivo}" não foi encontrado em um 
+            serviço de armazenamento externo (Cloudinary/S3).
+            
+            Solução: O campo 'downloadURL' deve ser preenchido durante o upload POST.
+            -----------------------------------------------------------------
+            Título: ${documento.titulo}
+            Estado: ${documento.estado}
+            ID: ${documento._id}
+            `;
+            
+            // Define o nome do arquivo com extensão .txt para evitar erro de PDF
+            const safeTitle = documento.titulo.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+            const fileName = `SIMULACAO_FALHA_${safeTitle}_${documento._id}.txt`;
+
+            res.setHeader('Content-disposition', `attachment; filename="${fileName}"`);
+            res.setHeader('Content-type', 'text/plain');
+            return res.send(fileContent);
         }
-        
-        const fileContent = `
-        --------------------------------------------------------
-        SIMULAÇÃO DE DOWNLOAD
-        --------------------------------------------------------
-        O arquivo original "${documento.nomeArquivo}" (Tipo: ${documento.mimeType}) 
-        foi recebido e seus metadados foram salvos no MongoDB.
-        
-        AVISO: O conteúdo binário do arquivo não foi armazenado no servidor Vercel. 
-        Para downloads reais, o servidor precisaria recuperar este arquivo 
-        de um serviço de armazenamento externo (como AWS S3, Cloudinary, etc.) 
-        antes de enviá-lo de volta ao usuário.
-        --------------------------------------------------------
-        Título: ${documento.titulo}
-        Estado: ${documento.estado}
-        ID: ${documento._id}
-        `;
-        
-        // Define os headers para simular o download
-        const fileName = `DOWNLOAD_SIMULADO_${documento.titulo.replace(/\s/g, '_')}_${documento._id}.txt`;
-
-        // Define os headers para simular o download de um arquivo de texto
-        res.setHeader('Content-disposition', `attachment; filename="${fileName}"`);
-        res.setHeader('Content-type', 'text/plain');
-
-        res.send(fileContent);
 
     } catch (error) {
         console.error('Erro ao processar download:', error);
@@ -347,6 +353,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
