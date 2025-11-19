@@ -71,14 +71,15 @@ const memorySchema = new mongoose.Schema({
 const documentacaoSchema = new mongoose.Schema({
     titulo: { type: String, required: true },
     estado: { type: String, required: true },
+    subpasta: { type: String, required: true }, // <--- CAMPO ADICIONADO
     tipoConteudo: { type: String, enum: ['TEXTO', 'PDF', 'HTML'], required: true }, 
     texto: { type: String }, // Conteúdo de texto OU metadados do arquivo
     nomeArquivo: { type: String }, // Nome original do arquivo (se for upload)
     mimeType: { type: String }, // Tipo MIME do arquivo (se for upload)
     
     // ARMAZENAMENTO DO ARQUIVO BINÁRIO (BUFFER)
-    fileData: { type: Buffer, select: false }, // ARMAZENADO, MAS EXCLUÍDO POR PADRÃO NAS BUSCAS
-    fileSize: { type: Number },   // Tamanho do arquivo
+    fileData: { type: Buffer, select: false }, 
+    fileSize: { type: Number },   
     
     agente: { type: String },
     dataCadastro: { type: Date, default: Date.now }
@@ -417,3 +418,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
