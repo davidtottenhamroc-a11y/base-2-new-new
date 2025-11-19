@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exame Teórico - Documentação de Suporte N2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            /* AZUL ESCURO FOSCO (MATTE DARK BLUE) */
+            background: #2c3e50;
+            min-height: 100vh;
+            padding: 20px;
+            color: #ecf0f1; /* Cor do texto claro para o fundo escuro */
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #34495e; /* Fundo do container ligeiramente mais claro */
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Sombra mais evidente */
+            overflow: hidden;
+        }
+        header {
+            background: #0056b3; /* Azul primário mais escuro */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .tabs {
+            display: flex;
+            background: #2c3e50; /* Fundo das abas escuro */
+            border-bottom: 1px solid #4a637d;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            color: #ecf0f1;
+        }
+        .tab:hover {
+            background: #3b506b; /* Escurecer no hover */
+        }
+        .tab.active {
+            border-bottom: 3px solid #007bff; /* Linha de destaque azul */
+            background: #34495e; /* Fundo do container para aba ativa */
+            color: #007bff;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            color: #ecf0f1; /* Cor do texto do conteúdo da aba */
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* --- Caixas de Informação (Info Boxes) --- */
+        .info-box {
+            background: #5e6f80; /* Fundo neutro mais escuro */
+            border-left: 4px solid #f39c12; /* Amarelo Laranja */
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .info-box.procedure {
+            background: #476a59; /* Verde escuro sutil */
+            border-left: 4px solid #2ecc71; /* Verde */
+        }
+        .info-box.error {
+            background: #734c51; /* Vermelho escuro sutil */
+            border-left: 4px solid #e74c3c; /* Vermelho */
+        }
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-content {
+            line-height: 1.6;
+        }
+        .info-content p {
+            margin-bottom: 10px;
+        }
+        .doc-section {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #4a637d;
+        }
+        .doc-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .doc-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #ecf0f1;
+            font-size: 22px;
+            border-bottom: 2px solid #007bff;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .doc-subtitle {
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #007bff;
+            font-size: 18px;
+        }
+        .code-block {
+            background: #1f2a38; /* Fundo de código bem escuro */
+            color: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        ul, ol {
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        /* --- FAQ - Estilo para a lista de perguntas, sem expansão inline --- */
+        .faq-item {
+            margin-bottom: 15px;
+            border-left: 3px solid #95a5a6;
+            padding-left: 15px;
+        }
+        .faq-question {
+            font-weight: bold;
+            color: #ecf0f1;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #3b506b; /* Fundo mais escuro para a pergunta */
+            padding: 12px; /* Aumentado o padding */
+            border-radius: 5px; /* Bordas arredondadas */
+            transition: background 0.2s;
+        }
+        .faq-question:hover {
+            background: #007bff; /* Azul primário no hover (IMPACTO) */
+            color: white;
+        }
+        /* Oculta as respostas originais para usar o modal */
+        .faq-answer {
+            display: none !important;
+        }
+        /* --- Tags de Estado --- */
+        .state-tag {
+            display: inline-block;
+            background: #f39c12; /* Laranja */
+            color: #1f2a38;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 5px;
+        }
+        /* --- Notas --- */
+        .note {
+            background: #3a5079; /* Azul escuro mais contrastante */
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-style: italic;
+        }
+        /* --- MODAL (POP-UP) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #34495e; /* Fundo do modal igual ao container */
+            color: #ecf0f1;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-width: 700px;
+            width: 90%;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-out;
+            border-top: 5px solid #2ecc71; /* Borda impactante */
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-header {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #f39c12; /* Cor impactante para o título */
+            font-size: 20px;
+        }
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .modal-footer {
+            padding-top: 15px;
+            text-align: right;
+        }
+        .modal-close-btn {
+            background: #e74c3c; /* Botão de fechamento impactante (vermelho) */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .modal-close-btn:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .modal-content {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <i class="fas fa-file-alt fa-2x"></i>
+            <h1>Exame Teórico - Documentação de Suporte N2</h1>
+            <p class="description">Guia para procedimentos e consultas de Nível 2 nos sistemas: Exame Teórico, Postman, MongoDB e Dashboard.</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="erros-importacao"><i class="fas fa-exclamation-triangle"></i> Erros de Importação</div>
+            <div class="tab" data-tab="pagamento-prova"><i class="fas fa-money-check-alt"></i> Pagamento e Geração de Prova</div>
+            <div class="tab" data-tab="biometria-camera"><i class="fas fa-fingerprint"></i> Biometria e Câmera</div>
+            <div class="tab" data-tab="envio-prova"><i class="fas fa-upload"></i> Envio e Resultado da Prova</div>
+            <div class="tab" data-tab="agendamento"><i class="fas fa-calendar-alt"></i> Consulta de Agendamento</div>
+            <div class="tab" data-tab="capturador"><i class="fas fa-camera-retro"></i> Capturador de Ambiente</div>
+            <div class="tab" data-tab="faq"><i class="fas fa-question-circle"></i> FAQ - Perguntas Frequentes</div>
+        </div>
+
+        <div class="tab-content active" id="erros-importacao">
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-exclamation-triangle"></i> Exame Não Importado (PB)</div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> ERRO:</div>
+                    <div class="info-content">
+                        <p><strong>PB:</strong> Exame não importado no Gestor Exame. Motivo: Agendamento sem CPF do examinador preenchido.</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO:</div>
+                    <div class="info-content">
+                        <ol>
+                            <li><strong>Opção 1 (Dashboard):</strong> Consultar no Dashboard > **Erros na importação**.
+                            </li>
+                            <li><strong>Opção 2 (Postman):</strong>
+                                <ul>
+                                    <li>Acessar: <code>Detran > PB > Buscar Agendamentos</code>.</li>
+                                    <li>Preencher: <code>Data</code> + <code>tipo exame: 5</code>.</li>
+                                    <li>Fazer uma pesquisa na lupa por <strong>11 zeros (<code>00000000000</code>)</strong>, pois quando não há examinador, o CPF é lido como zerado.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="pagamento-prova">
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-money-check-alt"></i> Boleto Pago, Prova Não Atualizada</div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> ERRO: Boleto Pago, Prova Não Gerada (Pilotar -> Gestor Exame)</div>
+                    <div class="info-content">
+                        <p>Boleto do exame está "Pago" na conta Pilotar, mas não foi atualizado no Gestor Exame.</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (Prova Não Gerada):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>Consultar no <strong>MongoDB</strong> se a prova foi gerada.</li>
+                            <li>Em caso negativo:
+                                <ul>
+                                    <li>Ir no Dashboard do Exame > **Exames futuros não pagos**.</li>
+                                    <li>Copiar o <strong>SchedulingID</strong>.</li>
+                                    <li>Ir no Postman em: <code>Exame Teórico > App > Exams > POST app_exam_exams...</code>.</li>
+                                    <li>Preencher os campos e inserir <strong><code>"reason": "free"</code></strong> para liberar a prova (Unlock).</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <div class="note">
+                            Este procedimento força a liberação da prova. O <code>reason</code> deve ser **"paid"** ou **"free"** dependendo da situação no Gestor Exame.
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> ERRO: Boleto Pago, Status "Aguardando Pagamento"</div>
+                    <div class="info-content">
+                        <p>Boleto está "Pago" na conta Pilotar, mas no Gestor Exame consta "aguardando pagamento".</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (Atualização de Pagamento):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>Conferir na <strong>Conta Pilotar - Login Interno</strong> se consta como pago.</li>
+                            <li>Acessar o Postman: <code>Exame Teórico > Conta digital Pilotar > GET Dados de um Serviço pelo CPF</code>.</li>
+                            <li>Coletar o <strong>ID</strong> e o <strong>Cobrança ID</strong> do retorno.</li>
+                            <li>Acessar o Postman: <code>Exame Teórico > Conta digital Pilotar > POST Notificação manual de cobrança</code>.</li>
+                            <li>Inserir o <code>"cobranca_id"</code> e <code>"servico_id"</code> (ID e Cobrança ID coletados) para forçar a atualização do pagamento.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-lock-open"></i> Geração Manual de Prova (Unlock)</div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (MA - Prova Não Gerada):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>Consultar agendamento no Postman: <code>Detran > MA > GET Consulta Agendamentos MA</code> (inserir <code>Data</code> + <code>CnpjCFC</code>).</li>
+                            <li>Montar o <strong>SchedulingID</strong> no formato: <code>MA + RENACH + CÓDIGO_AGENDAMENTO + MÊS + DIA + -5</code> (Ex: <code>MA049772769-58563025-1107-5</code>).</li>
+                            <li>Executar o **Unlock** no Postman: <code>Exame Teórico > App > Exams > POST app_exam_exams...</code>.
+                                <ul>
+                                    <li>Inserir o <strong>SchedulingID</strong> e o <code>"reason"</code> (<code>"paid"</code> ou <code>"free"</code>).</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (PB - Prova Não Gerada):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>Consultar agendamento para coletar o número RENACH (Link: <code>https://wsdetran.pb.gov.br/detran-portal-servicos/servlet/easynat-app?op=S03</code>).</li>
+                            <li>Montar o <strong>SchedulingID</strong> no formato: <code>PB + RENACH + MÊS + DIA + -5</code> (Ex: <code>PB048145211-1107-5</code>).</li>
+                            <li>Executar o **Unlock** no Postman.</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (PE - SchedulingID):</div>
+                    <div class="info-content">
+                        <p>O SchedulingID é formado por: <code>PE + RENACH + 389706 (código Detran constante) + DIA + MÊS + -5</code> (Ex: <code>PE122582934-389706-1212-5</code>).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="biometria-camera">
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-fingerprint"></i> Consultas de Biometria (Face)</div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> CENÁRIO: Consulta Biometria Face do Maranhão (MA)</div>
+                    <div class="info-content">
+                        <p>Consultar se há biometria coletada na base Valid do Detran MA.</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (MA - Face Valid):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>Postman: <code>Exame Teórico > Detran > MA > POST Consulta Imagens (VALID)</code>.</li>
+                            <li><strong>Caso não apareça a foto:</strong> Não consta biometria coletada no Detran MA. A orientação provável é que o CFC verifique com o setor de Gráfica do Detran (Setor de coleta de biometria, Valid).</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> ERRO: "Credenciais incorretas ou CPF não encontrado" (Foto do Candidato)</div>
+                    <div class="info-content">
+                        <p>Ocorre erro no momento da foto do candidato: "Credenciais incorretas".</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (Foto do Candidato):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>Consultar no Postman: <code>Detran > [Estado] > POST Consultar imagem candidato</code>.</li>
+                            <li>Se a imagem do candidato constar (campo <code>FotoAtual</code>), realizar um **Unlock**.
+                                <ul>
+                                    <li>Unlock: <code>Exame Teórico > App > Exams > POST app_exam_exams...</code>.</li>
+                                    <li><code>"reason"</code>: **"paid"** ou **"free"**.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> ERRO: "Não foi possível iniciar camera ambiente"</div>
+                    <div class="info-content">
+                        <p>Mensagem de "Não foi possível iniciar camera ambiente".</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (Câmera Ambiente):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>MongoDB: <code>CfcConfigEntity</code> > Inserir CNPJ (Ex: <code>{Cnpj: "01443994000345"}</code>).</li>
+                            <li>Conferir se <code>UseCheckInInExamRoom</code> e <code>UseV2Liveness</code> estão ativos (<code>true</code>).</li>
+                            <li>MongoDB: <code>AppConfigExamRoomEntity</code> > Conferir os dados da câmera configurada.</li>
+                            <li>Para desativação manual (Ex: erro de cadastro da câmera), desativar no Gestor Exame em <strong>Habilitar Monitoramento</strong>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="envio-prova">
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-upload"></i> Verificação de Envio de Prova e Vídeo</div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> ERRO: Prova com status "enviado" há muitos minutos</div>
+                    <div class="info-content">
+                        <p>A prova está com status "enviado" no Exame Teórico - Aluno, por um longo período.</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (Conferir Recebimento):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>MongoDB: <code>ExamEntity</code> > Pesquisar pelo CPF > Copiar o <strong>Proctoring ID</strong>.</li>
+                            <li>Postman: <code>Exame Teórico > Easy Proctoring > GET Proctoring</code> > Colar o <strong>Proctoring ID</strong>.</li>
+                            <li>Conferir se o <code>"status"</code> é <strong>"FINISHED"</strong> e se o <code>"proctoringType"</code> é <strong>"VIDEO"</strong>.</li>
+                            <li>Conferir se <code>"videoCameraUploaded": true</code> e <code>"audioCameraUploaded": true</code>.</li>
+                            <li>MongoDB: <code>ExamEntity</code> > Conferir se:
+                                <ul>
+                                    <li><code>Status</code> é <strong>2 (Finalizado)</strong>.</li>
+                                    <li>Constam todas as <strong>30 questões</strong> (<code>Questions: Array (30)</code> e <code>Answers: Array (30)</code>).</li>
+                                    <li>Consta <code>EndDate</code> preenchido.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-chalkboard-teacher"></i> Reenvio de Resultado (Finalizado/Ausente)</div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> CENÁRIO: Candidato Faltou ou Prova Finalizada, Detran Sem Resultado</div>
+                    <div class="info-content">
+                        <p><strong>Candidato Faltou:</strong> Status "Ausente" não atualizado no Gestor.</p>
+                        <p><strong>Prova Finalizada:</strong> Resultado (Aprovado, Reprovado, Desclassificado) não consta no sistema Detran.</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (Urgência - Resend):</div>
+                    <div class="info-content">
+                        <p><strong>Em caso de urgência</strong>, usar o Postman com o Scheduling ID:</p>
+                        <ul>
+                            <li><strong>Ausente:</strong> <code>Postman > Sistema prova > POST ResendAbsent</code> > Inserir o Scheduling ID > Send.</li>
+                            <li><strong>Finalizado:</strong> <code>Postman > Sistema prova > POST ResendFinishExame</code> > Inserir o Scheduling ID > Send.</li>
+                        </ul>
+                        <p><strong>Em casos não urgentes, e como retorno para o Agente N1:</strong> Abrir chamado para o N2 do produto.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-search"></i> Exame em Auditoria - "Em Execução"</div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> CENÁRIO: Exame em Auditoria consta "em execução"</div>
+                    <div class="info-content">
+                        <p>Geralmente ocorre quando não houve o envio completo dos arquivos do exame (áudio e vídeo).</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (N2 - Reenvio de Arquivos):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li>Postman: Consultar no <code>EasyProctor > GET Proctoring</code> com o **Proctoring ID** (obtido no Mongo <code>ExamEntity</code>).</li>
+                            <li>Se <code>"videoCameraUploaded"</code> e <code>"audioCameraUploaded"</code> forem <code>false</code>, o vídeo/áudio não foi recebido.</li>
+                            <li>Acessar a máquina do exame no diretório: <code>C:\Users\User\AppData\Local\EasyProctor\Files</code>.</li>
+                            <li>Se houver arquivo pendente, executar o <strong>EasyProctor Sender</strong> como administrador: <code>C:\Program Files\EasyProctor\Application\EasyProctor Sender.exe</code>.</li>
+                            <li>Após o envio, a pasta <code>Files</code> deve estar vazia.</li>
+                            <li>Concluir conferindo o recebimento no <code>GET Proctoring</code> (<code>"videoCameraUploaded": true</code>, <code>"audioCameraUploaded": true</code>).</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="agendamento">
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-calendar-alt"></i> Consulta de Agendamentos no Detran</div>
+                <div class="info-box">
+                    <div class="info-title"><i class="fas fa-search"></i> CENÁRIO: Consultar agendamento Exame Teórico</div>
+                    <div class="info-content">
+                        <p>Conferir no Postman o agendamento que consta no Detran.</p>
+                    </div>
+                </div>
+                <div class="doc-subtitle">Parâmetros de Consulta (Postman)</div>
+                <ul>
+                    <li><strong><span class="state-tag">PB</span>:</strong> Preenche apenas <code>Data</code> e <code>tipo exame</code> (Ex: <code>"tpExame": "5"</code>).</li>
+                    <li><strong><span class="state-tag">PE</span>:</strong> Preenche <code>Data Inicial</code>, <code>Data Final</code> e <code>CnpjEntidadeLegislacao</code>.
+                        <ul>
+                            <li><strong>Observação PE:</strong> Sempre observar a <code>"Operacao"</code>:
+                                <ul>
+                                    <li>**+ Inclusão:** O agendamento será enviado.</li>
+                                    <li>**C Cancelado:** O agendamento não será recebido.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong><span class="state-tag">MA</span>:</strong> Preenche <code>Data</code> e <code>CNPJ CFC</code> (em Query Params).</li>
+                </ul>
+                <div class="doc-subtitle">Localização no Postman</div>
+                <div class="code-block">
+Exame Teórico > Detran > PB > POST Buscar Agendamentos
+Exame Teórico > Detran > PE > POST Consultar Agendamento ...
+Exame Teórico > Detran > MA > GET Consulta Agendamentos MA
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="capturador">
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-camera-retro"></i> Reinstalação e Configuração do Capturador</div>
+                <div class="info-box error">
+                    <div class="info-title"><i class="fas fa-bug"></i> ERRO: Troca de Máquina, Formatação ou Dados Cadastrais Divergentes</div>
+                    <div class="info-content">
+                        <p>O CFC trocou/formatou a máquina, ou há dados cadastrais divergentes no capturador (CNPJ / App ID).</p>
+                    </div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> PROCEDIMENTO (Reinstalação/Correção):</div>
+                    <div class="info-content">
+                        <ol>
+                            <li><strong>Reinstalação:</strong> Se a pasta <code>Vsoft</code> não existir ou o serviço <code>Capturador-Wsvc</code> falhar (Erro 2), siga com a instalação (links fornecidos na documentação de origem).</li>
+                            <li><strong>Obter AppId:</strong> Após a reinstalação, vá em <code>C:\Vsoft</code> e execute <code>Vsoft.ExameTeorico.Capturador-Tools</code> para conferir o <strong>AppId</strong>.</li>
+                            <li><strong>Conferir AppIds no Mongo:</strong>
+                                <ul>
+                                    <li>MongoDB: <code>AppConfigExamRoomEntity</code> > Pesquisar pelo CNPJ (Ex: <code>{Cnpj:"014480000132"}</code>).</li>
+                                    <li>**IMPORTANTE:** Se o CFC tem 1 câmera/sala, só pode ter **UM AppId ativo**.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Inativar AppIds Incorretos:</strong> Inativar o(s) AppId(s) que não correspondem ao número obtido no **Tools** no painel Gestor (Opção: App Capturador).</li>
+                            <li><strong>Conferir Câmera:</strong> Verificar dados (IP, login, senha) no painel Gestor em **Câmeras** e tentar logar no Chrome.</li>
+                            <li><strong>Teste Final do Capturador:</strong> Executar <code>Vsoft.ExameTeorico.Capturador-Wsvc</code>. Se aparecer **"Nenhum exame para monitorar"**, a correção foi bem-sucedida.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="doc-section">
+                <div class="doc-title"><i class="fas fa-images"></i> Verificação de Fotos (Capturador/Webcam)</div>
+                <div class="info-box">
+                    <div class="info-title"><i class="fas fa-search"></i> CENÁRIO: Verificação de Envio de Fotos</div>
+                </div>
+                <div class="info-box procedure">
+                    <div class="info-title"><i class="fas fa-clipboard-list"></i> ENTIDADES NO MONGODB:</div>
+                    <div class="info-content">
+                        <ul>
+                            <li><strong>Fotos do Capturador (Sala):</strong> Salvas em <code>ExamPicturesClassRoomEntity</code>. Consultar via <code>{examId: "..."}</code>.</li>
+                            <li><strong>Fotos da Webcam (Candidato):</strong> Salvas em <code>Capture.UserPictureEntity</code>. Consultar via <code>{examId: "..."}</code>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="faq">
+            <div class="doc-title"><i class="fas fa-question-circle"></i> Perguntas Frequentes do Exame Teórico (FAQ)</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Verificações na Sala Inativa" data-answer="
+                        <p>O agente deve acessar remotamente a máquina do capturador:</p>
+                        <ol>
+                            <li>Localizar <code>Disco Local C</code> > Pasta <code>Vsoft</code>.</li>
+                            <li>Pesquisar por “Serviço” no menu Iniciar e reiniciar o serviço <code>Capturador-Wsvc</code>.</li>
+                            <li>Conferir na subpasta <code>Logs</code> (data atual) se consta a frase <strong>“Capturando foto”</strong>.</li>
+                        </ol>
+                        <div class='note'>Se a frase constar, prossiga com a abertura. Se não, acione o N2 com dados do CNPJ, acesso remoto e resumo da análise.</div>
+                    ">
+                        <span>01. Quais verificações devemos realizar para abertura de um exame na sala do ambiente "inativo"?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="faq-answer"></div> 
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Tela em Branco ou Carregando" data-answer="
+                        <ol>
+                            <li>Verificar se o status no Gestor Exame Teórico é **Agendado** (Exame não iniciado).</li>
+                            <li>Conferir remotamente a máquina do exame:
+                                <ul>
+                                    <li>Verificar atualizações do <code>WinUpdate</code>.</li>
+                                    <li>Desinstalar **programas não autorizados** (Ex: VPNs, TeamViewer, Teams, McAfee, Mouse Remote, etc.).</li>
+                                </ul>
+                            </li>
+                            <li>Desativar **Firewall** e conferir se o **Easy Proctor** está configurado para 'Executar como administrador'.</li>
+                        </ol>
+                        <div class='note'>Se o problema persistir, acionar o N2, informando o resumo e a qualidade da conexão.</div>
+                    ">
+                        <span>02. O que fazer quando a tela do exame está em branco ou apenas carregando?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="faq-answer"></div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Exame em Status 'Auditoria'" data-answer="
+                        <p>Consultar a situação no painel do Exame Admin Auditoria.</p>
+                        <ul>
+                            <li><strong>Aguardando Análise:</strong>
+                                <ul>
+                                    <li>Se houver arquivo de vídeo salvo, abrir chamado para o N2.</li>
+                                    <li>Se não houver vídeo, acessar a pasta <code>Files</code> do Easy Proctor na máquina do exame. Se houver mídias, executar o <code>Easy Proctor.Sender.exe</code>. Se as mídias permanecerem, acionar o N2; se não, abrir chamado para o N2 com logs.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Aguardando Examinador:</strong> O exame foi enviado e aguarda atualização no Detran. CFC deve aguardar o retorno do Órgão.</li>
+                            <li><strong>Aguardando Auditoria:</strong> O exame está em análise (prazo de até 48h úteis). Se o prazo for excedido, abrir chamado para o N2.</li>
+                            <li><strong><span class='state-tag'>PB</span> Especial:</strong> Para a Paraíba, o painel de auditoria precisa conter a 3ª página (imagens da sala de exame com o aluno). Caso não esteja disponível, solicitar acesso remoto ao CFC e auxílio ao N2.</li>
+                        </ul>
+                    ">
+                        <span>03. Como proceder quando o status do exame é "Auditoria" no painel Gestor do Exame?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="faq-answer"></div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Agendamento no Mesmo Dia" data-answer="
+                        <ul>
+                            <li><strong><span class='state-tag'>PE</span>:</strong> Sim, pois os agendamentos são sincronizados a cada 10 minutos.</li>
+                            <li><strong><span class='state-tag'>MA</span> e <span class='state-tag'>PB</span>:</strong> Não, devido à regra do estado de prazo mínimo de 24h de antecedência.</li>
+                        </ul>
+                    ">
+                        <span>04. É possível agendar o exame no mesmo dia da prova?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="faq-answer"></div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Tempo de Duração da Prova" data-answer="
+                        <ul>
+                            <li><strong><span class='state-tag'>PE</span>:</strong> 30 minutos (primeira habilitação) e 60 minutos (provas especializadas).</li>
+                            <li><strong><span class='state-tag'>MA</span>:</strong> 50 minutos.</li>
+                            <li><strong><span class='state-tag'>PB</span>:</strong> 40 minutos.</li>
+                        </ul>
+                    ">
+                        <span>07. Qual o tempo de duração da prova?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="faq-answer"></div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Status da Prova" data-answer="
+                        <ul>
+                            <li><strong>Aprovado:</strong> Acerto de 70% ou mais, sem irregularidades/alertas não liberados.</li>
+                            <li><strong>Reprovado:</strong> Acerto de menos de 70%.</li>
+                            <li><strong>Em Auditoria:</strong> Acerto de 70% ou mais, mas com alertas gerados pendentes de auditoria.</li>
+                            <li><strong>Desclassificado:</strong> Acerto de 70% ou mais, gerou alerta, foi auditado e identificada irregularidade.</li>
+                        </ul>
+                    ">
+                        <span>12. Quais os status da prova?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="faq-answer"></div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Webcam Não Reconhecida" data-answer="
+                        <p>Acessar remotamente, testar a câmera e verificar os **requisitos técnicos** (câmera HD, 720p, 1280x720).</p>
+                        <ul>
+                            <li><strong><span class='state-tag'>PE</span>:</strong> Não é permitida câmera USB, apenas integrada do notebook.</li>
+                            <li><strong><span class='state-tag'>MA</span> e <span class='state-tag'>PB</span>:</strong> Permitido câmera USB dentro dos requisitos, mas deve permanecer fixa para atualização automática de drivers.</li>
+                        </ul>
+                    ">
+                        <span>13. O que fazer quando a webcam não é reconhecida pelo Easy Proctor no momento da prova?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="faq-answer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="faqModalOverlay" class="modal-overlay">
+        <div id="faqModalContent" class="modal-content">
+            <div class="modal-header" id="modalTitle"></div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="modal-close-btn" id="modalCloseButton">Fechar <i class="fas fa-times-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lógica para alternar abas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Desativa todas as abas e conteúdos
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                    // Ativa a aba clicada e o conteúdo correspondente
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Lógica para FAQ (usando Pop-up)
+            const modalOverlay = document.getElementById('faqModalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalCloseButton = document.getElementById('modalCloseButton');
+            
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', () => {
+                    const titleText = question.querySelector('span').textContent;
+                    const answerContent = question.getAttribute('data-answer');
+                    
+                    // Preenche e exibe o modal
+                    modalTitle.textContent = titleText;
+                    modalBody.innerHTML = answerContent;
+                    modalOverlay.classList.add('active');
+                    modalOverlay.style.display = 'flex';
+                });
+            });
+
+            // Lógica para fechar o modal
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+                modalOverlay.style.display = 'none';
+            }
+
+            modalCloseButton.addEventListener('click', closeModal);
+            
+            // Fechar ao clicar fora do conteúdo (overlay)
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            // Fechar ao pressionar a tecla ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.style.display === 'flex') {
+                    closeModal();
+                }
+            });
+
+
+            // Ativa a primeira aba ao carregar
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+</html>
