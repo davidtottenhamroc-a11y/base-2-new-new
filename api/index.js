@@ -316,7 +316,8 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
 app.get('/api/documentacao/content/:id', async (req, res) => {
     try {
         const docId = req.params.id;
-        // Seleciona todos os metadados e o fileData
+        
+        // Selecionamos todos os metadados e forçamos a inclusão do 'fileData' (+fileData)
         const documento = await Documentacao.findById(docId).select('+fileData'); 
 
         if (!documento) {
@@ -331,11 +332,12 @@ app.get('/api/documentacao/content/:id', async (req, res) => {
             // Prepara o conteúdo: Texto simples ou Buffer em Base64
             content: documento.tipoConteudo === 'TEXTO' 
                      ? documento.texto // Se for texto, envia a string
-                     : (documento.fileData ? documento.fileData.toString('base64') : null), // Se for binário, envia em Base64
+                     // Se for binário, converte o Buffer para Base64 antes de enviar
+                     : (documento.fileData ? documento.fileData.toString('base64') : null), 
             
             nomeArquivo: documento.nomeArquivo,
             estado: documento.estado,
-            subpasta: documento.subpasta // <-- SUBPASTA INCLUÍDA
+            subpasta: documento.subpasta // <-- SUBPASTA INCLUÍDA NO RETORNO
         };
 
         res.send(responseData);
@@ -438,3 +440,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
