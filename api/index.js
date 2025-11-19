@@ -87,7 +87,7 @@ const User = mongoose.model('User', userSchema, 'user');
 const Aula = mongoose.model('Aula', aulaSchema);
 const Incidente = mongoose.model('Incidente', incidenteSchema);
 const Memory = mongoose.model('Memory', memorySchema); 
-
+const Documentacao = mongoose.model('Documentacao', documentacaoSchema, 'documentacao');
 // ------------------------------------
 // --- Rotas da API ---
 // ------------------------------------
@@ -303,6 +303,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
