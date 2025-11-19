@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 3000;
 // Senha pré-definida para cadastro (você pode mudar isso se quiser)
 const PRE_DEFINED_ACCESS_PASSWORD = "otimus32";
 
-const Documentacao = mongoose.model('Documentacao', documentacaoSchema, 'documentacao');
+
 
 // Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
@@ -303,6 +303,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
