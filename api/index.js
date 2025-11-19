@@ -257,7 +257,10 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
         `;
         
         // Define os headers para simular o download
-        res.setHeader('Content-disposition', `attachment; filename="DOWNLOAD_SIMULADO_${documento.nomeArquivo || 'documento.txt'}"`);
+        const fileName = `DOWNLOAD_SIMULADO_${documento.titulo.replace(/\s/g, '_')}_${documento._id}.txt`;
+
+        // Define os headers para simular o download de um arquivo de texto
+        res.setHeader('Content-disposition', `attachment; filename="${fileName}"`);
         res.setHeader('Content-type', 'text/plain');
 
         res.send(fileContent);
@@ -344,6 +347,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
