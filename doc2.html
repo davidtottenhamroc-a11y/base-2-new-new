@@ -30,6 +30,12 @@
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
         }
+        .folder-toggle {
+            transition: transform 0.2s;
+        }
+        .folder-closed .folder-toggle {
+            transform: rotate(-90deg);
+        }
     </style>
 </head>
 
@@ -52,20 +58,18 @@
         <div id="messageBox" class="p-3 text-center rounded-lg hidden font-semibold text-sm border-2" role="alert"></div>
 
         <div id="items-list-container">
-            <h2 class="text-xl font-bold text-gray-300 mb-4">Arquivos e Artigos</h2>
-            <ul id="knowledge-items-list" class="space-y-3">
-                <li class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Carregando itens...</li>
-            </ul>
+            <h2 class="text-xl font-bold text-gray-300 mb-4">Organização por Estado</h2>
+            <div id="knowledge-items-list" class="space-y-4">
+                <p class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Carregando itens...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Rota corrigida para a API de Documentação
         const API_ENDPOINT = '/api/documentacao';
-        const ITEMS_LIST = document.getElementById('knowledge-items-list');
+        const ITEMS_LIST_CONTAINER = document.getElementById('knowledge-items-list');
         const MESSAGE_BOX = document.getElementById('messageBox');
         
-        // Função para exibir mensagens na caixa de feedback
         function showMessage(message, type = 'success') {
             MESSAGE_BOX.textContent = message;
             MESSAGE_BOX.classList.remove('hidden', 'bg-red-500/10', 'bg-green-500/10', 'text-red-400', 'text-green-400', 'border-red-500', 'border-green-500', 'bg-primary-blue/10', 'text-primary-blue', 'border-primary-blue');
@@ -77,74 +81,131 @@
             }
         }
 
-        // Função de Download (acessível globalmente)
         window.downloadFile = function(itemId) {
-            // Usa a rota GET de download que serve o Buffer
             window.location.href = `${API_ENDPOINT}/download/${itemId}`;
         }
-        
-        // Função para carregar e renderizar a lista de itens
+        
+        // NOVO: Função para alternar a visibilidade da pasta
+        window.toggleFolder = function(state) {
+            const folderContent = document.getElementById(`folder-content-${state}`);
+            const folderDiv = document.getElementById(`folder-${state}`);
+            const icon = document.getElementById(`folder-icon-${state}`);
+            
+            if (folderContent.classList.contains('hidden')) {
+                folderContent.classList.remove('hidden');
+                folderDiv.classList.remove('folder-closed');
+                icon.classList.replace('fa-folder-closed', 'fa-folder-open');
+            } else {
+                folderContent.classList.add('hidden');
+                folderDiv.classList.add('folder-closed');
+                icon.classList.replace('fa-folder-open', 'fa-folder-closed');
+            }
+        }
+
+        // NOVO: Função para agrupar e renderizar os itens
         async function loadKnowledgeItems() {
-            ITEMS_LIST.innerHTML = '<li class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Carregando itens...</li>';
+            ITEMS_LIST_CONTAINER.innerHTML = '<p class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Carregando itens...</p>';
             
             try {
                 const response = await fetch(API_ENDPOINT);
                 if (!response.ok) throw new Error('Falha ao carregar itens');
                 
                 const items = await response.json();
-                ITEMS_LIST.innerHTML = ''; // Limpa a lista
+                ITEMS_LIST_CONTAINER.innerHTML = ''; 
                 
                 if (items.length === 0) {
-                    ITEMS_LIST.innerHTML = '<li class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Nenhum item de conhecimento cadastrado.</li>';
+                    ITEMS_LIST_CONTAINER.innerHTML = '<p class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Nenhum item de conhecimento cadastrado.</p>';
                     return;
                 }
 
-                items.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'p-3 bg-input-bg rounded-lg flex justify-between items-center flex-wrap';
-                    
-                    let contentInfo;
-                    
-                    // CRUCIAL: Agora todos os tipos, incluindo TEXTO, geram o botão de Download.
-                    const isDownloadable = (item.tipoConteudo === 'TEXTO' || item.tipoConteudo === 'PDF' || item.tipoConteudo === 'HTML');
-                    
-                    let actionButton = '';
-
-                    if (item.tipoConteudo === 'TEXTO') {
-                        // Exibe um resumo do texto
-                        const resumo = item.texto ? item.texto.substring(0, 80).replace(/\n/g, ' ') + '...' : 'Sem conteúdo de texto.';
-                        contentInfo = `<span class="text-sm text-gray-300 mt-1 md:mt-0 w-full md:w-auto flex items-center"><i class="fas fa-terminal mr-2 text-primary-blue"></i>Texto: ${resumo}</span>`;
-                    } else {
-                        // Para arquivos, exibe o nome do arquivo
-                        const icon = item.tipoConteudo === 'PDF' ? 'fas fa-file-pdf' : 'fas fa-code';
-                        const fileName = item.nomeArquivo || 'Nome Indisponível';
-                        contentInfo = `<span class="text-sm text-gray-300 mt-1 md:mt-0 w-full md:w-auto flex items-center"><i class="${icon} mr-2 text-primary-blue"></i>Arquivo: ${fileName}</span>`;
-                    }
-                    
-                    // Gera o botão de download se for baixável
-                    if (isDownloadable) {
-                        actionButton = `
-                            <button onclick="downloadFile('${item._id}')" 
-                                class="mt-2 md:mt-0 py-1 px-3 bg-primary-blue hover:bg-green-600 text-dark-blue-bg text-xs font-bold rounded transition duration-200 flex items-center">
-                                <i class="fas fa-download mr-1"></i> Download
-                            </button>
-                        `;
+                // 1. Agrupar os itens por Estado
+                const groupedItems = items.reduce((acc, item) => {
+                    const state = item.estado || 'GERAL'; // Usa 'GERAL' se o estado não for definido
+                    if (!acc[state]) {
+                        acc[state] = [];
                     }
+                    acc[state].push(item);
+                    return acc;
+                }, {});
 
-                    listItem.innerHTML = `
-                        <div class="w-full md:w-auto flex-grow">
-                            <p class="font-semibold text-white">${item.titulo} <span class="text-gray-400 text-xs ml-2">(${item.estado})</span></p>
-                            ${contentInfo}
-                        </div>
-                        ${actionButton}
-                    `;
-                    ITEMS_LIST.appendChild(listItem);
-                });
+                // Ordenar os estados alfabeticamente
+                const sortedStates = Object.keys(groupedItems).sort();
+
+                // 2. Renderizar a lista de pastas (Accordions)
+                sortedStates.forEach(state => {
+                    const stateItems = groupedItems[state];
+                    const folderDiv = document.createElement('div');
+                    
+                    // Inicialmente todos fechados (adiciona a classe 'folder-closed')
+                    folderDiv.className = 'bg-input-bg rounded-lg shadow-md folder-closed transition-all'; 
+                    folderDiv.id = `folder-${state}`;
+
+                    const headerButton = document.createElement('button');
+                    headerButton.className = 'w-full text-left p-4 flex justify-between items-center font-bold text-lg hover:bg-[#203a56] rounded-t-lg transition duration-200';
+                    headerButton.onclick = () => toggleFolder(state);
+                    
+                    // Ícones e Título da Pasta
+                    headerButton.innerHTML = `
+                        <span class="flex items-center">
+                            <i id="folder-toggle-${state}" class="fas fa-chevron-down mr-3 text-primary-blue folder-toggle"></i>
+                            <i id="folder-icon-${state}" class="far fa-folder-closed mr-3 text-yellow-500"></i>
+                            Pasta: ${state} <span class="text-sm ml-3 px-2 py-1 bg-primary-blue/20 text-primary-blue rounded-full">${stateItems.length} itens</span>
+                        </span>
+                    `;
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.id = `folder-content-${state}`;
+                    contentDiv.className = 'hidden space-y-2 p-4 border-t border-gray-600/30';
+                    
+                    // 3. Renderizar os Documentos dentro da Pasta
+                    stateItems.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'p-3 bg-card-bg rounded-lg flex justify-between items-center flex-wrap';
+
+                        let contentInfo;
+                        const isDownloadable = (item.tipoConteudo === 'TEXTO' || item.tipoConteudo === 'PDF' || item.tipoConteudo === 'HTML');
+                        
+                        // Lógica para Tipo de Conteúdo e Ícone
+                        let iconClass;
+                        if (item.tipoConteudo === 'TEXTO') {
+                            iconClass = 'fas fa-terminal';
+                            const resumo = item.texto ? item.texto.substring(0, 70).replace(/\n/g, ' ') + '...' : 'Sem conteúdo de texto.';
+                            contentInfo = `<span class="text-sm text-gray-400 mt-1 md:mt-0 w-full md:w-auto flex items-center"><i class="${iconClass} mr-2 text-primary-blue/80"></i>${resumo}</span>`;
+                        } else {
+                            iconClass = item.tipoConteudo === 'PDF' ? 'fas fa-file-pdf' : 'fas fa-code';
+                            const fileName = item.nomeArquivo || 'Nome Indisponível';
+                            contentInfo = `<span class="text-sm text-gray-400 mt-1 md:mt-0 w-full md:w-auto flex items-center"><i class="${iconClass} mr-2 text-primary-blue/80"></i>Arquivo: ${fileName}</span>`;
+                        }
+                        
+                        let actionButton = '';
+                        if (isDownloadable) {
+                            actionButton = `
+                                <button onclick="downloadFile('${item._id}')" 
+                                    class="mt-2 md:mt-0 py-1 px-3 bg-primary-blue hover:bg-green-600 text-dark-blue-bg text-xs font-bold rounded transition duration-200 flex items-center shadow-md">
+                                    <i class="fas fa-download mr-1"></i> Download
+                                </button>
+                            `;
+                        }
+
+                        itemDiv.innerHTML = `
+                            <div class="w-full md:w-auto flex-grow">
+                                <p class="font-semibold text-white">${item.titulo}</p>
+                                ${contentInfo}
+                            </div>
+                            ${actionButton}
+                        `;
+                        contentDiv.appendChild(itemDiv);
+                    });
+
+                    folderDiv.appendChild(headerButton);
+                    folderDiv.appendChild(contentDiv);
+                    ITEMS_LIST_CONTAINER.appendChild(folderDiv);
+                });
 
             } catch (error) {
                 console.error('Erro ao carregar itens:', error);
                 showMessage('Erro ao carregar dados do servidor. Verifique o backend.', 'error');
-                ITEMS_LIST.innerHTML = '';
+                ITEMS_LIST_CONTAINER.innerHTML = '';
             }
         }
 
