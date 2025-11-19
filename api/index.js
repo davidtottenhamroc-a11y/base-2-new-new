@@ -2,9 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-
+const multer = require('multer');
 const app = express();
-
+const storage = multer.memoryStorage();
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+});
 // Configurações
 app.use(cors()); 
 app.use(express.json());
@@ -16,6 +20,8 @@ const PORT = process.env.PORT || 3000;
 
 // Senha pré-definida para cadastro (você pode mudar isso se quiser)
 const PRE_DEFINED_ACCESS_PASSWORD = "otimus32";
+
+
 
 // Conexão com o banco de dados MongoDB
 mongoose.connect(MONGODB_URI)
@@ -297,5 +303,6 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
