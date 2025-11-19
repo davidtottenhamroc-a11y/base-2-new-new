@@ -245,26 +245,29 @@ app.delete('/api/incidentes/:id', async (req, res) => {
 app.get('/api/documentacao/download/:id', async (req, res) => {
     try {
         const docId = req.params.id;
-        // Selecionamos o documento E o conteúdo binário (fileData)
+        
+        // Buscamos o documento e explicitamente incluímos o 'fileData'.
+        // Em alguns modelos Mongoose, é necessário usar .select('+fieldName') 
+        // se o campo não estiver selecionado por padrão.
         const documento = await Documentacao.findById(docId).select('+fileData'); 
 
         if (!documento) {
             return res.status(404).send({ message: "Documento não encontrado." });
         }
         
+        // Valida se o documento tem o conteúdo binário anexado
         if (!documento.fileData || documento.tipoConteudo === 'TEXTO') {
             return res.status(400).send({ message: "Este item não possui um arquivo binário anexado para download." });
         }
 
-        // 🛑 ENVIO DO ARQUIVO BINÁRIO DIRETO DO MONGO 🛑
         
-        // 1. Define o cabeçalho Content-Disposition para forçar o download com o nome original
+        // 1. Content-Disposition: Força o download e define o nome do arquivo.
         res.setHeader('Content-disposition', `attachment; filename="${documento.nomeArquivo}"`);
         
-        // 2. Define o tipo de conteúdo (MIME Type) para o navegador saber o que é
+        // 2. Content-type: Define o tipo MIME do arquivo (PDF, HTML, etc.). Isso é crucial!
         res.setHeader('Content-type', documento.mimeType);
         
-        // 3. Define o tamanho do arquivo
+        // 3. Content-Length: Define o tamanho do arquivo para o navegador
         res.setHeader('Content-Length', documento.fileSize);
         
         // 4. Envia o buffer (dados binários)
@@ -365,6 +368,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
 
 
 
