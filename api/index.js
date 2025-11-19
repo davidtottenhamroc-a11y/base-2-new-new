@@ -67,18 +67,18 @@ const memorySchema = new mongoose.Schema({
     imagemUrl: String
 });
 
-// NOVO SCHEMA PARA CADASTRO DE DOCUMENTAÇÃO (COM ARMAZENAMENTO DE BUFFER)
+// NOVO SCHEMA PARA CADASTRO DE DOCUMENTAÇÃO (COM ARMAZENAMENTO DE BUFFER E SUBPASTA)
 const documentacaoSchema = new mongoose.Schema({
     titulo: { type: String, required: true },
     estado: { type: String, required: true },
-    subpasta: { type: String, required: true }, // <--- CAMPO ADICIONADO
+    subpasta: { type: String, required: true }, // <-- CAMPO SUBPASTA AGORA FAZ PARTE DO SCHEMA
     tipoConteudo: { type: String, enum: ['TEXTO', 'PDF', 'HTML'], required: true }, 
     texto: { type: String }, // Conteúdo de texto OU metadados do arquivo
     nomeArquivo: { type: String }, // Nome original do arquivo (se for upload)
     mimeType: { type: String }, // Tipo MIME do arquivo (se for upload)
     
     // ARMAZENAMENTO DO ARQUIVO BINÁRIO (BUFFER)
-    fileData: { type: Buffer, select: false }, 
+    fileData: { type: Buffer, select: false }, // ARMAZENADO, MAS EXCLUÍDO POR PADRÃO NAS BUSCAS
     fileSize: { type: Number },   
     
     agente: { type: String },
@@ -225,10 +225,8 @@ app.delete('/api/incidentes/:id', async (req, res) => {
 // POST: Cadastro de Novo Documento (Salvando o Buffer no Mongo)
 app.post('/api/documentacao', upload.single('file'), async (req, res) => {
     try {
-        // 1. EXTRAÇÃO: 'subpasta' é adicionada à desestruturação
         const { titulo, estado, tipoConteudo, texto, agente, subpasta } = req.body;
 
-        // 2. VALIDAÇÃO: Verifica Título, Estado, Tipo de Conteúdo e Subpasta
         if (!titulo || !estado || !tipoConteudo || !subpasta) {
             return res.status(400).send({ message: "Título, Estado, Tipo de Conteúdo e Subpasta são obrigatórios." });
         }
@@ -238,7 +236,7 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
             estado,
             tipoConteudo,
             agente: agente || 'Sistema Web (Cadastro)',
-            subpasta, // <--- CAMPO NOVO SALVO AQUI
+            subpasta, 
         };
 
         if (tipoConteudo === 'TEXTO') {
@@ -248,25 +246,21 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
             }
             dataToSave.texto = texto;
             
-            // Cria Buffer a partir do texto
             const textBuffer = Buffer.from(texto, 'utf8');
             
             dataToSave.fileData = textBuffer; 
             dataToSave.fileSize = textBuffer.length;
             
-            // Define nome e MIME type para que o download funcione como .txt
             const safeTitle = titulo.substring(0, 50).replace(/[^a-zA-Z0-9\s]/g, '_').trim();
             dataToSave.nomeArquivo = `${safeTitle || 'documento_texto'}.txt`; 
             dataToSave.mimeType = 'text/plain'; 
 
         } else if (tipoConteudo === 'PDF' || tipoConteudo === 'HTML') {
             
-            // Se for upload de arquivo
             if (!req.file) {
                 return res.status(400).send({ message: "Arquivo obrigatório para o tipo de conteúdo selecionado." });
             }
 
-            // Salvando o Buffer Binário e Metadados do arquivo
             dataToSave.nomeArquivo = req.file.originalname;
             dataToSave.mimeType = req.file.mimetype;
             dataToSave.texto = `Arquivo: ${req.file.originalname}. Conteúdo binário armazenado no MongoDB.`;
@@ -277,14 +271,12 @@ app.post('/api/documentacao', upload.single('file'), async (req, res) => {
         const novoDocumento = new Documentacao(dataToSave);
         await novoDocumento.save();
 
-        // Remove o buffer da resposta para evitar sobrecarga de rede
         novoDocumento.fileData = undefined; 
 
         res.status(201).send({ message: "Documento salvo com sucesso.", _id: novoDocumento._id, ...novoDocumento.toObject() });
 
     } catch (error) {
         console.error('Erro ao salvar documento:', error);
-        // Trata erro de limite de tamanho do documento MongoDB (16MB)
         if (error.code === 10334 || error.name === 'MongoError' && error.message.includes('Document size')) {
              return res.status(400).send({ message: "Erro: O arquivo é muito grande. O limite de documento do MongoDB é 16MB.", error: error.message });
         }
@@ -298,26 +290,20 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
     try {
         const docId = req.params.id;
         
-        // Buscamos o documento, forçando a inclusão do 'fileData' (devido ao `select: false` no schema).
         const documento = await Documentacao.findById(docId).select('+fileData'); 
 
         if (!documento) {
             return res.status(404).send({ message: "Documento não encontrado." });
         }
         
-        // =========================================================
-        // === ALTERAÇÃO: AGORA PERMITE O DOWNLOAD DE TEXTO/BUFFER ===
-        // =========================================================
-        if (!documento.fileData) { // Apenas checa se o Buffer existe
+        if (!documento.fileData) { 
             return res.status(400).send({ message: "Este item não possui um arquivo binário anexado para download." });
         }
 
-        // CONFIGURAÇÃO DOS HEADERS PARA ENVIO DO ARQUIVO BINÁRIO
         res.setHeader('Content-disposition', `attachment; filename="${documento.nomeArquivo}"`);
         res.setHeader('Content-type', documento.mimeType);
         res.setHeader('Content-Length', documento.fileSize);
         
-        // Envia o buffer (dados binários)
         res.send(documento.fileData);
 
     } catch (error) {
@@ -326,18 +312,47 @@ app.get('/api/documentacao/download/:id', async (req, res) => {
     }
 });
 
+// GET: Rota para buscar conteúdo para visualização no modal
+app.get('/api/documentacao/content/:id', async (req, res) => {
+    try {
+        const docId = req.params.id;
+        // Seleciona todos os metadados e o fileData
+        const documento = await Documentacao.findById(docId).select('+fileData'); 
+
+        if (!documento) {
+            return res.status(404).send({ message: "Documento não encontrado." });
+        }
+        
+        const responseData = {
+            titulo: documento.titulo,
+            tipoConteudo: documento.tipoConteudo,
+            mimeType: documento.mimeType,
+            
+            // Prepara o conteúdo: Texto simples ou Buffer em Base64
+            content: documento.tipoConteudo === 'TEXTO' 
+                     ? documento.texto // Se for texto, envia a string
+                     : (documento.fileData ? documento.fileData.toString('base64') : null), // Se for binário, envia em Base64
+            
+            nomeArquivo: documento.nomeArquivo,
+            estado: documento.estado,
+            subpasta: documento.subpasta // <-- SUBPASTA INCLUÍDA
+        };
+
+        res.send(responseData);
+        
+    } catch (error) {
+        console.error('Erro ao buscar conteúdo para modal:', error);
+        res.status(500).send({ message: "Erro interno do servidor ao buscar conteúdo.", error: error.message });
+    }
+});
+
 
 // GET: Buscar Todos os Documentos (Excluindo o Buffer)
 app.get('/api/documentacao', async (req, res) => {
     try {
-        // Buscamos o documento, excluindo explicitamente o campo 'fileData' 
-        // para não sobrecarregar a rede e a memória do servidor/cliente.
-        const documentos = await Documentacao.find({})
-            .select('-fileData') 
-            .sort({ dataCadastro: -1 });
-            
+        // Busca e exclui o Buffer. O campo 'subpasta' é retornado por padrão.
+        const documentos = await Documentacao.find({}).select('-fileData').sort({ dataCadastro: -1 });
         res.send(documentos);
-        
     } catch (error) {
         console.error('Erro ao buscar documentos:', error);
         res.status(500).send({ message: "Erro ao buscar documentos.", error: error.message });
@@ -423,5 +438,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
-
-
