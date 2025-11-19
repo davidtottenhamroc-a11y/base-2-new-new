@@ -110,21 +110,30 @@
                     </select>
                 </div>
                 
-                <!-- Seleção de Subpasta (NOVO) -->
-                <div>
-                    <label for="subpasta" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
-                        <i class="fas fa-folder mr-2"></i>Subpasta de Organização:
-                    </label>
-                    <select id="subpasta" name="subpasta" required onchange="checkCustomSubfolder()"
+                <!-- Seleção de Subpasta -->
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
+                    <!-- Campo de seleção fixo -->
+                    <div>
+                        <label for="subpasta" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
+                            <i class="fas fa-folder mr-2"></i>Subpasta de Organização:
+                        </label>
+                        <select id="subpasta" name="subpasta" required 
                              class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 text-white custom-select appearance-none">
-                        <option value="" class="bg-input-bg">-- Selecione ou Adicione --</option>
-                        <option value="Query" class="bg-input-bg">Query</option>
-                        <option value="Documentacao Operacional" class="bg-input-bg">Documentação Operacional</option>
-                        <option value="FAQ" class="bg-input-bg">FAQ</option>
-                        <option value="custom" class="bg-input-bg">Outro / Adicionar Novo...</option>
-                    </select>
-                </div>
+                            <option value="" class="bg-input-bg">-- Selecione a Categoria --</option>
+                            <option value="Query" class="bg-input-bg">Query</option>
+                            <option value="Documentacao Operacional" class="bg-input-bg">Documentação Operacional</option>
+                            <option value="FAQ" class="bg-input-bg">FAQ</option>
+                        </select>
+                    </div>
 
+                    <!-- Botão de adicionar nova subpasta -->
+                    <div class="flex items-end">
+                        <button type="button" onclick="showCustomSubfolder()" 
+                                class="w-full md:w-auto h-12 py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-dark-blue-bg font-bold rounded-lg transition duration-300 flex items-center justify-center shadow-md">
+                            <i class="fas fa-plus mr-2"></i> Nova
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Tipo de Conteúdo (Seleção) -->
                 <div>
@@ -140,13 +149,19 @@
                 </div>
             </div>
 
-            <!-- Input Personalizado da Subpasta (NOVO) -->
+            <!-- Input Personalizado da Subpasta (NOVO, escondido por padrão) -->
             <div id="custom-subfolder-wrapper" class="hidden">
                 <label for="custom-subfolder" class="block text-sm font-medium text-primary-blue mb-2 flex items-center">
                     <i class="fas fa-edit mr-2"></i>Nome da Nova Subpasta:
                 </label>
-                <input type="text" id="custom-subfolder" placeholder="Ex: Procedimentos de Backup"
-                        class="w-full p-3 bg-input-bg border border-transparent rounded-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 placeholder-gray-500 text-white">
+                <div class="flex">
+                    <input type="text" id="custom-subfolder" placeholder="Ex: Procedimentos de Backup"
+                        class="flex-grow p-3 bg-input-bg border border-transparent rounded-l-lg focus:ring-1 focus:ring-primary-blue focus:border-primary-blue transition duration-200 placeholder-gray-500 text-white">
+                    <button type="button" onclick="cancelCustomSubfolder()"
+                            class="py-3 px-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-r-lg transition duration-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
 
 
@@ -192,22 +207,39 @@
         const FORM = document.getElementById('knowledgeForm');
         const CUSTOM_SUBFOLDER_WRAPPER = document.getElementById('custom-subfolder-wrapper');
         const CUSTOM_SUBFOLDER_INPUT = document.getElementById('custom-subfolder');
+        const SUBPASTA_SELECT = document.getElementById('subpasta');
+        
+        // Variável de controle para armazenar a subpasta personalizada (se adicionada)
+        let customSubfolderValue = ''; 
 
-        // Função para mostrar/esconder o input de subpasta personalizada
-        function checkCustomSubfolder() {
-            const subpastaSelect = document.getElementById('subpasta').value;
-            if (subpastaSelect === 'custom') {
-                CUSTOM_SUBFOLDER_WRAPPER.classList.remove('hidden');
-                CUSTOM_SUBFOLDER_INPUT.setAttribute('required', 'required');
-            } else {
-                CUSTOM_SUBFOLDER_WRAPPER.classList.add('hidden');
-                CUSTOM_SUBFOLDER_INPUT.removeAttribute('required');
-                CUSTOM_SUBFOLDER_INPUT.value = ''; // Limpa o valor se sair
-            }
+        // NOVO: Função para exibir o campo de input personalizado
+        function showCustomSubfolder() {
+            // Guarda o valor atual do select para restaurar depois
+            SUBPASTA_SELECT.setAttribute('data-original-value', SUBPASTA_SELECT.value);
+            SUBPASTA_SELECT.value = ''; // Limpa o select visualmente
+            SUBPASTA_SELECT.removeAttribute('required'); // O input customizado será required
+
+            CUSTOM_SUBFOLDER_INPUT.value = customSubfolderValue; // Preenche se já houver um valor
+            CUSTOM_SUBFOLDER_WRAPPER.classList.remove('hidden');
+            CUSTOM_SUBFOLDER_INPUT.setAttribute('required', 'required');
+            CUSTOM_SUBFOLDER_INPUT.focus();
         }
-        window.checkCustomSubfolder = checkCustomSubfolder; // Torna acessível no HTML
+        window.showCustomSubfolder = showCustomSubfolder;
 
-        // Função para alternar entre textarea e file input
+        // NOVO: Função para cancelar o campo de input personalizado
+        function cancelCustomSubfolder() {
+            CUSTOM_SUBFOLDER_WRAPPER.classList.add('hidden');
+            CUSTOM_SUBFOLDER_INPUT.removeAttribute('required');
+            customSubfolderValue = ''; // Limpa o valor da memória
+            CUSTOM_SUBFOLDER_INPUT.value = '';
+
+            // Restaura o valor original ou força a seleção de um item válido
+            SUBPASTA_SELECT.value = SUBPASTA_SELECT.getAttribute('data-original-value') || '';
+            SUBPASTA_SELECT.setAttribute('required', 'required'); // Reativa o required no select
+        }
+        window.cancelCustomSubfolder = cancelCustomSubfolder;
+
+        // Função para alternar entre textarea e file input
         function toggleContentInput() {
             const contentType = document.getElementById('content-type').value;
             const textWrapper = document.getElementById('text-input-wrapper');
@@ -254,16 +286,27 @@
             const tipoConteudo = document.getElementById('content-type').value;
             
             // Determina o valor final da subpasta
-            let finalSubpasta = document.getElementById('subpasta').value;
-            if (finalSubpasta === 'custom') {
+            let finalSubpasta;
+            if (!CUSTOM_SUBFOLDER_WRAPPER.classList.contains('hidden')) {
+                // Se o campo customizado estiver visível, use seu valor
                 finalSubpasta = CUSTOM_SUBFOLDER_INPUT.value.trim();
-                if (!finalSubpasta) {
-                    showMessage('O nome da nova subpasta é obrigatório.', 'error');
-                    SUBMIT_BUTTON.disabled = false;
-                    SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
-                    SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
-                    return;
-                }
+            } else {
+                // Caso contrário, use o valor do select
+                finalSubpasta = SUBPASTA_SELECT.value;
+            }
+            
+            // Validação final da subpasta
+            if (!finalSubpasta) {
+                showMessage('A subpasta de organização é obrigatória.', 'error');
+                SUBMIT_BUTTON.disabled = false;
+                SUBMIT_BUTTON.textContent = 'Salvar Item de Conhecimento';
+                SUBMIT_BUTTON.classList.remove('opacity-70', 'cursor-not-allowed');
+                return;
+            }
+            
+            // Armazena o valor customizado na memória
+            if (!SUBPASTA_SELECT.value) { // Se o select não tiver valor (usamos custom)
+                customSubfolderValue = finalSubpasta;
             }
 
 
@@ -275,7 +318,7 @@
                 bodyContent = JSON.stringify({
                     titulo: FORM.titulo.value,
                     estado: FORM.estado.value,
-                    subpasta: finalSubpasta, // <-- ADICIONADO SUBPASTA
+                    subpasta: finalSubpasta, 
                     tipoConteudo: tipoConteudo,
                     texto: FORM.texto.value,
                     agente: 'Sistema Web (Cadastro)', 
@@ -289,7 +332,7 @@
                 // 1. ANEXAR CAMPOS DE TEXTO
                 formData.append('titulo', FORM.titulo.value);
                 formData.append('estado', FORM.estado.value);
-                formData.append('subpasta', finalSubpasta); // <-- ADICIONADO SUBPASTA
+                formData.append('subpasta', finalSubpasta); 
                 formData.append('tipoConteudo', tipoConteudo);
                 formData.append('agente', 'Sistema Web (Cadastro)');
                 
@@ -313,7 +356,7 @@
                     showMessage(`Item salvo com sucesso! ID: ${data._id}`, 'success');
                     FORM.reset(); // Limpa o formulário
                     toggleContentInput(); // Reseta a exibição para TEXTO
-                    checkCustomSubfolder(); // Reseta o input customizado
+                    cancelCustomSubfolder(); // Esconde o input customizado
                 } else {
                     const errorData = await response.json();
                     showMessage(`Erro ao salvar: ${errorData.message || response.statusText}`, 'error');
@@ -331,7 +374,8 @@
         // Inicializa o estado do formulário
         window.onload = () => {
             toggleContentInput();
-            checkCustomSubfolder();
+            // A função cancelCustomSubfolder é chamada no onload para garantir que o campo esteja escondido e o select required
+            cancelCustomSubfolder(); 
         };
 
     </script>
