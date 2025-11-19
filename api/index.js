@@ -196,7 +196,7 @@ app.post('/api/login', async (req, res) => {
 
         // 2. Lógica de Restrição: Aplicada APENAS se o destino for 'knowledge_manager'
         if (target === 'knowledge_manager') {
-            const allowedUsers = ["hyury.passos", "david", "helio", "renataoliveira"];
+            const allowedUsers = ["hyury.passos", "David", "helio", "renataoliveira"];
             
             // Verifica se o usuário autenticado está na lista restrita (case-insensitive)
             if (!allowedUsers.includes(username.toLowerCase())) {
@@ -378,3 +378,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
