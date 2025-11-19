@@ -205,6 +205,60 @@ app.delete('/api/incidentes/:id', async (req, res) => {
         res.status(500).send(error);
     }
 });
+// ----------------------------------------------------
+// --- ROTAS PARA DOCUMENTAÇÃO (documentacao) ---
+// ----------------------------------------------------
+
+// POST: Cadastro de Novo Documento (usa 'upload.single('file')' para lidar com uploads)
+app.post('/api/documentacao', upload.single('file'), async (req, res) => {
+    try {
+        const { titulo, estado, tipoConteudo, texto, agente } = req.body;
+
+        if (!titulo || !estado || !tipoConteudo) {
+            return res.status(400).send({ message: "Título, Estado e Tipo de Conteúdo são obrigatórios." });
+        }
+
+        let dataToSave = {
+            titulo,
+            estado,
+            tipoConteudo,
+            agente: agente || 'Sistema Web (Cadastro)'
+        };
+
+        if (tipoConteudo === 'TEXTO') {
+            dataToSave.texto = texto;
+        } else if (tipoConteudo === 'PDF' || tipoConteudo === 'HTML') {
+            if (!req.file) {
+                return res.status(400).send({ message: "Arquivo obrigatório para o tipo de conteúdo selecionado." });
+            }
+
+            // Salva apenas metadados do arquivo
+            dataToSave.nomeArquivo = req.file.originalname;
+            dataToSave.mimeType = req.file.mimetype;
+            dataToSave.texto = `Arquivo: ${req.file.originalname}. Metadados salvos.`;
+        }
+
+        const novoDocumento = new Documentacao(dataToSave);
+        await novoDocumento.save();
+
+        res.status(201).send({ message: "Documento salvo com sucesso.", _id: novoDocumento._id, ...novoDocumento.toObject() });
+
+    } catch (error) {
+        console.error('Erro ao salvar documento:', error);
+        res.status(400).send({ message: "Erro ao salvar documento.", error: error.message });
+    }
+});
+
+// GET: Buscar Todos os Documentos
+app.get('/api/documentacao', async (req, res) => {
+    try {
+        const documentos = await Documentacao.find({}).sort({ dataCadastro: -1 });
+        res.send(documentos);
+    } catch (error) {
+        console.error('Erro ao buscar documentos:', error);
+        res.status(500).send({ message: "Erro ao buscar documentos.", error: error.message });
+    }
+});
 
 // --- ROTAS PARA MEMÓRIA DO CHATBOT ---
 app.post('/api/memories', async (req, res) => {
@@ -232,3 +286,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
