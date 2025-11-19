@@ -1,218 +1,394 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Itens de Conhecimento</title>
-    <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome para Ícones -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Conhecimento</title>
+    <!-- Carrega o Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome para Ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'dark-blue-bg': '#0a192f', /* Mais escuro */
-                        'card-bg': '#112240', /* Cartão mais claro */
-                        'primary-blue': '#64ffda', /* Cor de destaque (neon/aqua) */
-                        'input-bg': '#172a45', /* Cor de fundo do input */
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-        }
-        .folder-toggle {
-            transition: transform 0.2s;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-blue-bg': '#0a192f',
+                        'card-bg': '#112240',
+                        'primary-blue': '#64ffda',
+                        'input-bg': '#172a45',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
         }
-        .folder-closed .folder-toggle {
-            transform: rotate(-90deg);
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; min-height: 100vh; }
+        
+        /* Animação da seta da pasta */
+        .folder-toggle { transition: transform 0.2s; }
+        .folder-closed .folder-toggle { transform: rotate(-90deg); }
+        
+        /* Modal Styles */
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.85); z-index: 50; }
+        .modal-content { max-height: 90vh; z-index: 60; }
+        .modal-body { overflow-y: auto; }
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0a192f; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475566; }
+
+        /* Iframe para visualização de PDF/HTML */
+        .modal-body iframe {
+            width: 100%;
+            height: 70vh; /* Altura do iframe dentro do modal */
+            border: none;
+            background-color: white; /* Fundo branco para PDFs */
         }
-    </style>
+    </style>
 </head>
 
 <body class="bg-dark-blue-bg text-gray-100 flex items-start justify-center p-4">
 
-    <div class="w-full max-w-4xl bg-card-bg shadow-2xl p-8 md:p-10 rounded-xl space-y-8 mt-8 border border-primary-blue/20">
-        
-        <header class="flex justify-between items-center border-b border-primary-blue/30 pb-4">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-white flex items-center">
-                <i class="fas fa-list-ul text-primary-blue mr-3"></i>
-                Itens de Conhecimento Salvos
-            </h1>
-            <a href="cadastro.html" class="py-2 px-4 text-primary-blue border border-primary-blue hover:bg-primary-blue/10 font-semibold rounded-lg transition duration-300 flex items-center">
-                <i class="fas fa-plus-circle mr-2"></i>
-                Novo Cadastro
-            </a>
-        </header>
-
-        <!-- Mensagens de Feedback (para erros de carregamento) -->
-        <div id="messageBox" class="p-3 text-center rounded-lg hidden font-semibold text-sm border-2" role="alert"></div>
-
-        <div id="items-list-container">
-            <h2 class="text-xl font-bold text-gray-300 mb-4">Organização por Estado</h2>
-            <div id="knowledge-items-list" class="space-y-4">
-                <p class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Carregando itens...</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const API_ENDPOINT = '/api/documentacao';
-        const ITEMS_LIST_CONTAINER = document.getElementById('knowledge-items-list');
-        const MESSAGE_BOX = document.getElementById('messageBox');
-        
-        function showMessage(message, type = 'success') {
-            MESSAGE_BOX.textContent = message;
-            MESSAGE_BOX.classList.remove('hidden', 'bg-red-500/10', 'bg-green-500/10', 'text-red-400', 'text-green-400', 'border-red-500', 'border-green-500', 'bg-primary-blue/10', 'text-primary-blue', 'border-primary-blue');
-            
-            if (type === 'success') {
-                MESSAGE_BOX.classList.add('bg-primary-blue/10', 'text-primary-blue', 'border', 'border-primary-blue');
-            } else if (type === 'error') {
-                MESSAGE_BOX.classList.add('bg-red-500/10', 'text-red-400', 'border', 'border-red-500');
-            }
-        }
-
-        window.downloadFile = function(itemId) {
-            window.location.href = `${API_ENDPOINT}/download/${itemId}`;
-        }
+    <div class="w-full max-w-6xl bg-card-bg shadow-2xl p-6 md:p-10 rounded-xl space-y-6 mt-4 border border-primary-blue/20">
         
-        // NOVO: Função para alternar a visibilidade da pasta
-        window.toggleFolder = function(state) {
-            const folderContent = document.getElementById(`folder-content-${state}`);
-            const folderDiv = document.getElementById(`folder-${state}`);
-            const icon = document.getElementById(`folder-icon-${state}`);
+        <header class="flex flex-col md:flex-row justify-between items-center border-b border-primary-blue/30 pb-4 gap-4">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-white flex items-center">
+                <i class="fas fa-book-reader text-primary-blue mr-3"></i>
+                Base de Conhecimento
+            </h1>
+            <div class="flex gap-2">
+                <button onclick="loadKnowledgeItems()" class="py-2 px-4 text-sm border border-gray-500 hover:bg-gray-700 text-gray-300 font-semibold rounded-lg transition duration-300">
+                    <i class="fas fa-sync-alt mr-2"></i> Atualizar
+                </button>
+                <a href="cadastro.html" class="py-2 px-4 bg-primary-blue hover:bg-emerald-400 text-dark-blue-bg font-bold rounded-lg transition duration-300 flex items-center shadow-lg shadow-primary-blue/20">
+                    <i class="fas fa-plus-circle mr-2"></i> Novo Item
+                </a>
+            </div>
+        </header>
+
+        <!-- Feedback Messages -->
+        <div id="messageBox" class="p-3 text-center rounded-lg hidden font-semibold text-sm border-2" role="alert"></div>
+
+        <!-- Lista Principal -->
+        <div id="items-list-container">
+            <div id="knowledge-items-list" class="space-y-4">
+                <p class="text-gray-400 text-sm p-8 bg-input-bg rounded-lg text-center animate-pulse">
+                    <i class="fas fa-spinner fa-spin mr-2"></i> Carregando biblioteca...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZAÇÃO (POP-UP) -->
+    <div id="contentModal" class="fixed inset-0 hidden modal-overlay items-center justify-center p-4">
+        <div class="bg-[#1e293b] rounded-xl shadow-2xl modal-content w-full md:w-4/5 lg:w-3/4 flex flex-col border border-gray-600">
             
-            if (folderContent.classList.contains('hidden')) {
-                folderContent.classList.remove('hidden');
-                folderDiv.classList.remove('folder-closed');
-                icon.classList.replace('fa-folder-closed', 'fa-folder-open');
+            <!-- Header do Modal -->
+            <header class="flex justify-between items-center p-4 border-b border-gray-600 bg-[#0f172a] rounded-t-xl">
+                <h3 id="modal-title" class="text-xl font-bold text-white truncate flex items-center">
+                    <i class="fas fa-eye text-primary-blue mr-3"></i> Visualizar
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-400 transition p-2 rounded-full hover:bg-white/5">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </header>
+            
+            <!-- Corpo do Modal -->
+            <div id="modal-content-viewer" class="modal-body flex-grow p-0 bg-white min-h-[70vh]">
+                <!-- O conteúdo será injetado aqui (Iframe ou Texto) -->
+                <div class="flex h-full items-center justify-center bg-dark-blue-bg text-gray-400">
+                    <p>Carregando...</p>
+                </div>
+            </div>
+            
+            <!-- Rodapé do Modal -->
+            <div class="flex justify-between items-center p-4 border-t border-gray-600 bg-[#0f172a] rounded-b-xl">
+                <span class="text-xs text-gray-500" id="modal-footer-info">Visualização rápida</span>
+                <div class="flex gap-3">
+                    <button id="modal-download-btn" onclick="" class="py-2 px-4 bg-primary-blue hover:bg-emerald-400 text-dark-blue-bg font-bold rounded shadow transition">
+                        <i class="fas fa-download mr-2"></i> Baixar Original
+                    </button>
+                    <button onclick="closeModal()" class="py-2 px-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded transition">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_ENDPOINT = '/api/documentacao';
+        const ITEMS_LIST_CONTAINER = document.getElementById('knowledge-items-list');
+        const MESSAGE_BOX = document.getElementById('messageBox');
+        
+        // Elementos do Modal
+        const CONTENT_MODAL = document.getElementById('contentModal');
+        const MODAL_TITLE = document.getElementById('modal-title');
+        const MODAL_VIEWER = document.getElementById('modal-content-viewer');
+        const MODAL_DOWNLOAD_BTN = document.getElementById('modal-download-btn');
+
+        function showMessage(message, type = 'success') {
+            MESSAGE_BOX.textContent = message;
+            MESSAGE_BOX.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'border-red-500', 'bg-green-500/10', 'text-green-400', 'border-green-500');
+            
+            if (type === 'success') {
+                MESSAGE_BOX.classList.add('bg-green-500/10', 'text-green-400', 'border', 'border-green-500');
             } else {
-                folderContent.classList.add('hidden');
-                folderDiv.classList.add('folder-closed');
-                icon.classList.replace('fa-folder-open', 'fa-folder-closed');
+                MESSAGE_BOX.classList.add('bg-red-500/10', 'text-red-400', 'border', 'border-red-500');
+            }
+            setTimeout(() => MESSAGE_BOX.classList.add('hidden'), 4000);
+        }
+
+        // --- Funções do Modal ---
+        
+        window.closeModal = function() {
+            CONTENT_MODAL.classList.add('hidden');
+            CONTENT_MODAL.classList.remove('flex');
+            MODAL_VIEWER.innerHTML = ''; // Limpa para economizar memória
+        }
+
+        window.viewDocument = async function(itemId) {
+            // Prepara o modal
+            MODAL_TITLE.innerText = 'Carregando...';
+            MODAL_VIEWER.innerHTML = `
+                <div class="flex flex-col h-full items-center justify-center bg-dark-blue-bg space-y-4">
+                    <i class="fas fa-circle-notch fa-spin text-5xl text-primary-blue"></i>
+                    <p class="text-gray-300">Buscando conteúdo do servidor...</p>
+                </div>`;
+            
+            CONTENT_MODAL.classList.remove('hidden');
+            CONTENT_MODAL.classList.add('flex');
+
+            try {
+                // Busca o conteúdo (Base64 ou Texto)
+                const response = await fetch(`${API_ENDPOINT}/content/${itemId}`);
+                if (!response.ok) throw new Error('Erro ao baixar conteúdo.');
+                
+                const item = await response.json();
+                MODAL_TITLE.innerText = item.titulo;
+                
+                // Configura o botão de download do modal para apontar para este arquivo
+                MODAL_DOWNLOAD_BTN.onclick = () => downloadFile(itemId);
+                
+                // Renderiza baseado no tipo
+                if (item.tipoConteudo === 'TEXTO') {
+                    MODAL_VIEWER.innerHTML = `
+                        <div class="w-full h-full p-8 bg-[#1e293b] overflow-auto">
+                            <pre class="whitespace-pre-wrap font-mono text-sm text-gray-200 bg-black/30 p-6 rounded-lg border border-gray-700 shadow-inner">${item.content || item.texto}</pre>
+                        </div>
+                    `;
+                } else if (item.content) {
+                    // Para PDF e HTML
+                    const dataUrl = `data:${item.mimeType};base64,${item.content}`;
+                    
+                    if (item.tipoConteudo === 'PDF') {
+                        // PDF precisa de um fundo claro para ser visível
+                        MODAL_VIEWER.innerHTML = `<iframe src="${dataUrl}" class="w-full h-full border-none bg-gray-200"></iframe>`;
+                    } else {
+                        // HTML
+                        MODAL_VIEWER.innerHTML = `<iframe src="${dataUrl}" class="w-full h-full border-none bg-white"></iframe>`;
+                    }
+                } else {
+                    throw new Error("Conteúdo vazio ou inválido.");
+                }
+
+            } catch (error) {
+                MODAL_TITLE.innerText = 'Erro';
+                MODAL_VIEWER.innerHTML = `
+                    <div class="flex flex-col h-full items-center justify-center bg-dark-blue-bg text-red-400 p-8 text-center">
+                        <i class="fas fa-exclamation-triangle text-5xl mb-4"></i>
+                        <h3 class="text-xl font-bold">Não foi possível visualizar</h3>
+                        <p class="mt-2">${error.message}</p>
+                        <p class="text-sm text-gray-500 mt-4">Tente usar o botão "Baixar Original".</p>
+                    </div>`;
             }
         }
 
-        // NOVO: Função para agrupar e renderizar os itens
-        async function loadKnowledgeItems() {
-            ITEMS_LIST_CONTAINER.innerHTML = '<p class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Carregando itens...</p>';
-            
-            try {
-                const response = await fetch(API_ENDPOINT);
-                if (!response.ok) throw new Error('Falha ao carregar itens');
-                
-                const items = await response.json();
-                ITEMS_LIST_CONTAINER.innerHTML = ''; 
-                
-                if (items.length === 0) {
-                    ITEMS_LIST_CONTAINER.innerHTML = '<p class="text-gray-400 text-sm p-3 bg-input-bg rounded-lg">Nenhum item de conhecimento cadastrado.</p>';
-                    return;
-                }
+        window.downloadFile = function(itemId) {
+            window.location.href = `${API_ENDPOINT}/download/${itemId}`;
+        }
 
-                // 1. Agrupar os itens por Estado
-                const groupedItems = items.reduce((acc, item) => {
-                    const state = item.estado || 'GERAL'; // Usa 'GERAL' se o estado não for definido
-                    if (!acc[state]) {
-                        acc[state] = [];
-                    }
-                    acc[state].push(item);
+        // --- Lógica de Pastas ---
+
+        window.toggleFolder = function(id) {
+            const content = document.getElementById(`content-${id}`);
+            const folder = document.getElementById(`folder-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                folder.classList.remove('folder-closed');
+                
+                if(icon.classList.contains('fa-chevron-right')) {
+                    icon.classList.replace('fa-chevron-right', 'fa-chevron-down');
+                }
+            } else {
+                content.classList.add('hidden');
+                folder.classList.add('folder-closed');
+                if(icon.classList.contains('fa-chevron-down')) {
+                    icon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+                }
+            }
+        }
+
+        // --- Carregamento e Agrupamento ---
+
+        async function loadKnowledgeItems() {
+            ITEMS_LIST_CONTAINER.innerHTML = `
+                <div class="text-center p-8 text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-3"></i><br>Carregando itens...
+                </div>`;
+
+            try {
+                const response = await fetch(API_ENDPOINT);
+                const items = await response.json();
+                
+                if (!items || items.length === 0) {
+                    ITEMS_LIST_CONTAINER.innerHTML = `
+                        <div class="text-center p-12 bg-input-bg rounded-xl border border-dashed border-gray-600">
+                            <i class="fas fa-folder-open text-5xl text-gray-600 mb-4"></i>
+                            <p class="text-gray-400 text-lg">Nenhuma documentação encontrada.</p>
+                            <a href="cadastro.html" class="text-primary-blue hover:underline mt-2 block">Cadastre o primeiro item</a>
+                        </div>`;
+                    return;
+                }
+
+                ITEMS_LIST_CONTAINER.innerHTML = ''; 
+
+                // 1. Agrupar por ESTADO
+                const byState = items.reduce((acc, item) => {
+                    const st = item.estado || 'Geral';
+                    if (!acc[st]) acc[st] = [];
+                    acc[st].push(item);
                     return acc;
                 }, {});
 
-                // Ordenar os estados alfabeticamente
-                const sortedStates = Object.keys(groupedItems).sort();
+                // Ordenar Estados
+                Object.keys(byState).sort().forEach(state => {
+                    const stateId = `state-${state.replace(/\s+/g, '-')}`;
+                    const stateItems = byState[state];
 
-                // 2. Renderizar a lista de pastas (Accordions)
-                sortedStates.forEach(state => {
-                    const stateItems = groupedItems[state];
-                    const folderDiv = document.createElement('div');
-                    
-                    // Inicialmente todos fechados (adiciona a classe 'folder-closed')
-                    folderDiv.className = 'bg-input-bg rounded-lg shadow-md folder-closed transition-all'; 
-                    folderDiv.id = `folder-${state}`;
+                    // Container do Estado
+                    const stateDiv = document.createElement('div');
+                    stateDiv.className = "bg-input-bg rounded-lg shadow-lg mb-4 overflow-hidden border border-gray-700 folder-closed";
+                    stateDiv.id = `folder-${stateId}`;
 
-                    const headerButton = document.createElement('button');
-                    headerButton.className = 'w-full text-left p-4 flex justify-between items-center font-bold text-lg hover:bg-[#203a56] rounded-t-lg transition duration-200';
-                    headerButton.onclick = () => toggleFolder(state);
-                    
-                    // Ícones e Título da Pasta
-                    headerButton.innerHTML = `
-                        <span class="flex items-center">
-                            <i id="folder-toggle-${state}" class="fas fa-chevron-down mr-3 text-primary-blue folder-toggle"></i>
-                            <i id="folder-icon-${state}" class="far fa-folder-closed mr-3 text-yellow-500"></i>
-                            Pasta: ${state} <span class="text-sm ml-3 px-2 py-1 bg-primary-blue/20 text-primary-blue rounded-full">${stateItems.length} itens</span>
-                        </span>
+                    // Cabeçalho do Estado
+                    const stateHeader = `
+                        <button onclick="toggleFolder('${stateId}')" class="w-full flex justify-between items-center p-4 hover:bg-[#23354d] transition duration-200 bg-[#1a273b] text-left">
+                            <div class="flex items-center">
+                                <i id="icon-${stateId}" class="fas fa-chevron-right w-6 text-primary-blue folder-toggle transition-transform duration-200"></i>
+                                <i class="fas fa-map-marker-alt text-red-400 mx-3 text-lg"></i>
+                                <span class="font-bold text-lg text-white">${state}</span>
+                            </div>
+                            <span class="bg-primary-blue/10 text-primary-blue text-xs font-bold px-2 py-1 rounded-full border border-primary-blue/20">
+                                ${stateItems.length} docs
+                            </span>
+                        </button>
                     `;
 
-                    const contentDiv = document.createElement('div');
-                    contentDiv.id = `folder-content-${state}`;
-                    contentDiv.className = 'hidden space-y-2 p-4 border-t border-gray-600/30';
-                    
-                    // 3. Renderizar os Documentos dentro da Pasta
-                    stateItems.forEach(item => {
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'p-3 bg-card-bg rounded-lg flex justify-between items-center flex-wrap';
+                    // Conteúdo do Estado (Container de Subpastas)
+                    const stateContent = document.createElement('div');
+                    stateContent.id = `content-${stateId}`;
+                    stateContent.className = "hidden bg-[#0f172a] p-2 space-y-2 border-t border-gray-700";
 
-                        let contentInfo;
-                        const isDownloadable = (item.tipoConteudo === 'TEXTO' || item.tipoConteudo === 'PDF' || item.tipoConteudo === 'HTML');
-                        
-                        // Lógica para Tipo de Conteúdo e Ícone
-                        let iconClass;
-                        if (item.tipoConteudo === 'TEXTO') {
-                            iconClass = 'fas fa-terminal';
-                            const resumo = item.texto ? item.texto.substring(0, 70).replace(/\n/g, ' ') + '...' : 'Sem conteúdo de texto.';
-                            contentInfo = `<span class="text-sm text-gray-400 mt-1 md:mt-0 w-full md:w-auto flex items-center"><i class="${iconClass} mr-2 text-primary-blue/80"></i>${resumo}</span>`;
-                        } else {
-                            iconClass = item.tipoConteudo === 'PDF' ? 'fas fa-file-pdf' : 'fas fa-code';
-                            const fileName = item.nomeArquivo || 'Nome Indisponível';
-                            contentInfo = `<span class="text-sm text-gray-400 mt-1 md:mt-0 w-full md:w-auto flex items-center"><i class="${iconClass} mr-2 text-primary-blue/80"></i>Arquivo: ${fileName}</span>`;
-                        }
-                        
-                        let actionButton = '';
-                        if (isDownloadable) {
-                            actionButton = `
-                                <button onclick="downloadFile('${item._id}')" 
-                                    class="mt-2 md:mt-0 py-1 px-3 bg-primary-blue hover:bg-green-600 text-dark-blue-bg text-xs font-bold rounded transition duration-200 flex items-center shadow-md">
-                                    <i class="fas fa-download mr-1"></i> Download
-                                </button>
-                            `;
-                        }
+                    // 2. Agrupar por SUBPASTA dentro do Estado
+                    const bySubfolder = stateItems.reduce((acc, item) => {
+                        const sub = item.subpasta || 'Geral';
+                        if (!acc[sub]) acc[sub] = [];
+                        acc[sub].push(item);
+                        return acc;
+                    }, {});
 
-                        itemDiv.innerHTML = `
-                            <div class="w-full md:w-auto flex-grow">
-                                <p class="font-semibold text-white">${item.titulo}</p>
-                                ${contentInfo}
-                            </div>
-                            ${actionButton}
+                    // Ordenar e Criar Subpastas
+                    Object.keys(bySubfolder).sort().forEach(sub => {
+                        const subId = `${stateId}-${sub.replace(/\s+/g, '-')}`;
+                        const subItems = bySubfolder[sub];
+
+                        const subDiv = document.createElement('div');
+                        subDiv.className = "bg-card-bg rounded border border-gray-700/50 folder-closed";
+                        subDiv.id = `folder-${subId}`;
+
+                        // Cabeçalho da Subpasta
+                        const subHeader = `
+                            <button onclick="toggleFolder('${subId}')" class="w-full flex justify-between items-center p-3 hover:bg-[#2a3c57] transition text-left rounded">
+                                <div class="flex items-center pl-4">
+                                    <i id="icon-${subId}" class="fas fa-chevron-right w-5 text-gray-500 folder-toggle text-sm"></i>
+                                    <i class="fas fa-folder text-yellow-500 mx-2"></i>
+                                    <span class="font-semibold text-gray-200">${sub}</span>
+                                </div>
+                                <span class="text-xs text-gray-500 bg-black/30 px-2 py-0.5 rounded">${subItems.length}</span>
+                            </button>
                         `;
-                        contentDiv.appendChild(itemDiv);
+
+                        // Lista de Itens
+                        const subContent = document.createElement('div');
+                        subContent.id = `content-${subId}`;
+                        subContent.className = "hidden p-2 space-y-2 bg-[#162438]";
+
+                        subItems.forEach(item => {
+                            // Ícone baseado no tipo
+                            let icon = item.tipoConteudo === 'PDF' ? 'fa-file-pdf text-red-500' : 
+                                       item.tipoConteudo === 'HTML' ? 'fa-file-code text-orange-500' : 
+                                       'fa-file-alt text-green-500';
+                            
+                            const fileName = item.nomeArquivo ? 
+                                (item.nomeArquivo.length > 40 ? item.nomeArquivo.substring(0, 40) + '...' : item.nomeArquivo) : 
+                                (item.texto ? 'Conteúdo de texto' : 'Sem nome');
+
+                            const itemHtml = `
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-3 bg-[#1e293b] rounded hover:bg-[#253347] border-l-4 border-primary-blue/30 transition group">
+                                    <div class="flex items-start gap-3 mb-2 md:mb-0">
+                                        <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-black/20 rounded-full">
+                                            <i class="fas ${icon} text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-sm text-white group-hover:text-primary-blue transition">${item.titulo}</h4>
+                                            <p class="text-xs text-gray-400 truncate">${fileName}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 w-full md:w-auto justify-end">
+                                        <button onclick="viewDocument('${item._id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded shadow transition flex items-center">
+                                            <i class="fas fa-eye mr-1"></i> Ver
+                                        </button>
+                                        <button onclick="downloadFile('${item._id}')" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-200 text-xs font-bold rounded shadow transition flex items-center border border-gray-600">
+                                            <i class="fas fa-download mr-1"></i> Baixar
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            subContent.innerHTML += itemHtml;
+                        });
+
+                        subDiv.innerHTML = subHeader;
+                        subDiv.appendChild(subContent);
+                        stateContent.appendChild(subDiv);
                     });
 
-                    folderDiv.appendChild(headerButton);
-                    folderDiv.appendChild(contentDiv);
-                    ITEMS_LIST_CONTAINER.appendChild(folderDiv);
+                    stateDiv.innerHTML = stateHeader;
+                    stateDiv.appendChild(stateContent);
+                    ITEMS_LIST_CONTAINER.appendChild(stateDiv);
                 });
 
-            } catch (error) {
-                console.error('Erro ao carregar itens:', error);
-                showMessage('Erro ao carregar dados do servidor. Verifique o backend.', 'error');
-                ITEMS_LIST_CONTAINER.innerHTML = '';
-            }
-        }
+            } catch (error) {
+                console.error(error);
+                ITEMS_LIST_CONTAINER.innerHTML = `
+                    <div class="p-6 bg-red-900/20 border border-red-500/50 rounded-xl text-center text-red-200">
+                        <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
+                        <p>Erro ao conectar com o servidor.</p>
+                        <button onclick="loadKnowledgeItems()" class="mt-4 underline">Tentar novamente</button>
+                    </div>`;
+            }
+        }
 
-        // Carrega os itens ao iniciar a página
-        window.onload = loadKnowledgeItems;
-
-    </script>
+        // Inicialização
+        window.onload = loadKnowledgeItems;
+    </script>
 </body>
-
 </html>
