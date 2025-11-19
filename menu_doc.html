@@ -53,6 +53,22 @@
         #file-upload::file-selector-button:hover {
             background-color: #4cffc7;
         }
+        .back-button-container {
+            margin-top: 30px;
+        }
+        .back-button {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+        .back-button:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
 
@@ -188,6 +204,10 @@
                         <i class="fas fa-exclamation-triangle mr-1"></i> O arquivo será salvo diretamente no MongoDB (limite de 16MB).
                     </p>
                 </div>
+                <div class="back-button-container">
+                <a href="menu.html" class="back-button"><i class="fas fa-arrow-left"></i> Voltar ao Menu Principal</a>
+                </div>
+
             </div>
             
             <div id="messageBox" class="p-3 text-center rounded-lg hidden font-semibold text-sm border-2" role="alert"></div>
