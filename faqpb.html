@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Integração e Sistemas DETRAN PB (RENACH-VSOFT)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            /* AZUL ESCURO FOSCO (MATTE DARK BLUE) */
+            background: #2c3e50;
+            min-height: 100vh;
+            padding: 20px;
+            color: #ecf0f1; /* Cor do texto claro para o fundo escuro */
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #34495e; /* Fundo do container ligeiramente mais claro */
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Sombra mais evidente */
+            overflow: hidden;
+        }
+        header {
+            background: #0056b3; /* Azul primário mais escuro */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .tabs {
+            display: flex;
+            background: #2c3e50; /* Fundo das abas escuro */
+            border-bottom: 1px solid #4a637d;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab:hover {
+            background: #3b506b; /* Escurecer no hover */
+        }
+        .tab.active {
+            border-bottom: 3px solid #2ecc71; /* Linha de destaque VERDE */
+            background: #34495e; /* Fundo do container para aba ativa */
+            color: #2ecc71;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            color: #ecf0f1; /* Cor do texto do conteúdo da aba */
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* --- Caixas de Informação --- */
+        .info-box {
+            background: #5e6f80; /* Fundo neutro mais escuro */
+            border-left: 4px solid #f39c12; /* Amarelo Laranja */
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .info-box.procedure {
+            background: #476a59; /* Verde escuro sutil */
+            border-left: 4px solid #2ecc71; /* Verde */
+        }
+        .info-box.error {
+            background: #734c51; /* Vermelho escuro sutil */
+            border-left: 4px solid #e74c3c; /* Vermelho */
+        }
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-content {
+            line-height: 1.6;
+        }
+        .info-content p {
+            margin-bottom: 10px;
+        }
+        .doc-section {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #4a637d;
+        }
+        .doc-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .doc-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #ecf0f1;
+            font-size: 22px;
+            border-bottom: 2px solid #2ecc71; /* Cor de destaque verde */
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .doc-subtitle {
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #007bff;
+            font-size: 18px;
+        }
+        .code-block {
+            background: #1f2a38; /* Fundo de código bem escuro */
+            color: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        ul, ol {
+            padding-left: 25px;
+            margin-top: 10px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        /* --- FAQ - Estilo para a lista de perguntas, sem expansão inline --- */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .faq-item {
+            border-left: 5px solid #007bff; /* Azul para item de FAQ */
+            border-radius: 5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .faq-item:hover {
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+        }
+        .faq-question {
+            font-weight: bold;
+            color: #ecf0f1;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #3b506b; /* Fundo mais escuro para a pergunta */
+            padding: 15px;
+            transition: background 0.2s;
+            font-size: 16px;
+        }
+        .faq-question:hover {
+            background: #007bff; /* Azul primário no hover */
+            color: white;
+        }
+        .faq-question i {
+            transition: transform 0.3s;
+        }
+        /* Oculta as respostas originais para usar o modal */
+        .faq-answer {
+            display: none !important;
+        }
+        /* --- Tags de Estado/Destaque --- */
+        .state-tag {
+            display: inline-block;
+            background: #f39c12; /* Laranja */
+            color: #1f2a38;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 5px;
+        }
+        .tag-info {
+            display: inline-block;
+            background: #007bff; /* Azul */
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 5px;
+        }
+        /* --- Notas/Alertas --- */
+        .note {
+            background: #3a5079; /* Azul escuro mais contrastante */
+            border-left: 4px solid #f39c12; /* Laranja para nota */
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-style: italic;
+            font-size: 14px;
+        }
+        /* --- MODAL (POP-UP) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #34495e; /* Fundo do modal igual ao container */
+            color: #ecf0f1;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 90%;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-out;
+            border-top: 5px solid #2ecc71; /* Borda impactante VERDE */
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-header {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #f39c12; /* Cor impactante para o título (Laranja) */
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+        .modal-body code {
+            background: #1f2a38;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 14px;
+            color: #55c2d8;
+        }
+        .modal-footer {
+            padding-top: 15px;
+            text-align: right;
+        }
+        .modal-close-btn {
+            background: #e74c3c; /* Botão de fechamento impactante (vermelho) */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .modal-close-btn:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                border-bottom: 1px solid #4a637d;
+            }
+            .modal-content {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <i class="fas fa-network-wired fa-2x"></i>
+            <h1>FAQ - Integração e Sistemas DETRAN PB (RENACH-VSOFT)</h1>
+            <p class="description">Perguntas Frequentes sobre a Integração RENACH/REST e Configuração de Servidor CFC.</p>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="integracao-rest"><i class="fas fa-link"></i> Integração RENACH e Serviços REST</div>
+            <div class="tab" data-tab="envio-cursos"><i class="fas fa-graduation-cap"></i> Envio de Cursos e Análise de Retorno</div>
+            <div class="tab" data-tab="instalacao-cfc"><i class="fas fa-server"></i> Instalação e Configuração de Servidor CFC</div>
+            <div class="tab" data-tab="solucao-ids"><i class="fas fa-wrench"></i> Solução de Problemas Comuns no IDS</div>
+            <div class="tab" data-tab="erros-matricula"><i class="fas fa-user-check"></i> Correção de Erros de Matrícula</div>
+            <div class="tab" data-tab="specs-tecnicas"><i class="fas fa-file-code"></i> Especificações Técnicas dos Serviços</div>
+        </div>
+
+        <div class="tab-content active" id="integracao-rest">
+            <div class="doc-title"><i class="fas fa-link"></i> Serviços REST do DETRAN PB</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Autenticação em Serviços REST" data-answer="
+                        <p>A autenticação da empresa é feita através de uma requisição <span class='tag-info'>POST</span> para a URL base seguida de <code class='code-block'>/login</code>, que no ambiente de Homologação é: <code>http://prxcodata.pb.gov.br/detran-service/login</code></p>
+                        <p>Os <strong>parâmetros de entrada</strong> (enviados no corpo da requisição JSON, dentro de <code>'data':{}</code> ) incluem:</p>
+                        <ul>
+                            <li><strong>orgao:</strong> Credencial de acesso fornecida pelo DETRAN/PB (Exemplo: &quot;000997&quot;).</li>
+                            <li><strong>usuario:</strong> Credencial de acesso fornecida pelo DETRAN/PB (Exemplo: &quot;0000997&quot;).</li>
+                            <li><strong>senha:</strong> Credencial de acesso fornecida pelo DETRAN/PB (Exemplo: &quot;det123&quot;).</li>
+                        </ul>
+                        <p>Em caso de sucesso, a aplicação retorna o cabeçalho <strong>Authorization: Bearer Token</strong> sem controle de tempo, que deve ser usado nas solicitações de consulta de imagem RENACH.</p>
+                    ">
+                        <span>1. Como a empresa deve se autenticar para acessar os serviços REST do DETRAN PB?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Consulta de Imagens (Face e Digitais)" data-answer="
+                        <p>O serviço para consulta de imagens (Face e Digitais) é acessado pelo endpoint: <code class='code-block'>URL_BASE/api/v1/rch/H83</code></p>
+                        <p>Os <strong>parâmetros de entrada obrigatórios</strong> são:</p>
+                        <ul>
+                            <li><strong>renach:</strong> Alfanumérico, 11 caracteres (Sigla do Estado + 9 números, Exemplo: &quot;PB030675057&quot;).</li>
+                            <li><strong>cpf:</strong> Alfanumérico, 11 caracteres, com &quot;0&quot; à esquerda (Exemplo: &quot;08558048070&quot;).</li>
+                        </ul>
+                    ">
+                        <span>2. Qual serviço é usado para consultar imagens (Face e Digitais)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Dados Retornados em Consulta de Imagens" data-answer="
+                        <p>Em caso de sucesso (<span class='tag-info'>status &quot;000&quot;</span>), a resposta JSON inclui:</p>
+                        <ul>
+                            <li><strong>imgFace:</strong> Foto do usuário.</li>
+                            <li><strong>tipolmgFace:</strong> Tipo da Imagem da Face (Ex: JPG).</li>
+                            <li><strong>imgD1 a imgD0:</strong> Imagens das digitais (Polegar Direito, Polegar Esquerdo, Indicador Direito, etc.).</li>
+                            <li><strong>tipolmgDigital:</strong> Tipo da Imagem Digital (Ex: WSQ).</li>
+                        </ul>
+                    ">
+                        <span>3. Quais dados são retornados em caso de sucesso na consulta de imagens?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Status HTTP de Erro 401 a 403" data-answer="
+                        <p>Os status HTTP <span class='tag-info'>401</span> a <span class='tag-info'>403</span> indicam erros relacionados ao processo de <strong>autenticação</strong>.</p>
+                        <div class='note'>
+                            <strong>Nota:</strong> Um status 400 indica qualquer problema no envio da requisição, e um status 200 indica que está tudo OK.
+                        </div>
+                    ">
+                        <span>4. O que indicam os status HTTP de erro 401 a 403 nos serviços?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Serviço para Efetivar Matrícula no CFC" data-answer="
+                        <p>O serviço para efetivar a matrícula no CFC utiliza o endpoint: <code class='code-block'>URL_BASE/api/v1/rch/H94</code></p>
+                        <p>Os <strong>parâmetros de entrada obrigatórios</strong> são:</p>
+                        <ul>
+                            <li><strong>cpfCandidato:</strong> Alfanumérico, 11 caracteres, com &quot;0&quot; à esquerda.</li>
+                            <li><strong>codigoCurso:</strong> Alfanumérico, 2 caracteres (Tabela de cursos pré-definidos).</li>
+                            <li><strong>cnpjEntidade:</strong> Alfanumérico, 14 caracteres (CNPJ do CFC).</li>
+                            <li><strong>cpfInstrutor:</strong> Alfanumérico, 11 caracteres (CPF do instrutor).</li>
+                        </ul>
+                    ">
+                        <span>5. Qual serviço é utilizado para efetivar a matrícula no CFC?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Consulta de Instrutor para Ministrar Aula" data-answer="
+                        <p>O serviço para consultar se um instrutor pode ministrar aula no CFC é acessado pelo endpoint: <code class='code-block'>URL_BASE/api/v1/rch/J18</code></p>
+                        <p>Os <strong>parâmetros obrigatórios</strong> são: <code>cpfInstrutor</code> (11 caracteres), <code>cnpjEntidade</code> (14 caracteres) e <code>codigoCurso</code> (2 caracteres).</p>
+                        <p>Em caso de sucesso, a resposta JSON é: <code class='code-block'>{ &quot;status&quot;: &quot;000&quot;, &quot;message&quot;: &quot;Condutor Habilitado&quot;, &quot;data&quot;: {} }</code></p>
+                    ">
+                        <span>6. Qual serviço é utilizado para consultar se um instrutor pode ministrar aula e qual a resposta de sucesso?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Consulta de Veículo para Aula no CFC" data-answer="
+                        <p>O serviço para consultar se um veículo pode ser usado na aula no CFC é acessado pelo endpoint: <code class='code-block'>URL_BASE/api/v1/rch/J22</code></p>
+                        <p>Os <strong>parâmetros obrigatórios de entrada</strong> são: <code>placaVeiculo</code> (7 caracteres) e <code>cnpjVeiculo</code> (14 caracteres).</p>
+                    ">
+                        <span>7. Como é feita a consulta se um veículo pode ser usado na aula no CFC?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="envio-cursos">
+            <div class="doc-title"><i class="fas fa-graduation-cap"></i> Envio de Cursos e Análise de Retorno</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Envio de Cursos Concluídos (H87) e Códigos Disponíveis" data-answer="
+                        <p>O serviço para envio de cursos concluídos utiliza o endpoint: <code class='code-block'>URL_BASE/api/v1/rch/H87</code></p>
+                        <p>A requisição exige <strong>diversos parâmetros</strong>, como: <code>numeroRenach</code> (11 caracteres), <code>cpf</code> (11 caracteres), <code>codCurso</code> (2 caracteres), <code>numCertificado</code> (10 caracteres) e dados repetitivos para cada aula (até 60 vezes), como <code>dataAula</code>, <code>horaEntrada</code>, <code>horaSaida</code>, <code>horasAula</code>, <code>cpfinstrutor</code>, <code>horalnicio</code>, <code>horaFinal</code>, <code>tipoAula</code>, e <code>cnpjEntidade</code>.</p>
+                        <p>Alguns exemplos de <strong>códigos de curso (codCurso)</strong> são:</p>
+                        <ul>
+                            <li><strong>20:</strong> Reciclagem Para Infratores.</li>
+                            <li><strong>30:</strong> Atualização Para Renovação Da CNH.</li>
+                            <li><strong>32:</strong> Aulas Práticas 04 Rodas.</li>
+                        </ul>
+                    ">
+                        <span>8. Como posso enviar cursos concluídos e quais são alguns dos códigos de curso disponíveis?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Verificação de Motivo de Recusa de Curso (PB)" data-answer="
+                        <div class='note'>
+                            Como o log de envio de cursos na Paraíba (PB) no Datadog atualmente não está retornando o motivo quando o curso é recusado, uma alternativa é realizar o envio do curso através de uma requisição para obter o motivo da recusa.
+                        </div>
+                        <p>O procedimento envolve:</p>
+                        <ol>
+                            <li>Acessar o Datadog após o envio do curso e a emissão do certificado.</li>
+                            <li>Visualizar o body da requisição clicando no segundo log exibido (que contém o Payload JSON com os detalhes do curso).</li>
+                            <li>Copiar o body da requisição.</li>
+                            <li>Inserir o body copiado no <strong>SOAP</strong> (<code>wsdetranpraticae-soapui-project &gt; DETRANPB &gt; H87</code>) para realizar o envio por meio da requisição.</li>
+                            <li>Após reenviar o curso, a mensagem de retorno com o motivo da recusa é obtida (Exemplo: &quot;Contrato X expirado&quot;).</li>
+                        </ol>
+                    ">
+                        <span>9. Como posso verificar o motivo de um envio de curso ter sido recusado na Paraíba (PB)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="instalacao-cfc">
+            <div class="doc-title"><i class="fas fa-server"></i> Instalação e Configuração de Servidor CFC</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Início do Processo de Instalação (Máquina Principal)" data-answer="
+                        <p>O primeiro passo é realizar o <strong>backup do banco de dados na máquina antiga</strong>.</p>
+                        <p>O backup é feito no <strong>Microsoft SQL Server Management Studio</strong> clicando com o botão direito no banco (CFC), indo em Tarefas e depois em Backup. O caminho de armazenamento geralmente é <code>c:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\Backup\</code>.</p>
+                        <div class='note'>
+                            Se o backup falhar com um erro de tamanho de setor (Ex: tamanho de setor 512, agora 4096), uma solução atípica é <strong>renomear o arquivo de backup mais recente para .old</strong>.
+                        </div>
+                    ">
+                        <span>10. Como devo iniciar o processo de instalação do zero em uma nova máquina principal?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Pre-requisitos na Máquina Nova (Antes do SQL Server)" data-answer="
+                        <p>Na máquina nova, antes de instalar o SQL Server:</p>
+                        <ol>
+                            <li>Conferir e realizar todas as <strong>atualizações do Windows Update</strong>.</li>
+                            <li>Desativar o <strong>firewall (Windows Defender Firewall)</strong>.</li>
+                            <li>Realizar a instalação das dependências do <strong>Microsoft Visual C++ Redistributable</strong> (versões x32 e x64, de 2008 até 2015-2019, conforme a lista fornecida).</li>
+                        </ol>
+                    ">
+                        <span>11. O que devo fazer na máquina nova antes de instalar o SQL Server?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Modo de Autenticação e Senha Padrão (SQL Server 2012)" data-answer="
+                        <p>Durante a Configuração do Mecanismo de Banco de Dados (Database Engine Configuration), deve-se selecionar o <strong>Modo Misto</strong> (<span class='tag-info'>autenticação do SQL Server e do Windows</span>).</p>
+                        <p>A senha padrão recomendada para a conta <code>sa</code> (administrador do sistema) é <strong>Vs120499</strong>, que deve ser digitada e confirmada.</p>
+                    ">
+                        <span>12. Qual modo de autenticação e senha padrão devem ser definidos durante a instalação do SQL Server 2012?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Desativação e Ativação de Licenças Neurotech" data-answer="
+                        <p><strong>Na máquina antiga (Desativação):</strong></p>
+                        <ol>
+                            <li>Abrir o aplicativo <strong>Activation Wizard</strong>.</li>
+                            <li>Clicar em <strong>Deactivate</strong> e, em seguida, selecionar a licença desejada (Ex: Face Extractor, Face Matcher) e clicar em Deactivate novamente.</li>
+                            <li>Após a desativação, as licenças devem aparecer com o status &quot;License deactivated&quot;.</li>
+                        </ol>
+                        <p><strong>Na máquina nova (Ativação):</strong></p>
+                        <ol>
+                            <li>Recortar a pasta <code>neurotech 10</code> (encontrada no Instalador da Servidor) e colá-la na pasta Windows ou Vsoft.</li>
+                            <li>Abrir o aplicativo <strong>Activation Wizard</strong> dentro do caminho <code>C:\Windows\neurotech 10\neurotech 10\Activation</code>.</li>
+                            <li>Configurar o modo como <strong>Single PC with Licensing Service</strong>.</li>
+                            <li>Selecionar <strong>Add Licenses</strong>, copiar o Serial da licença (como Face Extractor ou Face Matcher) e colar em Enter serial numbers usando o botão Paste.</li>
+                            <li>Clicar em <strong>Activate</strong> para que as licenças sejam ativadas automaticamente (requer conexão com a internet).</li>
+                        </ol>
+                    ">
+                        <span>13. Como as licenças Neurotech devem ser desativadas na máquina antiga e ativadas na máquina nova?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Endereços de Servidor para Configuração do Bioserver (iDS CFC Server)" data-answer="
+                        <p>Ao configurar o iDS CFC Server:</p>
+                        <ul>
+                            <li>O <strong>nome ou endereço do servidor de banco de dados</strong> deve ser o mesmo nome do servidor SQL (Exemplo: <code>DESKTOP-UBNO1S1\SQLEXPRESS</code>).</li>
+                            <li>O <strong>endereço base do DETRAN</strong> a ser adicionado no campo Servidor é: <code>https://biows.detran.pb.gov.br/webdataserver</code>.</li>
+                            <li>O <strong>CNPJ do CFC</strong> e a <strong>Guid do CFC</strong> também são necessários.</li>
+                        </ul>
+                        <div class='note'>
+                            A <strong>GUID do CFC</strong> pode ser coletada no iDS (Admin) no detalhe do Centro de Formação (Exemplo: <code>3c1b5fad-f8d4-4a1a-82bc-683c8af7c249</code>).
+                        </div>
+                    ">
+                        <span>14. Quais são os endereços de servidor necessários para configurar o Bioserver (iDS CFC Server)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Solução para Falha de Backup de BD (Erro de Tamanho de Setor)" data-answer="
+                        <p>Se o backup falhar e exibir uma mensagem sobre tamanho de setor incompatível (exemplo: arquivo formatado com tamanho de setor 512 e agora em um dispositivo com 4096), o procedimento atípico a ser seguido é <strong>renomear o arquivo de backup mais recente para .old</strong>.</p>
+                    ">
+                        <span>20. O que devo fazer se um backup de banco de dados SQL falhar devido a um erro de tamanho de setor?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Procedimento de Desativação de Licença Neurotech (Máquina Antiga)" data-answer="
+                        <p>Na máquina antiga, para desativar as licenças Neurotech:</p>
+                        <ol>
+                            <li>Abra o aplicativo <strong>Activation Wizard</strong>.</li>
+                            <li>Clique em <strong>Deactivate</strong>.</li>
+                            <li>Selecione a licença desejada (Ex: Face Extractor, Face Matcher) e clique em Deactivate novamente.</li>
+                            <li>Após a desativação bem-sucedida, o status da licença será exibido como &quot;License deactivated&quot;.</li>
+                        </ol>
+                    ">
+                        <span>21. Qual é o processo para desativar uma licença Neurotech (como Face Extractor ou Face Matcher) na máquina antiga antes da migração?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Obtenção do Guid do CFC para Configuração do iDS CFC Server" data-answer="
+                        <p>O <strong>Guid do CFC</strong> é o OID (identificador único) do Centro de Formação.</p>
+                        <p>Para obtê-lo, é necessário acessar o <strong>IDS CNH Admin</strong> na tela de Centro de Formação (<code>CentroFormacao_DetailView</code>). O Guid será exibido no detalhe do Centro de Formação (Exemplo: <code>3c1b5fad-f8d4-4a1a-82bc-683c8af7c249</code>).</p>
+                        <p>O endereço base do DETRAN a ser adicionado no Bioserver é: <code>https://biows.detran.pb.gov.br/webdataserver</code>.</p>
+                    ">
+                        <span>22. Como o Guid do CFC é obtido para configurar o iDS CFC Server (Bioserver)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="solucao-ids">
+            <div class="doc-title"><i class="fas fa-wrench"></i> Solução de Problemas Comuns no IDS</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Correção do Erro '[IDS] Erro: Executing Sql 'insert into'" data-answer="
+                        <p>O erro &ldquo;Executing Sql &lsquo;insert into&rdquo; geralmente está relacionado a um problema com o <strong>serviço SQL local</strong> do sistema.</p>
+                        <p>O erro pode ocorrer ao selecionar um candidato/instrutor, abrir/fechar aulas no IDS Validador, ou criar/agendar turmas no IDS Admin.</p>
+                        <p>Para solucionar:</p>
+                        <ol>
+                            <li>Acesse a máquina do CFC e feche o sistema IDS em uso (Admin ou Validador).</li>
+                            <li>Busque por <strong>Serviços</strong> no menu Iniciar do Windows.</li>
+                            <li>Localize os serviços com o nome <strong>SQL</strong> na lista.</li>
+                            <li><strong>Interrompa</strong> o serviço SQL.</li>
+                            <li>Em seguida, <strong>inicie</strong> novamente o serviço SQL.</li>
+                            <li>O CFC deve tentar realizar a ação novamente no sistema IDS.</li>
+                        </ol>
+                        <div class='note'>Se o erro persistir, o caso deve ser encaminhado para o N2 de plantão para análise.</div>
+                    ">
+                        <span>15. O que devo fazer para corrigir o erro &quot;[IDS] Erro: Executing Sql 'insert into&quot;?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Procedimento para Erro &quot;As Faces não Correspondem. Deseja Tentar Novamente?&quot;" data-answer="
+                        <p>Este erro pode ocorrer na abertura ou encerramento de aulas no Validador ou simulador.</p>
+                        <p>O suporte deve seguir o checklist:</p>
+                        <ol>
+                            <li>Acessar a máquina no momento do atendimento.</li>
+                            <li>Salvar a evidência no chamado, incluindo:
+                                <ul>
+                                    <li>A tentativa de validação com a imagem do candidato, para registrar a presença no CFC.</li>
+                                    <li>A tela do erro, com o horário da captura.</li>
+                                </ul>
+                            </li>
+                            <li>Criar o <strong>abono</strong> após o encerramento da aula.</li>
+                        </ol>
+                        <div class='note'>
+                            É crucial que o CFC entre em contato <strong>durante a tentativa de abertura da aula</strong>; o agente não deve instruir o CFC a realizar a aula primeiro e enviar os dados depois. Para aulas em simulador, o agente deve verificar no IDS se a aula foi realizada.
+                        </div>
+                    ">
+                        <span>16. Qual é o procedimento de suporte quando ocorre o erro &quot;As Faces não Correspondem. Deseja Tentar Novamente?&quot; na abertura de aula?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="erros-matricula">
+            <div class="doc-title"><i class="fas fa-user-check"></i> Correção de Erros de Matrícula</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Causa e Mensagem de Erro que Impede a Matrícula" data-answer="
+                        <p>Ao tentar matricular um candidato no sistema admin, o erro exibido é: <strong>&quot;Ocorreu um erro ao realizar matrícula. Contate o suporte técnico. O objeto nulo deve ter um valor&quot;</strong>.</p>
+                        <p>Este problema geralmente ocorre quando o campo de vínculo do candidato com o sistema IDSCNH (o campo <code>Oidservidor</code>) está <strong>vazio (nulo)</strong> no banco de dados do CFC.</p>
+                    ">
+                        <span>17. Qual é a causa e a mensagem de erro que impede a matrícula de um candidato no IDS Admin?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Correção do Campo de Vínculo (Oidservidor) no Banco de Dados" data-answer="
+                        <p>A correção é realizada diretamente no <strong>SQL Server Management Studio</strong> no banco de dados do CFC.</p>
+                        <p>O procedimento envolve:</p>
+                        <ol>
+                            <li>Localizar o OID do candidato na tabela <code>Pessoa</code> usando o CPF (Ex: <code>SELECT Oid, Nome FROM Pessoa WHERE Cpf = &lsquo;N° CPF&rsquo;</code>).</li>
+                            <li>Consultar a tabela <code>Candidato</code> com esse OID e verificar que o campo <code>Oidservidor</code> está <span class='tag-info'>NULL</span> (nulo).</li>
+                            <li>Obter o OID do candidato acessando e copiando o identificador do candidato diretamente do sistema <strong>IDSCNH</strong>.</li>
+                            <li>Atualizar a tabela <code>Candidato</code> no banco de dados do CFC inserindo o OID do IDSCNH no campo <code>Oidservidor</code>.</li>
+                        </ol>
+                        <div class='note'>
+                            Após a atualização, a matrícula no sistema admin deve ser concluída com sucesso.
+                        </div>
+                    ">
+                        <span>18. Como o campo de vínculo do candidato (Oidservidor) é corrigido no banco de dados do CFC?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="specs-tecnicas">
+            <div class="doc-title"><i class="fas fa-file-code"></i> Especificações Técnicas dos Serviços REST (DETRAN PB)</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Tipos de Imagem Retornados no Serviço de Consulta (H83)" data-answer="
+                        <p>Em caso de sucesso (<span class='tag-info'>status &quot;000&quot;</span>), o serviço de consulta de imagens (H83) retorna:</p>
+                        <ul>
+                            <li><strong>tipolmgFace:</strong> Tipo da Imagem da Face. Exemplo: <code>JPG</code>.</li>
+                            <li><strong>tipolmgDigital:</strong> Tipo da Imagem Digital. Exemplo: <code>WSQ</code>.</li>
+                        </ul>
+                    ">
+                        <span>23. No serviço de consulta de imagens (H83), quais são os tipos de imagem retornados para face e digitais?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Significado do Status &quot;003&quot; no Serviço H83" data-answer="
+                        <p>O status <span class='tag-info'>&quot;003&quot;</span> no serviço de consulta de imagens (H83) indica um erro.</p>
+                        <p>A mensagem de retorno associada é: <strong>&quot;CPF diverge do cadastro renach&quot;</strong>.</p>
+                    ">
+                        <span>24. O que significa o status &quot;003&quot; no serviço de consulta de imagens (H83)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Códigos de Curso Disponíveis para Envio (H87)" data-answer="
+                        <p>O serviço de envio de cursos concluídos (H87) utiliza o campo <code>codCurso</code>. Alguns dos códigos de curso definidos são:</p>
+                        <ul>
+                            <li><strong>20:</strong> Reciclagem Para Infratores.</li>
+                            <li><strong>31:</strong> Aulas Teóricas - Legislação.</li>
+                            <li><strong>32:</strong> Aulas Práticas 04 Rodas.</li>
+                            <li><strong>34:</strong> Curso Simulador de Direção Veicular.</li>
+                            <li><strong>35:</strong> Curso Preventivo de Reciclagem.</li>
+                        </ul>
+                    ">
+                        <span>25. Quais são alguns dos códigos de curso disponíveis para envio (H87)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Informações Detalhadas Retornadas Após Efetivação de Matrícula (H94)" data-answer="
+                        <p>Em caso de sucesso (<span class='tag-info'>status &quot;000&quot;</span>), o serviço de efetivação de matrícula (H94) retorna uma ampla gama de dados do candidato, incluindo:</p>
+                        <ul>
+                            <li><code>renach</code> e <code>nomeCandidato</code>.</li>
+                            <li><code>categoria Atual</code> e <code>categoria Pretendida</code>.</li>
+                            <li>Datas como <code>dataEmissaoLadv</code> e <code>dataVencimentoLadv</code>.</li>
+                            <li>Flags como <code>flagLaudo Medico</code> e <code>flagPhs</code> (Programa Habilitação Social).</li>
+                            <li>Informações pessoais como <code>dataNascimento</code>, <code>codigoSexo</code>, <code>nomePai</code> e <code>nomeMae</code>.</li>
+                            <li>Detalhes de endereço (<code>tipoLogradouro</code>, <code>nomeLogradouro</code>, <code>bairro Endereco</code>, <code>codMunicEndereco</code>).</li>
+                        </ul>
+                    ">
+                        <span>26. Quais informações detalhadas sobre o candidato são retornadas após a efetivação da matrícula no CFC (H94)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" data-title="Erros de Validação para Parâmetros Faltantes (Consulta de Instrutor - J18)" data-answer="
+                        <p>O serviço de consulta de instrutor pode ministrar aula (J18) retorna mensagens específicas para parâmetros não informados:</p>
+                        <ul>
+                            <li><strong>Status 013:</strong> Código do curso não informado.</li>
+                            <li><strong>Status 033:</strong> CNPJ da entidade não informado.</li>
+                            <li><strong>Status 034:</strong> CPF do instrutor não informado.</li>
+                        </ul>
+                    ">
+                        <span>27. Quais erros de validação são retornados se faltarem parâmetros na consulta de instrutor (J18)?</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="faqModalOverlay" class="modal-overlay">
+        <div id="faqModalContent" class="modal-content">
+            <div class="modal-header" id="modalTitle"></div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="modal-close-btn" id="modalCloseButton">Fechar <i class="fas fa-times-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lógica para alternar abas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Desativa todas as abas e conteúdos
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                    // Ativa a aba clicada e o conteúdo correspondente
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Lógica para FAQ (usando Pop-up)
+            const modalOverlay = document.getElementById('faqModalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalCloseButton = document.getElementById('modalCloseButton');
+            
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', () => {
+                    const titleText = question.querySelector('span').textContent;
+                    const answerContent = question.getAttribute('data-answer');
+                    
+                    // Preenche e exibe o modal
+                    modalTitle.textContent = titleText;
+                    modalBody.innerHTML = answerContent;
+                    modalOverlay.classList.add('active');
+                    
+                    // Garante que o modal seja exibido com flex
+                    modalOverlay.style.display = 'flex'; 
+                });
+            });
+
+            // Lógica para fechar o modal
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+                modalOverlay.style.display = 'none';
+            }
+
+            modalCloseButton.addEventListener('click', closeModal);
+            
+            // Fechar ao clicar fora do conteúdo (overlay)
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            // Fechar ao pressionar a tecla ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            // Ativa a primeira aba ao carregar
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        });
+    </script>
+</body>
+</html>
