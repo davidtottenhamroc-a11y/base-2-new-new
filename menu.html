@@ -946,8 +946,11 @@
             try {
                 const response = await fetch(N8N_AI_WEBHOOK_URL, {
                     method: 'POST',
-                    // RESTAURANDO A LEITURA: Removendo 'mode: no-cors'
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        // CORREÇÃO DE SEGURANÇA: Adiciona o header de autenticação
+                        'X-Custom-Secret': 'Tottenham0724' 
+                    },
                     body: JSON.stringify({
                         query: messageText,
                         estado: estadoFilter,
@@ -958,13 +961,16 @@
                 // TENTAR LER A RESPOSTA JSON DE VOLTA:
                 if (response.ok) {
                     const data = await response.json();
-                    // Assumindo que o n8n retorna { response: "resposta formatada" }
                     const botResponse = data.response || "A busca retornou um resultado vazio. Tente refinar a pergunta.";
                     appendMessageToAI(botResponse, 'bot-message');
                 } else {
-                    // Se o n8n retornar um status de erro (4xx, 5xx)
+                    // Se o n8n retornar um status de erro (4xx, 5xx), pode ser falha de AUTH
                     const errorText = await response.text();
-                    appendMessageToAI(`[ERRO N8N] O fluxo retornou um erro (Status: ${response.status}). Verifique as execuções no n8n.`, 'bot-message');
+                    if (response.status === 401 || response.status === 403) {
+                         appendMessageToAI(`[ERRO DE AUTENTICAÇÃO 🔑] O acesso ao n8n foi negado. Verifique se o header 'X-Custom-Secret' está configurado corretamente no Webhook.`, 'bot-message');
+                    } else {
+                         appendMessageToAI(`[ERRO N8N] O fluxo retornou um erro (Status: ${response.status}). Verifique as execuções no n8n.`, 'bot-message');
+                    }
                     console.error('N8N Error:', errorText);
                 }
 
@@ -1014,6 +1020,143 @@
             document.getElementById('ai-chat-send-btn').disabled = false;
             document.getElementById('ai-chat-input').focus();
         }
+        
+        // ----------------------------------------------------------------------------------
+        // --- CÓDIGO DO NÓ CODE IN JAVASCRIPT (Deve ser copiado para o n8n) ---
+        // ----------------------------------------------------------------------------------
+
+        /*
+        
+        // Este é o código que deve ser COLADO no nó Code in JavaScript do n8n (no modo 'Run Once for All Items').
+
+        // Acessa a lista completa de itens de input
+        const allItems = $input.all();
+
+        // Acessa a consulta do Webhook (Assumindo que o Merge coloca a query no primeiro item)
+        // Usamos .all()[0] para acessar o primeiro item da coleção no modo 'Run Once for All Items'
+        const webhookData = allItems[0]?.json?.body || {};
+        const rawQuery = webhookData.query || '';
+        const estadoFilter = (webhookData.estado || '').toUpperCase();
+        let responseMessage = '';
+
+        // 1. Unificar TODAS as Fontes de Dados (Desempacotando os 3 inputs do Merge)
+        let documentPool = [];
+
+        // Funções utilitárias para desempacotar
+        const getJsonData = (inputItem) => {
+            if (!inputItem || !inputItem.json) return [];
+            
+            // Se for um Array (comum em nós HTTP)
+            if (Array.isArray(inputItem.json)) {
+                return inputItem.json;
+            }
+            
+            // Se for um Objeto (comum em Webhooks), pode ser necessário ajustá-lo
+            return [inputItem.json];
+        };
+
+        // --- Itera sobre todos os itens de Input (incluindo Webhook, APIs e Cache) ---
+        for (let i = 0; i < allItems.length; i++) {
+            const item = allItems[i];
+            
+            // Tentativa de ler JSON do item (funciona para HTTP Request e para o Webhook)
+            documentPool.push(...getJsonData(item));
+
+            // Tratamento específico para o Cache HTML BINÁRIO do Read File
+            if (item.binary && item.binary.conteudo) { // Verifica a propriedade binária 'conteudo'
+                try {
+                    // O binário do 'Convert to File' deve ser lido
+                    const htmlJsonBuffer = item.binary.conteudo; 
+                    const htmlJsonString = htmlJsonBuffer.toString('utf8');
+                    const htmlData = JSON.parse(htmlJsonString);
+                    
+                    // Adiciona o conteúdo do arquivo
+                    if (Array.isArray(htmlData)) {
+                        documentPool.push(...htmlData);
+                    } else if (typeof htmlData === 'object' && htmlData !== null) {
+                        documentPool.push(htmlData);
+                    }
+
+                } catch (e) {
+                    console.error("Erro ao ler ou parsear o cache HTML binário:", e);
+                }
+            }
+        }
+
+
+        // 2. Validação e Pré-processamento
+        if (documentPool.length === 0) {
+            responseMessage = "ERRO: Base de conhecimento vazia. Verifique se o cache HTML foi lido corretamente e se as APIs (Docs/Memories) retornaram dados.";
+            return [{ json: { response: responseMessage } }];
+        }
+
+        if (!rawQuery) {
+            responseMessage = "Por favor, forneça uma consulta (query) para que eu possa pesquisar.";
+            return [{ json: { response: responseMessage } }];
+        }
+
+        // Normalização da consulta e extração de palavras-chave
+        const normalizedQuery = rawQuery.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        // CORREÇÃO DE BUSCA: Permite palavras com 2 ou mais caracteres (ex: RN, DF, Web, Job)
+        const keywords = normalizedQuery.split(/\s+/).filter(w => w.length >= 2); 
+
+        // 3. Execução da Busca, Filtro e Pontuação (Relevância)
+        const MAX_RESULTS = 7;
+        let matchingResults = documentPool.map(doc => {
+            let score = 0;
+            const searchField = ((doc.titulo || '') + ' ' + (doc.texto || '')).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            const docEstado = (doc.estado || 'TODOS').toUpperCase();
+
+            // Filtro Imediato por Estado
+            if (estadoFilter && estadoFilter !== 'TODOS' && docEstado !== estadoFilter) {
+                return null;
+            }
+
+            // Pontuação por Palavras-Chave
+            if (keywords.length > 0) {
+                keywords.forEach(keyword => {
+                    if (doc.titulo && doc.titulo.toLowerCase().includes(keyword)) score += 5;
+                    if (searchField.includes(keyword)) score += 2;
+                });
+                
+                const allKeywordsMatch = keywords.every(keyword => searchField.includes(keyword));
+                if (allKeywordsMatch) score += 10;
+            }
+            
+            if (score === 0) return null;
+
+            return { ...doc, _score: score };
+        }).filter(doc => doc !== null)
+        .sort((a, b) => b._score - a._score);
+
+
+        // 4. Formatação dos Resultados (Mensagem Final)
+        if (matchingResults.length === 0) {
+            responseMessage = `Desculpe, não encontrei referências relevantes para "${rawQuery}" no estado ${estadoFilter || 'TODOS'} em nenhuma das fontes.`;
+        } else {
+            // Limita e formata os MAX_RESULTS
+            const formattedList = matchingResults.slice(0, MAX_RESULTS).map((doc, index) => {
+                const title = doc.titulo || 'Trecho sem Título';
+                const contentPreview = (doc.texto || 'Conteúdo indisponível.').substring(0, 150) + '...';
+                const source = doc.fonte || (doc.agente ? 'Memória' : 'Cache Local');
+                
+                return `**${index + 1}. [${doc.estado || 'TODOS'}] ${title}**\n${contentPreview} (Fonte: ${source})`;
+            }).join('\n\n---\n\n');
+
+            const total = matchingResults.length;
+            responseMessage = `Encontrei **${total}** referências relevantes. As ${Math.min(MAX_RESULTS, total)} principais são:\n\n${formattedList}`;
+        }
+
+        // 5. Retorna o Objeto para o Nó Respond to Webhook
+        return [{ 
+            json: { 
+                response: responseMessage 
+            } 
+        }];
+        
+        */
+        // ----------------------------------------------------------------------------------
+
     </script>
 </body>
 </html>
