@@ -17,6 +17,7 @@
         }
     </script>
     <style>
+        /* Estilos Globais */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -43,6 +44,7 @@
             margin-bottom: 30px;
         }
 
+        /* Estilos Header, Grid e Logout (Mantidos) */
         header {
             background: #2c3e50;
             color: white;
@@ -76,7 +78,7 @@
 
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adaptado para cards menores de estado */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
         }
 
@@ -90,10 +92,10 @@
             color: #333;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centraliza conteúdo para cards de estado */
+            align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 120px; /* Altura mínima para melhor visualização */
+            min-height: 120px;
         }
 
         .menu-card:hover {
@@ -103,20 +105,20 @@
         }
 
         .card-icon {
-            font-size: 35px; /* Ícone um pouco menor */
+            font-size: 35px;
             color: #3498db;
             margin-bottom: 10px;
         }
 
         .card-icon img {
-            width: 50px;       /* tamanho da imagem */
-            height: 50px;      /* ajuste conforme o layout */
-            object-fit: cover; /* evita distorção */
-            border-radius: 12px; /* arredonda as bordas (opcional) */
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 12px;
         }
         
         .card-title {
-            font-size: 16px; /* Título menor para se ajustar */
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 5px;
         }
@@ -148,8 +150,8 @@
             background: linear-gradient(135deg, #c82333, #a71d24);
         }
 
-        /* --- Estilos do Chatbot (Mantidos) --- */
-        #chat-widget-container {
+        /* --- Estilos Comuns do Chatbot --- */
+        #chat-widget-container, #ai-chat-widget-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -177,7 +179,8 @@
             overflow: hidden;
         }
         
-        #chat-header {
+        /* Adaptação para headers dos chats */
+        #chat-header, #ai-chat-header {
             background: #3498db;
             color: white;
             padding: 12px 20px;
@@ -187,8 +190,13 @@
             justify-content: space-between;
             align-items: center;
         }
-        #chat-header i { margin-right: 10px; }
-        #chat-close-btn {
+        #ai-chat-header {
+            background: #e67e22; /* Cor diferente para o chat IA */
+        }
+        
+        #chat-header i, #ai-chat-header i { margin-right: 10px; }
+        
+        #chat-close-btn, #ai-chat-close-btn {
             background: none;
             border: 1px solid white; 
             border-radius: 50%;
@@ -200,14 +208,16 @@
             transition: background 0.2s;
         }
         #chat-close-btn:hover { background: #2980b9; }
+        #ai-chat-close-btn:hover { background: #d35400; }
 
-        #chat-body {
+        #chat-body, #ai-chat-body {
             display: flex;
             flex-direction: column;
             height: 100%;
             padding: 15px;
         }
-        #chat-messages {
+        
+        #chat-messages, #ai-chat-messages {
             flex-grow: 1;
             overflow-y: auto;
             padding: 10px;
@@ -216,7 +226,7 @@
             margin-bottom: 12px;
         }
         
-        /* Estilização das Mensagens Aprimorada */
+        /* Estilização das Mensagens Aprimorada (Aplicada a ambos) */
         .message {
             max-width: 90%; 
             padding: 12px 18px;
@@ -255,14 +265,15 @@
             line-height: 1.3;
         }
 
-        #chat-input-container {
+        #chat-input-container, #ai-chat-input-container {
             display: flex;
             align-items: center;
             gap: 8px;
             padding: 6px 0;
             border-top: 1px solid #ddd;
         }
-        #estado-filter {
+        
+        #estado-filter, #ai-estado-filter {
             padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid #ccc;
@@ -270,7 +281,8 @@
             width: 120px;
             background: white;
         }
-        #chat-input {
+        
+        #chat-input, #ai-chat-input {
             flex-grow: 1;
             padding: 12px 20px;
             border: 1px solid #ccc;
@@ -279,8 +291,9 @@
             font-size: 16px;
             transition: border-color 0.2s;
         }
-        #chat-input:focus { border-color: #3498db; outline: none; }
-        #chat-send-btn {
+        #chat-input:focus, #ai-chat-input:focus { border-color: #3498db; outline: none; }
+        
+        #chat-send-btn, #ai-chat-send-btn {
             background: #28a745;
             color: white;
             border: none;
@@ -291,8 +304,8 @@
             font-size: 18px;
             transition: background 0.3s, transform 0.1s;
         }
-        #chat-send-btn:hover { background: #218838; }
-        #chat-send-btn:active { transform: scale(0.95); }
+        #chat-send-btn:hover, #ai-chat-send-btn:hover { background: #218838; }
+        #chat-send-btn:active, #ai-chat-send-btn:active { transform: scale(0.95); }
 
         .chat-button {
             padding: 8px 12px;
@@ -321,11 +334,11 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Estilo do Botão Flutuante --- */
+        /* --- Estilo dos Botões Flutuantes (Adaptado) --- */
         #chat-open-btn {
             position: fixed;
             bottom: 30px;
-            right: 30px;
+            right: 30px; /* Posição original */
             padding: 15px 20px;
             background: #3498db;
             color: white;
@@ -339,6 +352,24 @@
         }
         #chat-open-btn i { margin-right: 8px; }
 
+        /* NOVO ESTILO para o botão da IA */
+        #chat-open-ai-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 210px; /* Deslocado para a esquerda para caber ao lado do outro botão */
+            padding: 15px 20px;
+            background: #e67e22; /* Laranja para destacar a IA */
+            color: white;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        #chat-open-ai-btn i { margin-right: 8px; }
+
         mark { background: #ffe58a; padding: 0 3px; border-radius: 2px; }
     </style>
 </head>
@@ -351,7 +382,7 @@
         </header>
 
         <main>
-               <div class="menu-grid">
+                <div class="menu-grid">
                     <a href="menu_rn.html" class="menu-card">
                 <div class="card-icon">
                     <img src="img/RN.jpeg" alt="Ícone RN">
@@ -452,14 +483,14 @@
                         <p class="card-description">Interface para adicionar e atualizar informações do chatbot por estado (MongoDB).</p>
                     </div>
                 </a>
-                 <a href="menu_doc.html" class="menu-card">
+                    <a href="menu_doc.html" class="menu-card">
                     <div class="card-icon"><i class="fas fa-database"></i></div>
                     <div>
                         <h2 class="card-title">DOC</h2>
                         <p class="card-description">Interface para amarzenamento de documetações internas.</p>
                     </div>
-                </a>   
-            </div>
+                </a> 	
+                </div>
         </main>
         <button class="logout-button" onclick="logout()">Sair</button>
     </div>
@@ -500,16 +531,54 @@
             </div>
         </div>
     </div>
-
+    <div id="ai-chat-widget-container">
+        <div class="chat-content">
+            <div id="ai-chat-header">
+                <div style="display:flex;align-items:center;gap:8px;"><i class="fas fa-brain"></i> Assistente IA Avançado (n8n)</div>
+                <button id="ai-chat-close-btn" onclick="toggleAIChat()">X</button>
+            </div>
+            <div id="ai-chat-body">
+                <div id="ai-chat-messages">
+                    <div class="message bot-message">
+                        Olá! Eu sou o assistente avançado alimentado pelo **n8n e IA**. Eu busco informações em **toda a documentação (incluindo PDFs/HTML)** armazenada no DOC!
+                    </div>
+                </div>
+                <div id="ai-chat-input-container">
+                    <select id="ai-estado-filter">
+                        <option value="">Todos os estados</option>
+                        <option value="RN">RN</option>
+                        <option value="SE">SE</option>
+                        <option value="MS">MS</option>
+                        <option value="DF">DF</option>
+                        <option value="PE">PE</option>
+                        <option value="PB">PB</option>
+                        <option value="BA">BA</option>
+                        <option value="MG">MG</option>
+                        <option value="GO">GO</option>
+                        <option value="MA">MA</option>
+                        <option value="AL">AL</option>
+                        <option value="CE">CE</option>
+                        <option value="TODOS">TODOS</option>
+                    </select>
+                    <input type="text" id="ai-chat-input" placeholder="Pergunte sobre qualquer documento ou procedimento...">
+                    <button id="ai-chat-send-btn" onclick="sendAIMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
     <button id="chat-open-btn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i> Chat N2</button>
-
+    <button id="chat-open-ai-btn" onclick="toggleAIChat()"><i class="fas fa-brain"></i> IA Avançada</button>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
 
     <script>
-        // Variáveis Globais para o Chatbot (Lógica Mantida)
-        let chatMemories = [];
+        // --- CONFIGURAÇÕES DE URL E ESTADOS ---
+        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
+        const N8N_AI_WEBHOOK_URL = 'https://basen2.app.n8n.cloud/webhook/ai-query'; 
+
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
+        // --- Variáveis e Lógica do Chat CLÁSSICO (Mantidas) ---
+        let chatMemories = [];
         const SYNONYM_MAP = {
             'endpoint': ['api', 'servico', 'url', 'acesso', 'integracao'],
             'sla': ['prazo', 'tempo', 'critico', 'atendimento'],
@@ -521,7 +590,6 @@
             'veiculos': ['veículo', 'carro', 'automovel', 'placa'],
             'aula': ['aulas', 'licao', 'lição', 'pratica', 'prática']
         };
-
         const STOP_WORDS_PT = [
             'a', 'o', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da', 'dos', 'das', 'e', 'é', 'ou',
             'para', 'com', 'sem', 'em', 'por', 'sobre', 'sob', 'até', 'ao', 'aos', 'à', 'às',
@@ -530,21 +598,19 @@
             'oii', 'oi', 'ola', 'bom', 'dia', 'tarde', 'noite', 'sobre', 'me', 'meu', 'queria', 'gostaria'
         ];
 
-        const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
-
         let fuse = null;
         let memoriesIndex = []; 
         let lastResults = []; 
         let resultsPage = 0;
         const PAGE_SIZE = 3;
         let lastQueryKeywords = [];
-
-        // FUNÇÃO LOGOUT ATUALIZADA para remover a flag de login
+        
+        // Funções de login, toggleChat e helpers (normalize, expandTerms, highlight)
         function logout() {
             localStorage.removeItem('agenteSelecionado');
             localStorage.removeItem('estadoSelecionado');
-            localStorage.removeItem('agenteLogado');      // Limpa a credencial
-            localStorage.removeItem('isLoggedIn');        // Limpa a flag de logado
+            localStorage.removeItem('agenteLogado');
+            localStorage.removeItem('isLoggedIn');
             window.location.href = 'login.html';
         }
 
@@ -555,7 +621,7 @@
             if (chatWidget.style.display === 'flex') {
                 chatWidget.style.display = 'none';
                 openBtn.style.display = 'block';
-                document.body.style.overflow = 'auto';
+                document.body.style.overflow = (document.getElementById('ai-chat-widget-container').style.display === 'flex') ? 'hidden' : 'auto';
             } else {
                 chatWidget.style.display = 'flex';
                 openBtn.style.display = 'none';
@@ -563,14 +629,7 @@
                 document.getElementById('chat-input').focus();
             }
         }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && document.getElementById('chat-widget-container').style.display === 'flex') {
-                toggleChat();
-            }
-        });
-
-        // --- Helpers de texto e busca (Lógica Mantida) ---
+        
         function normalizeText(t) {
             return (t || '')
                 .normalize('NFD').replace(/[̀-\u036f]/g, '')
@@ -583,7 +642,6 @@
         function expandTerms(terms) {
             const expanded = new Set();
             const stateTokens = VALID_STATES.map(s => s.toLowerCase());
-            
             for (const t of terms) {
                 expanded.add(t);
                 if (!stateTokens.includes(t)) {
@@ -604,9 +662,13 @@
             return out;
         }
 
-        // --- Carregamento da Base de Dados (Lógica Mantida) ---
+        // Funções de carregamento de memória, send/append message, e getBotResponse (CLÁSSICO)
+        // ... (Mantenha as funções loadMemoriesFromDatabase, sendMessage, appendMessage, showTypingIndicator, hideTypeningIndicator, getBotResponse, formatResultsPage, showMoreResults, showFullMemory, sendFeedback) ...
+        
+        // --- LÓGICA DO CHAT CLÁSSICO (COPIADAS) ---
+        
         async function loadMemoriesFromDatabase() {
-            appendConsoleLog(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
+            console.log(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
             try {
                 const response = await fetch(`${BACKEND_URL}/api/memories`);
                 if (response.ok) {
@@ -633,7 +695,7 @@
                         useExtendedSearch: true
                     };
                     fuse = new Fuse(memoriesIndex, options);
-                    appendConsoleLog(`[MongoDB] ${memoriesIndex.length} memórias indexadas com Fuse.`);
+                    console.log(`[MongoDB] ${memoriesIndex.length} memórias indexadas com Fuse.`);
                 } else {
                     appendMessage(`[ERRO ${response.status}] A API retornou um status de erro. O backend Vercel pode estar inativo ou ter falhado ao conectar ao MongoDB.`, 'bot-message');
                 }
@@ -642,14 +704,13 @@
                 appendMessage(`[ERRO DE CONEXÃO] Não foi possível acessar o backend Vercel em **${BACKEND_URL}**. Verifique se a URL está correta e se o projeto está implantado e ativo.`, 'bot-message');
             }
         }
-
+        
         document.addEventListener('DOMContentLoaded', async () => {
-            // Garante que o botão de chat só aparece após o carregamento da base
             await loadMemoriesFromDatabase();
             document.getElementById('chat-open-btn').style.display = 'block';
+            document.getElementById('chat-open-ai-btn').style.display = 'block'; // Mostra os dois botões
         });
 
-        // --- Funções de Chatbot (Lógica Mantida) ---
         document.getElementById('chat-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendMessage();
         });
@@ -688,10 +749,6 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function appendConsoleLog(text) {
-            console.log(text);
-        }
-
         function showTypingIndicator() {
             const messagesContainer = document.getElementById('chat-messages');
             const typingDiv = document.createElement('div');
@@ -712,7 +769,6 @@
             document.getElementById('chat-input').focus();
         }
 
-        // --- Lógica de Resposta do Chatbot (Lógica Mantida) ---
         function getBotResponse(message) {
             const estadoFilter = (document.getElementById('estado-filter')?.value || '').toUpperCase();
             const raw = message.trim();
@@ -843,10 +899,120 @@
                 appendMessage('Erro ao enviar feedback.', 'bot-message');
             }
         }
+        
+        // --- FIM LÓGICA DO CHAT CLÁSSICO ---
+
+
+        // ----------------------------------------
+        // --- LÓGICA DO NOVO CHATBOT IA (n8n) ---
+        // ----------------------------------------
+
+        function toggleAIChat() {
+            const chatWidget = document.getElementById('ai-chat-widget-container');
+            const openBtn = document.getElementById('chat-open-ai-btn');
+
+            if (chatWidget.style.display === 'flex') {
+                chatWidget.style.display = 'none';
+                openBtn.style.display = 'block';
+                // Garante que o scroll do corpo volte ao normal se o outro chat também estiver fechado
+                if (document.getElementById('chat-widget-container').style.display !== 'flex') {
+                    document.body.style.overflow = 'auto';
+                }
+            } else {
+                chatWidget.style.display = 'flex';
+                openBtn.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+                document.getElementById('ai-chat-input').focus();
+            }
+        }
+
+        document.getElementById('ai-chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendAIMessage();
+        });
+
+        async function sendAIMessage() {
+            const input = document.getElementById('ai-chat-input');
+            const messageText = input.value.trim();
+
+            if (messageText === '') return;
+
+            // 1. Mostrar a mensagem do usuário
+            appendMessageToAI(messageText, 'user-message');
+            input.value = '';
+            
+            // 2. Mostrar indicador e desabilitar input
+            showAITypingIndicator();
+
+            const estadoFilter = (document.getElementById('ai-estado-filter')?.value || '').toUpperCase();
+            const agente = localStorage.getItem('agenteLogado') || 'desconhecido';
+            
+            try {
+                const response = await fetch(N8N_AI_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: messageText,
+                        estado: estadoFilter,
+                        user: agente
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Assumindo que o n8n retorna { response: "resposta gerada pela IA" }
+                    const botResponse = data.response || "A IA não conseguiu gerar uma resposta. Tente refinar a sua pergunta.";
+                    appendMessageToAI(botResponse, 'bot-message');
+                } else {
+                    const errorText = await response.text();
+                    appendMessageToAI(`[ERRO N8N] Falha ao consultar serviço de IA (Status: ${response.status}). Verifique o fluxo no n8n.`, 'bot-message');
+                    console.error('N8N Error:', errorText);
+                }
+
+            } catch (error) {
+                console.error('Erro ao chamar webhook n8n:', error);
+                appendMessageToAI(`[ERRO DE CONEXÃO] Falha ao comunicar com o n8n em **${N8N_AI_WEBHOOK_URL}**.`, 'bot-message');
+            } finally {
+                hideAITypeningIndicator();
+            }
+        }
+
+        function appendMessageToAI(text, className) {
+            const messagesContainer = document.getElementById('ai-chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            
+            // Reutilizando a lógica de formatação de texto
+            const codeBlockRegex = /(```json|```|\{)\n?([\s\S]*?)(\n?```|\n\})/g;
+            let processedText = text.replace(codeBlockRegex, (match, openTag, content, closeTag) => {
+                content = content.replace(/```json|```|{|}/g, '').trim();
+                return `\n<pre>${content}</pre>\n`;
+            });
+            processedText = processedText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            messageDiv.innerHTML = processedText;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showAITypingIndicator() {
+            const messagesContainer = document.getElementById('ai-chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-indicator';
+            typingDiv.id = 'ai-typing-indicator';
+            typingDiv.innerHTML = 'IA processando documentos...';
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            document.getElementById('ai-chat-input').disabled = true;
+            document.getElementById('ai-chat-send-btn').disabled = true;
+        }
+
+        function hideAITypeningIndicator() {
+            const typingIndicator = document.getElementById('ai-typing-indicator');
+            if (typingIndicator) typingIndicator.remove();
+            document.getElementById('ai-chat-input').disabled = false;
+            document.getElementById('ai-chat-send-btn').disabled = false;
+            document.getElementById('ai-chat-input').focus();
+        }
     </script>
 </body>
-
 </html>
-
-
-
