@@ -540,7 +540,7 @@
             <div id="ai-chat-body">
                 <div id="ai-chat-messages">
                     <div class="message bot-message">
-                        Olá! Eu sou o assistente avançado alimentado pelo **n8n e IA**. Eu busco informações em **toda a documentação (incluindo PDFs/HTML)** armazenada no DOC!
+                        Olá! Eu sou o assistente avançado alimentado pelo **n8n**. Eu busco informações em **toda a documentação (incluindo PDFs/HTML)** armazenada no DOC!
                     </div>
                 </div>
                 <div id="ai-chat-input-container">
@@ -573,7 +573,7 @@
     <script>
         // --- CONFIGURAÇÕES DE URL E ESTADOS ---
         const BACKEND_URL = 'https://base-2-new-new-9xow.vercel.app';
-        const N8N_AI_WEBHOOK_URL = 'https://basen2.app.n8n.cloud/webhook/ai-query'; 
+        const N8N_AI_WEBHOOK_URL = 'https://basen2.app.n8n.cloud/webhook/ai-query'; // Seu Webhook n8n
 
         const VALID_STATES = ['RN', 'DF', 'SE', 'MS', 'PE', 'PB', 'BA', 'MG', 'GO', 'MA', 'AL', 'CE', 'TODOS'];
 
@@ -663,9 +663,6 @@
         }
 
         // Funções de carregamento de memória, send/append message, e getBotResponse (CLÁSSICO)
-        // ... (Mantenha as funções loadMemoriesFromDatabase, sendMessage, appendMessage, showTypingIndicator, hideTypeningIndicator, getBotResponse, formatResultsPage, showMoreResults, showFullMemory, sendFeedback) ...
-        
-        // --- LÓGICA DO CHAT CLÁSSICO (COPIADAS) ---
         
         async function loadMemoriesFromDatabase() {
             console.log(`Tentando carregar memórias de: ${BACKEND_URL}/api/memories`);
@@ -949,7 +946,10 @@
             try {
                 const response = await fetch(N8N_AI_WEBHOOK_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    // SOLUÇÃO DE CONTORNO CORS: IMPEDE A LEITURA DA RESPOSTA NO FRONTEND
+                    mode: 'no-cors', 
+                    // REMOVEMOS O HEADER Content-Type, pois 'no-cors' não permite
+                    // headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify({
                         query: messageText,
                         estado: estadoFilter,
@@ -957,20 +957,16 @@
                     })
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    // Assumindo que o n8n retorna { response: "resposta gerada pela IA" }
-                    const botResponse = data.response || "A IA não conseguiu gerar uma resposta. Tente refinar a sua pergunta.";
-                    appendMessageToAI(botResponse, 'bot-message');
-                } else {
-                    const errorText = await response.text();
-                    appendMessageToAI(`[ERRO N8N] Falha ao consultar serviço de IA (Status: ${response.status}). Verifique o fluxo no n8n.`, 'bot-message');
-                    console.error('N8N Error:', errorText);
-                }
+                // ATENÇÃO: Com 'no-cors', não é possível ler o status ou o corpo (response.json())
+                // Portanto, assumimos sucesso se não houver um erro de rede no catch
+                
+                // Mensagem de Feedback de Contorno
+                appendMessageToAI("✅ Solicitação de busca enviada ao n8n. Por favor, verifique o painel 'Executions' do n8n para ver o resultado da busca (o navegador impede a leitura da resposta).", 'bot-message');
+
 
             } catch (error) {
                 console.error('Erro ao chamar webhook n8n:', error);
-                appendMessageToAI(`[ERRO DE CONEXÃO] Falha ao comunicar com o n8n em **${N8N_AI_WEBHOOK_URL}**.`, 'bot-message');
+                appendMessageToAI(`[ERRO DE REDE FATAL] O navegador bloqueou a comunicação. O n8n Cloud não está permitindo a requisição, mesmo com 'no-cors'.`, 'bot-message');
             } finally {
                 hideAITypeningIndicator();
             }
@@ -999,7 +995,7 @@
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message bot-message typing-indicator';
             typingDiv.id = 'ai-typing-indicator';
-            typingDiv.innerHTML = 'IA processando documentos...';
+            typingDiv.innerHTML = 'n8n está processando documentos...';
             messagesContainer.appendChild(typingDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             document.getElementById('ai-chat-input').disabled = true;
