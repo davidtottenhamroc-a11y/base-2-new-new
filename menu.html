@@ -946,10 +946,8 @@
             try {
                 const response = await fetch(N8N_AI_WEBHOOK_URL, {
                     method: 'POST',
-                    // SOLUÇÃO DE CONTORNO CORS: IMPEDE A LEITURA DA RESPOSTA NO FRONTEND
-                    mode: 'no-cors', 
-                    // REMOVEMOS O HEADER Content-Type, pois 'no-cors' não permite
-                    // headers: { 'Content-Type': 'application/json' }, 
+                    // RESTAURANDO A LEITURA: Removendo 'mode: no-cors'
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         query: messageText,
                         estado: estadoFilter,
@@ -957,16 +955,23 @@
                     })
                 });
 
-                // ATENÇÃO: Com 'no-cors', não é possível ler o status ou o corpo (response.json())
-                // Portanto, assumimos sucesso se não houver um erro de rede no catch
-                
-                // Mensagem de Feedback de Contorno
-                appendMessageToAI("✅ Solicitação de busca enviada ao n8n. Por favor, verifique o painel 'Executions' do n8n para ver o resultado da busca (o navegador impede a leitura da resposta).", 'bot-message');
-
+                // TENTAR LER A RESPOSTA JSON DE VOLTA:
+                if (response.ok) {
+                    const data = await response.json();
+                    // Assumindo que o n8n retorna { response: "resposta formatada" }
+                    const botResponse = data.response || "A busca retornou um resultado vazio. Tente refinar a pergunta.";
+                    appendMessageToAI(botResponse, 'bot-message');
+                } else {
+                    // Se o n8n retornar um status de erro (4xx, 5xx)
+                    const errorText = await response.text();
+                    appendMessageToAI(`[ERRO N8N] O fluxo retornou um erro (Status: ${response.status}). Verifique as execuções no n8n.`, 'bot-message');
+                    console.error('N8N Error:', errorText);
+                }
 
             } catch (error) {
+                // Se houver falha de rede/JSON (o que acontecia com o CORS)
                 console.error('Erro ao chamar webhook n8n:', error);
-                appendMessageToAI(`[ERRO DE REDE FATAL] O navegador bloqueou a comunicação. O n8n Cloud não está permitindo a requisição, mesmo com 'no-cors'.`, 'bot-message');
+                appendMessageToAI(`[ERRO DE CONEXÃO] Falha na rede. O n8n Cloud pode ter bloqueado a requisição novamente.`, 'bot-message');
             } finally {
                 hideAITypeningIndicator();
             }
